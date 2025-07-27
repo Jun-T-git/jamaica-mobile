@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import {
   View,
-  Text,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
@@ -10,7 +9,8 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useGameStore } from '../store/gameStore';
 import { GameMode } from '../types';
-import { COLORS } from '../constants';
+import { ModernDesign } from '../constants';
+import { Typography } from '../components/ui/Typography';
 
 interface ModeSelectionScreenProps {
   navigation: any;
@@ -28,91 +28,98 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({ naviga
     navigation.navigate(mode === GameMode.CHALLENGE ? 'ChallengeMode' : 'InfiniteMode');
   };
 
+
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.BACKGROUND} />
+      <StatusBar barStyle="light-content" backgroundColor={ModernDesign.colors.background.primary} />
       
+      {/* Header with improved typography */}
       <View style={styles.header}>
-        <Text style={styles.title}>モダンジャマイカ</Text>
-        <Text style={styles.subtitle}>5つの数字で目標を作ろう！</Text>
+        <Typography variant="h2" textAlign="center" style={styles.title}>
+          数字パズル
+        </Typography>
+        <Typography variant="body1" color="secondary" textAlign="center" style={styles.subtitle}>
+          5つの数字で目標を作ろう
+        </Typography>
       </View>
 
+      {/* Game Mode Selection */}
       <View style={styles.modesContainer}>
+        
+        {/* Challenge Mode Button */}
         <TouchableOpacity
-          style={[styles.modeCard, styles.challengeCard]}
           onPress={() => handleModeSelect(GameMode.CHALLENGE)}
+          style={styles.modeButton}
           activeOpacity={0.8}
         >
-          <Text style={styles.modeTitle}>チャレンジモード</Text>
-          <Text style={styles.modeDescription}>
-            時間制限内に何問解けるか挑戦！
-          </Text>
-          <View style={styles.modeFeatures}>
-            <View style={styles.featureRow}>
-              <MaterialIcons name="timer" size={16} color={COLORS.CARD} />
-              <Text style={styles.modeFeature}>制限時間あり</Text>
+          <View style={styles.modeContent}>
+            <View style={styles.modeIconContainer}>
+              <MaterialIcons name="timer" size={28} color={ModernDesign.colors.accent.neon} />
             </View>
-            <View style={styles.featureRow}>
-              <MaterialIcons name="gps-fixed" size={16} color={COLORS.CARD} />
-              <Text style={styles.modeFeature}>スコア競争</Text>
+            <View style={styles.modeTextContainer}>
+              <Typography variant="h4" style={styles.modeTitle}>
+                チャレンジモード
+              </Typography>
+              <Typography variant="body2" color="secondary" style={styles.modeDescription}>
+                時間制限内に何問解けるか挑戦
+              </Typography>
             </View>
-            <View style={styles.featureRow}>
-              <MaterialIcons name="autorenew" size={16} color={COLORS.CARD} />
-              <Text style={styles.modeFeature}>リセット機能</Text>
+            <View style={styles.modeArrow}>
+              <MaterialIcons name="arrow-forward-ios" size={20} color={ModernDesign.colors.text.tertiary} />
             </View>
           </View>
           {challengeHighScore > 0 && (
-            <View style={styles.highScoreContainer}>
-              <MaterialIcons name="emoji-events" size={20} color={COLORS.CARD} />
-              <Text style={styles.highScoreText}>ハイスコア: {challengeHighScore}問</Text>
+            <View style={styles.statsBadge}>
+              <MaterialIcons name="emoji-events" size={16} color={ModernDesign.colors.accent.gold} />
+              <Typography variant="caption" color="secondary" style={styles.statsText}>
+                ベスト: {challengeHighScore}問
+              </Typography>
             </View>
           )}
         </TouchableOpacity>
 
+        {/* Infinite Mode Button */}
         <TouchableOpacity
-          style={[styles.modeCard, styles.infiniteCard]}
           onPress={() => handleModeSelect(GameMode.INFINITE)}
+          style={styles.modeButton}
           activeOpacity={0.8}
         >
-          <Text style={styles.modeTitle}>無限に遊ぶモード</Text>
-          <Text style={styles.modeDescription}>
-            自分のペースでじっくり練習
-          </Text>
-          <View style={styles.modeFeatures}>
-            <View style={styles.featureRow}>
-              <MaterialIcons name="all-inclusive" size={16} color={COLORS.CARD} />
-              <Text style={styles.modeFeature}>時間制限なし</Text>
+          <View style={styles.modeContent}>
+            <View style={styles.modeIconContainer}>
+              <MaterialIcons name="all-inclusive" size={28} color={ModernDesign.colors.accent.neon} />
             </View>
-            <View style={styles.featureRow}>
-              <MaterialIcons name="bar-chart" size={16} color={COLORS.CARD} />
-              <Text style={styles.modeFeature}>統計記録</Text>
+            <View style={styles.modeTextContainer}>
+              <Typography variant="h4" style={styles.modeTitle}>
+                練習モード
+              </Typography>
+              <Typography variant="body2" color="secondary" style={styles.modeDescription}>
+                自分のペースでじっくり練習
+              </Typography>
             </View>
-            <View style={styles.featureRow}>
-              <MaterialIcons name="lightbulb-outline" size={16} color={COLORS.CARD} />
-              <Text style={styles.modeFeature}>ヒント機能</Text>
+            <View style={styles.modeArrow}>
+              <MaterialIcons name="arrow-forward-ios" size={20} color={ModernDesign.colors.text.tertiary} />
             </View>
           </View>
           {infiniteStats && infiniteStats.longestStreak > 0 && (
-            <View style={styles.highScoreContainer}>
-              <MaterialIcons name="local-fire-department" size={20} color={COLORS.CARD} />
-              <Text style={styles.highScoreText}>最長連続正解: {infiniteStats.longestStreak}問</Text>
+            <View style={styles.statsBadge}>
+              <MaterialIcons name="local-fire-department" size={16} color={ModernDesign.colors.accent.coral} />
+              <Typography variant="caption" color="secondary" style={styles.statsText}>
+                最長: {infiniteStats.longestStreak}問連続
+              </Typography>
             </View>
           )}
         </TouchableOpacity>
       </View>
 
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerButton}>
-          <MaterialIcons name="settings" size={20} color={COLORS.TEXT.SECONDARY} />
-          <Text style={styles.footerButtonText}>設定</Text>
+      {/* Bottom Actions */}
+      <View style={styles.bottomActions}>
+        <TouchableOpacity style={styles.actionButton}>
+          <MaterialIcons name="help-outline" size={24} color={ModernDesign.colors.text.secondary} />
+          <Typography variant="caption" color="secondary">ヘルプ</Typography>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <MaterialIcons name="assessment" size={20} color={COLORS.TEXT.SECONDARY} />
-          <Text style={styles.footerButtonText}>統計</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <MaterialIcons name="info" size={20} color={COLORS.TEXT.SECONDARY} />
-          <Text style={styles.footerButtonText}>情報</Text>
+        <TouchableOpacity style={styles.actionButton}>
+          <MaterialIcons name="settings" size={24} color={ModernDesign.colors.text.secondary} />
+          <Typography variant="caption" color="secondary">設定</Typography>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -122,101 +129,90 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({ naviga
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.BACKGROUND,
+    backgroundColor: ModernDesign.colors.background.primary,
   },
   header: {
+    paddingTop: ModernDesign.spacing[16],
+    paddingBottom: ModernDesign.spacing[12],
+    paddingHorizontal: ModernDesign.spacing[6],
     alignItems: 'center',
-    paddingVertical: 40,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: COLORS.TEXT.PRIMARY,
-    marginBottom: 8,
+    marginBottom: ModernDesign.spacing[3],
+    color: ModernDesign.colors.text.primary,
+    fontWeight: ModernDesign.typography.fontWeight.black,
   },
   subtitle: {
-    fontSize: 16,
-    color: COLORS.TEXT.SECONDARY,
+    opacity: 0.6,
+    fontSize: ModernDesign.typography.fontSize.lg,
   },
   modesContainer: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: ModernDesign.spacing[6],
+    paddingTop: ModernDesign.spacing[8],
+    gap: ModernDesign.spacing[4],
+  },
+  modeButton: {
+    backgroundColor: ModernDesign.colors.background.tertiary,
+    borderRadius: ModernDesign.borderRadius['2xl'],
+    padding: ModernDesign.spacing[6],
+    borderWidth: 1,
+    borderColor: ModernDesign.colors.border.subtle,
+    ...ModernDesign.shadows.base,
+  },
+  modeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  modeIconContainer: {
+    width: 56,
+    height: 56,
+    backgroundColor: ModernDesign.colors.background.secondary,
+    borderRadius: ModernDesign.borderRadius.lg,
     justifyContent: 'center',
-    gap: 20,
+    alignItems: 'center',
+    marginRight: ModernDesign.spacing[4],
   },
-  modeCard: {
-    backgroundColor: COLORS.CARD,
-    borderRadius: 20,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  challengeCard: {
-    borderWidth: 2,
-    borderColor: COLORS.CHALLENGE_MODE.PRIMARY,
-  },
-  infiniteCard: {
-    borderWidth: 2,
-    borderColor: COLORS.INFINITE_MODE.PRIMARY,
+  modeTextContainer: {
+    flex: 1,
   },
   modeTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.TEXT.PRIMARY,
-    marginBottom: 8,
+    marginBottom: ModernDesign.spacing[1],
+    fontWeight: ModernDesign.typography.fontWeight.semibold,
+    fontSize: ModernDesign.typography.fontSize['2xl'],
   },
   modeDescription: {
-    fontSize: 16,
-    color: COLORS.TEXT.SECONDARY,
-    marginBottom: 16,
+    fontSize: ModernDesign.typography.fontSize.sm,
+    lineHeight: ModernDesign.typography.fontSize.sm * 1.3,
   },
-  modeFeatures: {
-    gap: 8,
+  modeArrow: {
+    marginLeft: ModernDesign.spacing[2],
   },
-  featureRow: {
+  statsBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-  },
-  modeFeature: {
-    fontSize: 14,
-    color: COLORS.TEXT.SECONDARY,
-  },
-  highScoreContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 16,
-    paddingTop: 16,
+    marginTop: ModernDesign.spacing[4],
+    paddingTop: ModernDesign.spacing[4],
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.2)',
-    gap: 8,
+    borderTopColor: ModernDesign.colors.border.subtle,
+    gap: ModernDesign.spacing[2],
   },
-  highScoreText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: COLORS.CARD,
+  statsText: {
+    fontSize: ModernDesign.typography.fontSize.xs,
+    fontWeight: ModernDesign.typography.fontWeight.medium,
   },
-  footer: {
+  bottomActions: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 20,
+    paddingVertical: ModernDesign.spacing[8],
+    paddingHorizontal: ModernDesign.spacing[6],
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: ModernDesign.colors.border.subtle,
   },
-  footerButton: {
-    padding: 10,
+  actionButton: {
     alignItems: 'center',
-    gap: 4,
-  },
-  footerButtonText: {
-    fontSize: 14,
-    color: COLORS.TEXT.SECONDARY,
+    gap: ModernDesign.spacing[2],
+    paddingVertical: ModernDesign.spacing[3],
+    paddingHorizontal: ModernDesign.spacing[4],
   },
 });

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import Svg, { Line } from 'react-native-svg';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { COLORS } from '../constants';
+import { ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
 import { GameMode, Operator } from '../types';
 
@@ -271,17 +271,17 @@ export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
     } else if (firstNode?.nodeId === node.nodeId) {
       style.push(styles.selectedCell);
     } else if (firstNode && selectedOperator) {
-      style.push({ ...styles.targetCell, backgroundColor: COLORS.CARD });
+      style.push({ ...styles.targetCell, backgroundColor: ModernDesign.colors.background.secondary });
     }
 
     return style;
   };
 
   const operators = [
-    { type: Operator.ADD, label: '+', color: '#10B981' },
-    { type: Operator.SUBTRACT, label: '−', color: '#3B82F6' },
-    { type: Operator.MULTIPLY, label: '×', color: '#F59E0B' },
-    { type: Operator.DIVIDE, label: '÷', color: '#EF4444' },
+    { type: Operator.ADD, label: '+', color: ModernDesign.colors.accent.neon },
+    { type: Operator.SUBTRACT, label: '−', color: ModernDesign.colors.accent.neon },
+    { type: Operator.MULTIPLY, label: '×', color: ModernDesign.colors.accent.neon },
+    { type: Operator.DIVIDE, label: '÷', color: ModernDesign.colors.accent.neon },
   ];
 
   // Calculate edges between parent and child nodes
@@ -427,7 +427,7 @@ export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
                     y1={parentPos.y}
                     x2={childPos.x}
                     y2={childPos.y}
-                    stroke={COLORS.TEXT.LIGHT}
+                    stroke={ModernDesign.colors.border.medium}
                     strokeWidth={3}
                     opacity={0.3}
                   />
@@ -506,7 +506,7 @@ export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
                   styles.operatorButton,
                   selectedOperator === op.type && styles.activeOperator,
                   !firstNode && styles.disabledOperator,
-                  { backgroundColor: op.color },
+                  selectedOperator === op.type && { backgroundColor: op.color },
                 ]}
                 onPress={() => handleOperatorPress(op.type)}
                 disabled={!firstNode}
@@ -535,7 +535,7 @@ export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
               <MaterialIcons
                 name="undo"
                 size={24}
-                color={canUndo() ? COLORS.TEXT.PRIMARY : COLORS.TEXT.LIGHT}
+                color={canUndo() ? ModernDesign.colors.text.primary : ModernDesign.colors.text.disabled}
               />
             </TouchableOpacity>
 
@@ -582,8 +582,8 @@ export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
                 size={24}
                 color={
                   mode === GameMode.CHALLENGE && challengeState?.skipCount === 0
-                    ? COLORS.TEXT.LIGHT
-                    : COLORS.TEXT.PRIMARY
+                    ? ModernDesign.colors.text.disabled
+                    : ModernDesign.colors.text.primary
                 }
               />
               {mode === GameMode.CHALLENGE && challengeState && (
@@ -604,32 +604,33 @@ export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.BACKGROUND,
+    backgroundColor: ModernDesign.colors.background.primary,
   },
   gameArea: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: ModernDesign.spacing[4],
+    paddingVertical: ModernDesign.spacing[3],
   },
   // Target - Clean and minimal
   targetContainer: {
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: ModernDesign.spacing[6],
+    backgroundColor: ModernDesign.colors.background.tertiary,
+    marginHorizontal: ModernDesign.spacing[2],
+    borderRadius: ModernDesign.borderRadius.xl,
+    marginBottom: ModernDesign.spacing[4],
   },
   targetLabel: {
-    fontSize: 14,
-    color: COLORS.TEXT.SECONDARY,
-    fontWeight: '500',
-    marginBottom: 4,
-    letterSpacing: 0.5,
+    fontSize: ModernDesign.typography.fontSize.sm,
+    color: ModernDesign.colors.text.secondary,
+    fontWeight: ModernDesign.typography.fontWeight.medium,
+    marginBottom: ModernDesign.spacing[1],
+    letterSpacing: ModernDesign.typography.letterSpacing.wide,
   },
   targetNumber: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: COLORS.PRIMARY,
-    textShadowColor: 'rgba(74, 144, 226, 0.15)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 6,
+    fontSize: ModernDesign.typography.fontSize['5xl'],
+    fontWeight: ModernDesign.typography.fontWeight.bold,
+    color: ModernDesign.colors.accent.neon,
   },
   // Grid
   gridWrapper: {
@@ -654,116 +655,105 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   filledCell: {
-    backgroundColor: COLORS.CARD,
-    borderColor: '#D1D5DB',
+    backgroundColor: ModernDesign.colors.background.tertiary,
+    borderColor: ModernDesign.colors.border.subtle,
   },
   inactiveCell: {
-    backgroundColor: '#F3F4F6',
-    borderColor: '#E5E7EB',
+    backgroundColor: ModernDesign.colors.background.secondary,
+    borderColor: ModernDesign.colors.border.subtle,
     opacity: 0.5,
   },
   selectedCell: {
-    backgroundColor: COLORS.PRIMARY,
-    borderColor: COLORS.PRIMARY,
+    backgroundColor: ModernDesign.colors.accent.neon,
+    borderColor: ModernDesign.colors.accent.neon,
     transform: [{ scale: 1.15 }],
-    shadowColor: COLORS.PRIMARY,
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
+    ...ModernDesign.shadows.glow,
   },
   targetCell: {
-    borderColor: COLORS.SUCCESS,
-    borderWidth: 4,
+    borderColor: ModernDesign.colors.success,
+    borderWidth: 3,
     borderStyle: 'dashed' as 'dashed',
   },
   cellText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.TEXT.PRIMARY,
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    fontSize: ModernDesign.typography.fontSize.xl,
+    fontWeight: ModernDesign.typography.fontWeight.bold,
+    color: ModernDesign.colors.text.primary,
   },
   inactiveCellText: {
-    color: COLORS.TEXT.LIGHT,
+    color: ModernDesign.colors.text.disabled,
   },
   selectedCellText: {
-    color: COLORS.CARD,
+    color: ModernDesign.colors.background.primary,
   },
   // State indicator - minimal
   stateIndicator: {
     alignItems: 'center',
-    minHeight: 40,
+    minHeight: ModernDesign.spacing[10],
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: ModernDesign.spacing[5],
   },
   selectionDisplay: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(74, 144, 226, 0.1)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: ModernDesign.colors.glass.background,
+    paddingHorizontal: ModernDesign.spacing[4],
+    paddingVertical: ModernDesign.spacing[2],
+    borderRadius: ModernDesign.borderRadius.full,
+    borderWidth: 1,
+    borderColor: ModernDesign.colors.glass.border,
   },
   selectedNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.PRIMARY,
+    fontSize: ModernDesign.typography.fontSize['2xl'],
+    fontWeight: ModernDesign.typography.fontWeight.bold,
+    color: ModernDesign.colors.accent.neon,
   },
   pendingOperation: {
-    fontSize: 20,
-    color: COLORS.TEXT.SECONDARY,
-    marginLeft: 8,
+    fontSize: ModernDesign.typography.fontSize.xl,
+    color: ModernDesign.colors.text.secondary,
+    marginLeft: ModernDesign.spacing[2],
   },
   // Operation dock
   operationDock: {
-    backgroundColor: COLORS.CARD,
-    borderRadius: 20,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: ModernDesign.colors.background.tertiary,
+    borderRadius: ModernDesign.borderRadius['2xl'],
+    paddingVertical: ModernDesign.spacing[4],
+    paddingHorizontal: ModernDesign.spacing[3],
+    borderWidth: 1,
+    borderColor: ModernDesign.colors.border.subtle,
+    ...ModernDesign.shadows.lg,
   },
   operatorRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    marginBottom: 16,
+    marginBottom: ModernDesign.spacing[4],
   },
   operatorButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 56,
+    height: 56,
+    borderRadius: ModernDesign.borderRadius.lg,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
+    backgroundColor: ModernDesign.colors.background.secondary,
+    borderWidth: 2,
+    borderColor: ModernDesign.colors.border.medium,
+    ...ModernDesign.shadows.base,
   },
   activeOperator: {
-    transform: [{ scale: 1.2 }],
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    transform: [{ scale: 1.1 }],
+    borderColor: ModernDesign.colors.accent.neon,
+    ...ModernDesign.shadows.glow,
   },
   disabledOperator: {
-    opacity: 0.4,
-    backgroundColor: '#E5E7EB',
+    opacity: 0.3,
+    backgroundColor: ModernDesign.colors.background.secondary,
   },
   operatorText: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: COLORS.CARD,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
+    fontSize: ModernDesign.typography.fontSize['2xl'],
+    fontWeight: ModernDesign.typography.fontWeight.bold,
+    color: ModernDesign.colors.text.primary,
   },
   disabledOperatorText: {
-    color: COLORS.TEXT.LIGHT,
+    color: ModernDesign.colors.text.disabled,
   },
   // Action row
   actionRow: {
@@ -771,39 +761,37 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
   },
   iconButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#F3F4F6',
+    width: ModernDesign.spacing[12],
+    height: ModernDesign.spacing[12],
+    borderRadius: ModernDesign.borderRadius.lg,
+    backgroundColor: ModernDesign.colors.background.secondary,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: ModernDesign.colors.border.subtle,
+    ...ModernDesign.shadows.sm,
   },
   disabledIconButton: {
-    opacity: 0.4,
+    opacity: 0.3,
   },
   skipButton: {
     position: 'relative',
   },
   skipBadge: {
     position: 'absolute',
-    top: -6,
-    right: -6,
-    backgroundColor: COLORS.DANGER,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    top: -ModernDesign.spacing[2],
+    right: -ModernDesign.spacing[2],
+    backgroundColor: ModernDesign.colors.error,
+    width: ModernDesign.spacing[5],
+    height: ModernDesign.spacing[5],
+    borderRadius: ModernDesign.spacing[5] / 2,
     justifyContent: 'center',
     alignItems: 'center',
   },
   skipBadgeText: {
-    color: COLORS.CARD,
-    fontSize: 10,
-    fontWeight: 'bold',
+    color: ModernDesign.colors.text.primary,
+    fontSize: ModernDesign.typography.fontSize.xs,
+    fontWeight: ModernDesign.typography.fontWeight.bold,
   },
   emptyCell: {
     backgroundColor: 'transparent',

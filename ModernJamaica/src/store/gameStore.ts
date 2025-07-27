@@ -17,7 +17,7 @@ interface GameStore extends GameState {
   generateNewProblem: () => void;
   connectNodes: (firstNodeId: string, secondNodeId: string, operator: string) => void;
   updateChallengeTime: (timeLeft: number) => void;
-  endChallenge: () => void;
+  endChallenge: (isManual?: boolean) => void;
   updateInfiniteStats: (correct: boolean, timeSpent: number) => void;
   undoLastMove: () => void;
   canUndo: () => boolean;
@@ -227,12 +227,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
   
-  endChallenge: async () => {
+  endChallenge: async (isManual: boolean = false) => {
     const state = get();
     if (state.challengeState) {
       const finalScore = state.challengeState.problemCount;
       set({
-        gameStatus: GameStatus.TIMEUP,
+        gameStatus: isManual ? GameStatus.MANUALLY_ENDED : GameStatus.TIMEUP,
         challengeState: {
           ...state.challengeState,
           isActive: false,

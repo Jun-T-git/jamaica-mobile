@@ -9,6 +9,7 @@ export enum GameStatus {
   COMPLETE = 'complete',
   CORRECT = 'correct',
   TIMEUP = 'timeup',
+  MANUALLY_ENDED = 'manually_ended',
 }
 
 export enum Operator {

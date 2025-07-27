@@ -12,7 +12,7 @@ import {
 import { NavigationProp } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { UltraSimpleBoard } from '../components/UltraSimpleBoard';
-import { COLORS, GAME_CONFIG } from '../constants';
+import { COLORS, GAME_CONFIG, ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
 import { GameStatus } from '../types';
 
@@ -161,30 +161,33 @@ export const ChallengeModeScreen: React.FC<ChallengeModeScreenProps> = ({
             </View>
           </View>
 
-          {/* Hamburger Menu */}
+          {/* Game Menu */}
           <TouchableOpacity
-            style={[styles.menuButton, showMenu && styles.menuButtonActive]}
+            style={[styles.gameMenuButton, showMenu && styles.gameMenuButtonActive]}
             onPress={() => {
               Vibration.vibrate(50);
               setShowMenu(!showMenu);
             }}
-            activeOpacity={0.7}
+            activeOpacity={0.8}
           >
-            <MaterialIcons
-              name={showMenu ? 'close' : 'more-vert'}
-              size={24}
-              color={showMenu ? COLORS.PRIMARY : COLORS.TEXT.PRIMARY}
-            />
+            <View style={styles.menuIconContainer}>
+              <MaterialIcons
+                name={showMenu ? 'close' : 'settings'}
+                size={20}
+                color={ModernDesign.colors.text.primary}
+              />
+            </View>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Full Screen Menu Overlay */}
+      {/* Professional Puzzle Game Pause Overlay */}
       {showMenu && (
         <>
+          {/* Enhanced Backdrop with Blur Effect */}
           <Animated.View
             style={[
-              styles.fullScreenOverlay,
+              styles.pauseBackdrop,
               {
                 opacity: fadeAnim,
               },
@@ -196,81 +199,137 @@ export const ChallengeModeScreen: React.FC<ChallengeModeScreenProps> = ({
               onPress={() => setShowMenu(false)}
             />
           </Animated.View>
+          
+          {/* Central Pause Menu Card */}
           <Animated.View
             style={[
-              styles.centeredMenu,
+              styles.pauseMenuCard,
               {
                 opacity: fadeAnim,
-                transform: [{ scale: scaleAnim }],
+                transform: [
+                  {
+                    scale: scaleAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.8, 1],
+                    }),
+                  },
+                ],
               },
             ]}
           >
-            <TouchableOpacity
-              style={[styles.menuItem, styles.dangerMenuItem]}
-              onPress={() => {
-                Vibration.vibrate(100);
-                setShowMenu(false);
-                Alert.alert(
-                  '🛑 チャレンジ中断',
-                  'チャレンジを中断してメニューに戻りますか？',
-                  [
-                    {
-                      text: 'キャンセル',
-                      style: 'cancel',
-                      onPress: () => {
-                        Vibration.vibrate(30);
-                      },
-                    },
-                    {
-                      text: '中断する',
-                      style: 'destructive',
-                      onPress: () => {
-                        Vibration.vibrate(200);
-                        endChallenge();
-                        navigation.goBack();
-                      },
-                    },
-                  ],
-                  { cancelable: false },
-                );
-              }}
-              activeOpacity={0.8}
-            >
-              <View style={styles.menuItemIcon}>
+            {/* Pause Icon Header */}
+            <View style={styles.pauseHeader}>
+              <View style={styles.pauseIconContainer}>
                 <MaterialIcons
-                  name="exit-to-app"
-                  size={22}
-                  color={COLORS.DANGER}
+                  name="pause-circle-filled"
+                  size={48}
+                  color={ModernDesign.colors.accent.neon}
                 />
               </View>
-              <View style={styles.menuItemContent}>
-                <Text style={[styles.menuItemText, styles.dangerText]}>
-                  チャレンジ中断
-                </Text>
-                <Text style={styles.menuItemSubtext}>スコアを保存して終了</Text>
-              </View>
-            </TouchableOpacity>
+              <Text style={styles.pauseTitle}>ゲーム一時停止</Text>
+            </View>
 
-            <TouchableOpacity
-              style={[styles.menuItem, styles.lastMenuItem]}
-              onPress={() => {
-                Vibration.vibrate(50);
-                setShowMenu(false);
-              }}
-              activeOpacity={0.8}
-            >
-              <View style={styles.menuItemIcon}>
-                <MaterialIcons
-                  name="close"
-                  size={22}
-                  color={COLORS.TEXT.SECONDARY}
-                />
-              </View>
-              <View style={styles.menuItemContent}>
-                <Text style={styles.menuItemText}>閉じる</Text>
-                <Text style={styles.menuItemSubtext}>チャレンジを続ける</Text>
-              </View>
-            </TouchableOpacity>
+            {/* Action Buttons Grid */}
+            <View style={styles.pauseActions}>
+              {/* Resume - Primary Action */}
+              <TouchableOpacity
+                style={[styles.pauseButton, styles.resumeButton]}
+                onPress={() => {
+                  Vibration.vibrate(50);
+                  setShowMenu(false);
+                }}
+                activeOpacity={0.8}
+              >
+                <View style={styles.pauseButtonIcon}>
+                  <MaterialIcons
+                    name="play-arrow"
+                    size={32}
+                    color={ModernDesign.colors.background.primary}
+                  />
+                </View>
+                <Text style={styles.resumeButtonText}>続ける</Text>
+              </TouchableOpacity>
+
+              {/* Restart */}
+              <TouchableOpacity
+                style={[styles.pauseButton, styles.secondaryButton]}
+                onPress={() => {
+                  Vibration.vibrate(75);
+                  setShowMenu(false);
+                  Alert.alert(
+                    'チャレンジをリスタート',
+                    '新しいチャレンジを開始しますか？\n\n⚠️ 現在の進行状況が失われます',
+                    [
+                      {
+                        text: 'キャンセル',
+                        style: 'cancel',
+                        onPress: () => Vibration.vibrate(30),
+                      },
+                      {
+                        text: 'リスタート',
+                        style: 'destructive',
+                        onPress: () => {
+                          Vibration.vibrate(100);
+                          // Add restart logic here
+                          setShowMenu(false);
+                        },
+                      },
+                    ],
+                    { cancelable: false },
+                  );
+                }}
+                activeOpacity={0.8}
+              >
+                <View style={styles.pauseButtonIcon}>
+                  <MaterialIcons
+                    name="refresh"
+                    size={28}
+                    color={ModernDesign.colors.text.primary}
+                  />
+                </View>
+                <Text style={styles.secondaryButtonText}>リスタート</Text>
+              </TouchableOpacity>
+
+              {/* Quit Game */}
+              <TouchableOpacity
+                style={[styles.pauseButton, styles.quitButton]}
+                onPress={() => {
+                  Vibration.vibrate(100);
+                  setShowMenu(false);
+                  Alert.alert(
+                    'チャレンジ終了',
+                    'チャレンジを終了してメインメニューに戻りますか？\n\n✨ 達成したスコアが保存されます',
+                    [
+                      {
+                        text: 'キャンセル',
+                        style: 'cancel',
+                        onPress: () => Vibration.vibrate(30),
+                      },
+                      {
+                        text: '終了する',
+                        style: 'destructive',
+                        onPress: () => {
+                          Vibration.vibrate(200);
+                          endChallenge(true); // 手動終了を示すフラグ
+                          navigation.goBack();
+                        },
+                      },
+                    ],
+                    { cancelable: false },
+                  );
+                }}
+                activeOpacity={0.8}
+              >
+                <View style={styles.pauseButtonIcon}>
+                  <MaterialIcons
+                    name="home"
+                    size={28}
+                    color={ModernDesign.colors.error}
+                  />
+                </View>
+                <Text style={styles.quitButtonText}>終了</Text>
+              </TouchableOpacity>
+            </View>
           </Animated.View>
         </>
       )}
@@ -330,23 +389,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
-  // Menu Styles
-  menuButton: {
-    padding: 14,
-    borderRadius: 12,
-    backgroundColor: '#F8F9FA',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 3,
+  // Game Menu Styles
+  gameMenuButton: {
+    borderRadius: ModernDesign.borderRadius.full,
+    backgroundColor: ModernDesign.colors.glass.background,
+    borderWidth: 1,
+    borderColor: ModernDesign.colors.glass.border,
+    ...ModernDesign.shadows.base,
   },
-  menuButtonActive: {
-    backgroundColor: '#E3F2FD',
+  gameMenuButtonActive: {
+    backgroundColor: ModernDesign.colors.accent.neon,
+    borderColor: ModernDesign.colors.accent.neon,
     transform: [{ scale: 0.95 }],
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 5,
+    ...ModernDesign.shadows.glow,
+  },
+  menuIconContainer: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   fullScreenOverlay: {
     position: 'absolute',
@@ -361,61 +422,135 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '50%',
     left: '50%',
-    width: 280,
-    marginLeft: -140,
-    marginTop: -120,
-    backgroundColor: COLORS.CARD,
-    borderRadius: 24,
-    borderWidth: 0,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.3,
-    shadowRadius: 30,
-    elevation: 25,
+    width: 300,
+    marginLeft: -150,
+    marginTop: -140,
+    backgroundColor: ModernDesign.colors.background.tertiary,
+    borderRadius: ModernDesign.borderRadius['3xl'],
+    borderWidth: 1,
+    borderColor: ModernDesign.colors.border.subtle,
+    ...ModernDesign.shadows.xl,
     zIndex: 1000,
     overflow: 'hidden',
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 24,
+    paddingHorizontal: ModernDesign.spacing[6],
+    paddingVertical: ModernDesign.spacing[5],
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: ModernDesign.colors.border.subtle,
     backgroundColor: 'transparent',
   },
   lastMenuItem: {
     borderBottomWidth: 0,
   },
   dangerMenuItem: {
-    backgroundColor: 'rgba(208, 2, 27, 0.02)',
+    backgroundColor: 'rgba(255, 107, 107, 0.05)',
   },
   menuItemIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F8F9FA',
+    width: 48,
+    height: 48,
+    borderRadius: ModernDesign.borderRadius.lg,
+    backgroundColor: ModernDesign.colors.background.secondary,
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: ModernDesign.spacing[4],
   },
-  menuItemContent: {
+  // Professional Puzzle Game Pause Menu
+  pauseBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(10, 14, 26, 0.85)',
+    zIndex: 999,
+  },
+  pauseMenuCard: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    width: 320,
+    marginLeft: -160,
+    marginTop: -140,
+    backgroundColor: ModernDesign.colors.background.tertiary,
+    borderRadius: ModernDesign.borderRadius['3xl'],
+    borderWidth: 2,
+    borderColor: ModernDesign.colors.accent.neon,
+    ...ModernDesign.shadows.xl,
+    zIndex: 1000,
+    paddingVertical: ModernDesign.spacing[8],
+    paddingHorizontal: ModernDesign.spacing[6],
+  },
+  pauseHeader: {
+    alignItems: 'center',
+    marginBottom: ModernDesign.spacing[8],
+  },
+  pauseIconContainer: {
+    marginBottom: ModernDesign.spacing[3],
+    opacity: 0.9,
+  },
+  pauseTitle: {
+    fontSize: ModernDesign.typography.fontSize['2xl'],
+    fontWeight: ModernDesign.typography.fontWeight.bold,
+    color: ModernDesign.colors.text.primary,
+    letterSpacing: ModernDesign.typography.letterSpacing.wide,
+  },
+  pauseActions: {
+    gap: ModernDesign.spacing[4],
+  },
+  pauseButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: ModernDesign.spacing[4],
+    paddingHorizontal: ModernDesign.spacing[6],
+    borderRadius: ModernDesign.borderRadius.xl,
+    borderWidth: 2,
+    ...ModernDesign.shadows.base,
+  },
+  resumeButton: {
+    backgroundColor: ModernDesign.colors.accent.neon,
+    borderColor: ModernDesign.colors.accent.neon,
+    ...ModernDesign.shadows.glow,
+  },
+  secondaryButton: {
+    backgroundColor: ModernDesign.colors.background.secondary,
+    borderColor: ModernDesign.colors.border.medium,
+  },
+  quitButton: {
+    backgroundColor: 'rgba(255, 107, 107, 0.15)',
+    borderColor: ModernDesign.colors.error,
+  },
+  pauseButtonIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: ModernDesign.borderRadius.lg,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: ModernDesign.spacing[4],
+  },
+  resumeButtonText: {
     flex: 1,
-    marginLeft: 16,
+    fontSize: ModernDesign.typography.fontSize.xl,
+    fontWeight: ModernDesign.typography.fontWeight.bold,
+    color: ModernDesign.colors.background.primary,
+    textAlign: 'center',
   },
-  menuItemText: {
-    fontSize: 18,
-    color: COLORS.TEXT.PRIMARY,
-    fontWeight: '600',
-    letterSpacing: 0.3,
-    marginBottom: 2,
+  secondaryButtonText: {
+    flex: 1,
+    fontSize: ModernDesign.typography.fontSize.lg,
+    fontWeight: ModernDesign.typography.fontWeight.semibold,
+    color: ModernDesign.colors.text.primary,
+    textAlign: 'center',
   },
-  menuItemSubtext: {
-    fontSize: 14,
-    color: COLORS.TEXT.SECONDARY,
-    fontWeight: '400',
-  },
-  dangerText: {
-    color: COLORS.DANGER,
+  quitButtonText: {
+    flex: 1,
+    fontSize: ModernDesign.typography.fontSize.lg,
+    fontWeight: ModernDesign.typography.fontWeight.semibold,
+    color: ModernDesign.colors.error,
+    textAlign: 'center',
   },
   controls: {
     padding: 20,

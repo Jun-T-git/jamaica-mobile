@@ -1,3 +1,5 @@
+import { ModernDesign, gameThemes } from '../design/modernDesignSystem';
+
 export const GAME_CONFIG = {
   CHALLENGE_MODE: {
     INITIAL_TIME: 60, // seconds
@@ -16,24 +18,59 @@ export const GAME_CONFIG = {
   },
 };
 
+// Modern Sophisticated Color System
 export const COLORS = {
-  PRIMARY: '#4A90E2',
-  SUCCESS: '#7ED321',
-  DANGER: '#D0021B',
-  BACKGROUND: '#F5F5F5',
-  CARD: '#FFFFFF',
+  // Core colors
+  PRIMARY: ModernDesign.colors.accent.neon,
+  SECONDARY: ModernDesign.colors.accent.purple,
+  SUCCESS: ModernDesign.colors.success,
+  DANGER: ModernDesign.colors.error,
+  WARNING: ModernDesign.colors.warning,
+  
+  // Background layers
+  BACKGROUND: ModernDesign.colors.background.primary,
+  SURFACE: ModernDesign.colors.background.secondary,
+  CARD: ModernDesign.colors.background.tertiary,
+  
+  // Text hierarchy
   TEXT: {
-    PRIMARY: '#333333',
-    SECONDARY: '#666666',
-    LIGHT: '#999999',
+    PRIMARY: ModernDesign.colors.text.primary,
+    SECONDARY: ModernDesign.colors.text.secondary,
+    LIGHT: ModernDesign.colors.text.tertiary,
+    INVERSE: ModernDesign.colors.text.inverse,
+    DISABLED: ModernDesign.colors.text.disabled,
   },
+  
+  // Borders and dividers
+  BORDER: {
+    LIGHT: ModernDesign.colors.border.subtle,
+    MEDIUM: ModernDesign.colors.border.medium,
+    STRONG: ModernDesign.colors.border.strong,
+  },
+  
+  // Glass morphism
+  GLASS: {
+    BACKGROUND: ModernDesign.colors.glass.background,
+    BORDER: ModernDesign.colors.glass.border,
+    SHADOW: ModernDesign.colors.glass.shadow,
+  },
+  
+  // Game mode themes
   CHALLENGE_MODE: {
-    PRIMARY: '#FF6B6B',
-    SECONDARY: '#FFA500',
-    ACCENT: '#FFD700',
+    PRIMARY: gameThemes.challenge.primary,
+    SECONDARY: gameThemes.challenge.secondary,
+    GRADIENT: gameThemes.challenge.gradient,
+    GLOW: gameThemes.challenge.glow,
   },
+  
   INFINITE_MODE: {
-    PRIMARY: '#4ECDC4',
+    PRIMARY: gameThemes.infinite.primary,
+    SECONDARY: gameThemes.infinite.secondary,
+    GRADIENT: gameThemes.infinite.gradient,
+    GLOW: gameThemes.infinite.glow,
   },
 };
+
+// Export modern design system
+export { ModernDesign };
 
