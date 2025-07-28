@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { ModeSelectionScreen } from './src/screens/ModeSelectionScreen';
 import { ChallengeModeScreen } from './src/screens/ChallengeModeScreen';
 import { InfiniteModeScreen } from './src/screens/InfiniteModeScreen';
+import { ChallengeResultScreen } from './src/screens/ChallengeResultScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 
 const Stack = createStackNavigator();
@@ -21,6 +22,7 @@ function App() {
           <Stack.Screen name="ModeSelection" component={ModeSelectionScreen} />
           <Stack.Screen name="ChallengeMode" component={ChallengeModeScreen} />
           <Stack.Screen name="InfiniteMode" component={InfiniteModeScreen} />
+          <Stack.Screen name="ChallengeResult" component={ChallengeResultScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </ErrorBoundary>

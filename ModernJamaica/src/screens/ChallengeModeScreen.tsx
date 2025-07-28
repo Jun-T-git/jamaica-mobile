@@ -20,6 +20,11 @@ type RootStackParamList = {
   ModeSelection: undefined;
   Challenge: undefined;
   Infinite: undefined;
+  ChallengeResult: {
+    finalScore: number;
+    isNewHighScore: boolean;
+    previousHighScore: number;
+  };
 };
 
 interface ChallengeModeScreenProps {
@@ -97,19 +102,12 @@ export const ChallengeModeScreen: React.FC<ChallengeModeScreenProps> = ({
       challengeState?.finalScore !== undefined
     ) {
       const isNewHighScore = challengeState.finalScore > challengeHighScore;
-      Alert.alert(
-        'タイムアップ！',
-        `お疲れ様でした！\n正解数: ${challengeState.finalScore}問${
-          isNewHighScore ? '\n\n🎉 新記録達成！' : 
-          challengeHighScore > 0 ? `\nハイスコア: ${challengeHighScore}問` : ''
-        }`,
-        [
-          {
-            text: 'メニューに戻る',
-            onPress: () => navigation.navigate('ModeSelection'),
-          },
-        ],
-      );
+      // Navigate to result screen instead of showing alert
+      navigation.navigate('ChallengeResult', {
+        finalScore: challengeState.finalScore,
+        isNewHighScore,
+        previousHighScore: challengeHighScore,
+      });
     }
   }, [gameStatus, challengeState?.finalScore, challengeHighScore, navigation]);
 

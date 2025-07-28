@@ -21,6 +21,11 @@ type RootStackParamList = {
   ModeSelection: undefined;
   Challenge: undefined;
   Infinite: undefined;
+  ChallengeResult: {
+    finalScore: number;
+    isNewHighScore: boolean;
+    previousHighScore: number;
+  };
 };
 
 interface InfiniteModeScreenProps {
