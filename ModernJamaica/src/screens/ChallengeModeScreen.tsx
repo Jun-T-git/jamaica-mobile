@@ -15,6 +15,7 @@ import { UltraSimpleBoard } from '../components/UltraSimpleBoard';
 import { COLORS, GAME_CONFIG, ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
 import { GameStatus } from '../types';
+import { adService } from '../services/adService';
 
 type RootStackParamList = {
   ModeSelection: undefined;
@@ -102,12 +103,22 @@ export const ChallengeModeScreen: React.FC<ChallengeModeScreenProps> = ({
       challengeState?.finalScore !== undefined
     ) {
       const isNewHighScore = challengeState.finalScore > challengeHighScore;
-      // Navigate to result screen instead of showing alert
-      navigation.navigate('ChallengeResult', {
-        finalScore: challengeState.finalScore,
-        isNewHighScore,
-        previousHighScore: challengeHighScore,
-      });
+      
+      // インタースティシャル広告を表示してからリザルト画面へ
+      const showResultScreen = async () => {
+        const adShown = await adService.showInterstitialAd();
+        
+        // 広告表示後、または広告がない場合はすぐにリザルト画面へ
+        setTimeout(() => {
+          navigation.navigate('ChallengeResult', {
+            finalScore: challengeState.finalScore!,
+            isNewHighScore,
+            previousHighScore: challengeHighScore,
+          });
+        }, adShown ? 100 : 0); // 広告表示後は少し待機
+      };
+      
+      showResultScreen();
     }
   }, [gameStatus, challengeState?.finalScore, challengeHighScore, navigation]);
 
@@ -170,7 +181,7 @@ export const ChallengeModeScreen: React.FC<ChallengeModeScreenProps> = ({
           >
             <View style={styles.menuIconContainer}>
               <MaterialIcons
-                name={showMenu ? 'close' : 'settings'}
+                name={showMenu ? 'close' : 'menu'}
                 size={20}
                 color={ModernDesign.colors.text.primary}
               />
@@ -491,7 +502,7 @@ const styles = StyleSheet.create({
   },
   pauseTitle: {
     fontSize: ModernDesign.typography.fontSize['2xl'],
-    fontWeight: ModernDesign.typography.fontWeight.bold,
+    fontWeight: ModernDesign.typography.fontWeight.bold as any,
     color: ModernDesign.colors.text.primary,
     letterSpacing: ModernDesign.typography.letterSpacing.wide,
   },
@@ -532,21 +543,21 @@ const styles = StyleSheet.create({
   resumeButtonText: {
     flex: 1,
     fontSize: ModernDesign.typography.fontSize.xl,
-    fontWeight: ModernDesign.typography.fontWeight.bold,
+    fontWeight: ModernDesign.typography.fontWeight.bold as any,
     color: ModernDesign.colors.background.primary,
     textAlign: 'center',
   },
   secondaryButtonText: {
     flex: 1,
     fontSize: ModernDesign.typography.fontSize.lg,
-    fontWeight: ModernDesign.typography.fontWeight.semibold,
+    fontWeight: ModernDesign.typography.fontWeight.semibold as any,
     color: ModernDesign.colors.text.primary,
     textAlign: 'center',
   },
   quitButtonText: {
     flex: 1,
     fontSize: ModernDesign.typography.fontSize.lg,
-    fontWeight: ModernDesign.typography.fontWeight.semibold,
+    fontWeight: ModernDesign.typography.fontWeight.semibold as any,
     color: ModernDesign.colors.error,
     textAlign: 'center',
   },

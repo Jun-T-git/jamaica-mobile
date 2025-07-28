@@ -1,23 +1,27 @@
 import React, { useEffect } from 'react';
 import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
   SafeAreaView,
   StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { BannerAdView } from '../components/ads/BannerAdView';
+import { Typography } from '../components/ui/Typography';
+import { ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
 import { GameMode } from '../types';
-import { ModernDesign } from '../constants';
-import { Typography } from '../components/ui/Typography';
 
 interface ModeSelectionScreenProps {
   navigation: any;
 }
 
-export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({ navigation }) => {
-  const { initGame, loadStoredData, challengeHighScore, infiniteStats } = useGameStore();
+export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
+  navigation,
+}) => {
+  const { initGame, loadStoredData, challengeHighScore, infiniteStats } =
+    useGameStore();
 
   useEffect(() => {
     loadStoredData();
@@ -25,27 +29,35 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({ naviga
 
   const handleModeSelect = (mode: GameMode) => {
     initGame(mode);
-    navigation.navigate(mode === GameMode.CHALLENGE ? 'ChallengeMode' : 'InfiniteMode');
+    navigation.navigate(
+      mode === GameMode.CHALLENGE ? 'ChallengeMode' : 'InfiniteMode',
+    );
   };
-
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={ModernDesign.colors.background.primary} />
-      
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={ModernDesign.colors.background.primary}
+      />
+
       {/* Header with improved typography */}
       <View style={styles.header}>
-        <Typography variant="h2" textAlign="center" style={styles.title}>
-          数字パズル
+        <Typography variant="h3" textAlign="center" style={styles.title}>
+          ジャマイカの木
         </Typography>
-        <Typography variant="body1" color="secondary" textAlign="center" style={styles.subtitle}>
+        <Typography
+          variant="body1"
+          color="secondary"
+          textAlign="center"
+          style={styles.subtitle}
+        >
           5つの数字で目標を作ろう
         </Typography>
       </View>
 
       {/* Game Mode Selection */}
       <View style={styles.modesContainer}>
-        
         {/* Challenge Mode Button */}
         <TouchableOpacity
           onPress={() => handleModeSelect(GameMode.CHALLENGE)}
@@ -54,24 +66,44 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({ naviga
         >
           <View style={styles.modeContent}>
             <View style={styles.modeIconContainer}>
-              <MaterialIcons name="timer" size={28} color={ModernDesign.colors.accent.neon} />
+              <MaterialIcons
+                name="timer"
+                size={28}
+                color={ModernDesign.colors.accent.neon}
+              />
             </View>
             <View style={styles.modeTextContainer}>
               <Typography variant="h4" style={styles.modeTitle}>
                 チャレンジモード
               </Typography>
-              <Typography variant="body2" color="secondary" style={styles.modeDescription}>
+              <Typography
+                variant="body2"
+                color="secondary"
+                style={styles.modeDescription}
+              >
                 時間制限内に何問解けるか挑戦
               </Typography>
             </View>
             <View style={styles.modeArrow}>
-              <MaterialIcons name="arrow-forward-ios" size={20} color={ModernDesign.colors.text.tertiary} />
+              <MaterialIcons
+                name="arrow-forward-ios"
+                size={20}
+                color={ModernDesign.colors.text.tertiary}
+              />
             </View>
           </View>
           {challengeHighScore > 0 && (
             <View style={styles.statsBadge}>
-              <MaterialIcons name="emoji-events" size={16} color={ModernDesign.colors.accent.gold} />
-              <Typography variant="caption" color="secondary" style={styles.statsText}>
+              <MaterialIcons
+                name="emoji-events"
+                size={16}
+                color={ModernDesign.colors.accent.gold}
+              />
+              <Typography
+                variant="caption"
+                color="secondary"
+                style={styles.statsText}
+              >
                 ベスト: {challengeHighScore}問
               </Typography>
             </View>
@@ -86,24 +118,44 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({ naviga
         >
           <View style={styles.modeContent}>
             <View style={styles.modeIconContainer}>
-              <MaterialIcons name="all-inclusive" size={28} color={ModernDesign.colors.accent.neon} />
+              <MaterialIcons
+                name="all-inclusive"
+                size={28}
+                color={ModernDesign.colors.accent.neon}
+              />
             </View>
             <View style={styles.modeTextContainer}>
               <Typography variant="h4" style={styles.modeTitle}>
                 練習モード
               </Typography>
-              <Typography variant="body2" color="secondary" style={styles.modeDescription}>
+              <Typography
+                variant="body2"
+                color="secondary"
+                style={styles.modeDescription}
+              >
                 自分のペースでじっくり練習
               </Typography>
             </View>
             <View style={styles.modeArrow}>
-              <MaterialIcons name="arrow-forward-ios" size={20} color={ModernDesign.colors.text.tertiary} />
+              <MaterialIcons
+                name="arrow-forward-ios"
+                size={20}
+                color={ModernDesign.colors.text.tertiary}
+              />
             </View>
           </View>
           {infiniteStats && infiniteStats.longestStreak > 0 && (
             <View style={styles.statsBadge}>
-              <MaterialIcons name="local-fire-department" size={16} color={ModernDesign.colors.accent.coral} />
-              <Typography variant="caption" color="secondary" style={styles.statsText}>
+              <MaterialIcons
+                name="local-fire-department"
+                size={16}
+                color={ModernDesign.colors.accent.coral}
+              />
+              <Typography
+                variant="caption"
+                color="secondary"
+                style={styles.statsText}
+              >
                 最長: {infiniteStats.longestStreak}問連続
               </Typography>
             </View>
@@ -111,17 +163,8 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({ naviga
         </TouchableOpacity>
       </View>
 
-      {/* Bottom Actions */}
-      <View style={styles.bottomActions}>
-        <TouchableOpacity style={styles.actionButton}>
-          <MaterialIcons name="help-outline" size={24} color={ModernDesign.colors.text.secondary} />
-          <Typography variant="caption" color="secondary">ヘルプ</Typography>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          <MaterialIcons name="settings" size={24} color={ModernDesign.colors.text.secondary} />
-          <Typography variant="caption" color="secondary">設定</Typography>
-        </TouchableOpacity>
-      </View>
+      {/* バナー広告 */}
+      <BannerAdView style={styles.bannerAd} />
     </SafeAreaView>
   );
 };
@@ -150,6 +193,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: ModernDesign.spacing[6],
     paddingTop: ModernDesign.spacing[8],
+    paddingBottom: ModernDesign.spacing[24], // 広告スペースを確保
     gap: ModernDesign.spacing[4],
   },
   modeButton: {
@@ -201,18 +245,10 @@ const styles = StyleSheet.create({
     fontSize: ModernDesign.typography.fontSize.xs,
     fontWeight: ModernDesign.typography.fontWeight.medium,
   },
-  bottomActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: ModernDesign.spacing[8],
-    paddingHorizontal: ModernDesign.spacing[6],
-    borderTopWidth: 1,
-    borderTopColor: ModernDesign.colors.border.subtle,
-  },
-  actionButton: {
-    alignItems: 'center',
-    gap: ModernDesign.spacing[2],
-    paddingVertical: ModernDesign.spacing[3],
-    paddingHorizontal: ModernDesign.spacing[4],
+  bannerAd: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });

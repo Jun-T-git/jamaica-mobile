@@ -12,6 +12,7 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { COLORS, ModernDesign } from '../constants';
+import { BannerAdView } from '../components/ads/BannerAdView';
 
 const { width } = Dimensions.get('window');
 
@@ -310,6 +311,9 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
           ))}
         </Animated.View>
       )}
+
+      {/* バナー広告 */}
+      <BannerAdView style={styles.bannerAd} />
     </SafeAreaView>
   );
 };
@@ -320,6 +324,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.BACKGROUND,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingBottom: 120, // 広告スペースを確保
   },
   backgroundGradient: {
     position: 'absolute',
@@ -499,5 +504,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
+  },
+  bannerAd: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import mobileAds from 'react-native-google-mobile-ads';
 import { ModeSelectionScreen } from './src/screens/ModeSelectionScreen';
 import { ChallengeModeScreen } from './src/screens/ChallengeModeScreen';
 import { InfiniteModeScreen } from './src/screens/InfiniteModeScreen';
@@ -10,6 +11,18 @@ import { ErrorBoundary } from './src/components/ErrorBoundary';
 const Stack = createStackNavigator();
 
 function App() {
+  useEffect(() => {
+    // AdMob SDKの初期化
+    mobileAds()
+      .initialize()
+      .then(() => {
+        console.log('AdMob SDK initialized');
+      })
+      .catch((error) => {
+        console.error('AdMob SDK initialization error:', error);
+      });
+  }, []);
+
   return (
     <ErrorBoundary>
       <NavigationContainer>

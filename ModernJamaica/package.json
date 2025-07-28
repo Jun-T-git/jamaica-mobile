@@ -16,6 +16,7 @@
     "react": "19.1.0",
     "react-native": "0.80.2",
     "react-native-gesture-handler": "^2.27.2",
+    "react-native-google-mobile-ads": "^15.4.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-screens": "^4.13.1",

@@ -157,7 +157,7 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({ navigati
           >
             <View style={styles.menuIconContainer}>
               <MaterialIcons 
-                name={showMenu ? "close" : "settings"} 
+                name={showMenu ? "close" : "menu"} 
                 size={20} 
                 color={ModernDesign.colors.text.primary} 
               />
