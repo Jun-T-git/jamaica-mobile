@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
   SafeAreaView,
   Animated,
@@ -10,25 +9,30 @@ import {
   Dimensions,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { NavigationProp, RouteProp } from '@react-navigation/native';
+import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, ModernDesign } from '../constants';
-import { BannerAdView } from '../components/ads/BannerAdView';
+import { BannerAdView } from '../components/molecules/BannerAdView';
+import { useGameStore } from '../store/gameStore';
+import { GameMode } from '../types';
+import { Button } from '../components/atoms/Button';
 
 const { width } = Dimensions.get('window');
 
 type RootStackParamList = {
   ModeSelection: undefined;
-  Challenge: undefined;
-  Infinite: undefined;
+  ChallengeMode: undefined;
+  InfiniteMode: undefined;
   ChallengeResult: {
     finalScore: number;
     isNewHighScore: boolean;
     previousHighScore: number;
+    mode?: 'challenge' | 'infinite';
   };
 };
 
 interface ChallengeResultScreenProps {
-  navigation: NavigationProp<RootStackParamList>;
+  navigation: StackNavigationProp<RootStackParamList>;
   route: RouteProp<RootStackParamList, 'ChallengeResult'>;
 }
 
@@ -36,7 +40,8 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { finalScore, isNewHighScore, previousHighScore } = route.params;
+  const { finalScore, isNewHighScore, previousHighScore, mode = 'challenge' } = route.params;
+  const { initGame } = useGameStore();
   
   // Animation values
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -113,14 +118,33 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
     }, 800);
   }, [finalScore, isNewHighScore]);
 
-  const handleRetry = () => {
+  const handleRetry = async () => {
+    console.log('Retry button pressed, mode:', mode);
     Vibration.vibrate(50);
-    navigation.navigate('Challenge');
+    
+    try {
+      // ゲーム状態をリセットしてから新しいゲームを開始
+      const gameMode = mode === 'infinite' ? GameMode.INFINITE : GameMode.CHALLENGE;
+      console.log('Initializing game with mode:', gameMode);
+      await initGame(gameMode);
+      
+      // 初期化完了を待つ
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // replaceを使用して戻るボタンでリザルト画面に戻らないようにする
+      const screenName = mode === 'infinite' ? 'InfiniteMode' : 'ChallengeMode';
+      console.log('Navigating to screen:', screenName);
+      navigation.replace(screenName);
+      console.log('Navigation completed');
+    } catch (error) {
+      console.error('Error in handleRetry:', error);
+    }
   };
 
   const handleBackToMenu = () => {
     Vibration.vibrate(50);
-    navigation.navigate('ModeSelection');
+    // replaceを使用して戻るボタンでリザルト画面に戻らないようにする
+    navigation.replace('ModeSelection');
   };
 
   return (
@@ -166,7 +190,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
 
         {/* Title */}
         <Text style={styles.title}>
-          {isNewHighScore ? '🎉 新記録達成！' : 'タイムアップ！'}
+          {isNewHighScore ? '新記録達成！' : 'タイムアップ！'}
         </Text>
         
         <Text style={styles.subtitle}>
@@ -175,10 +199,10 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
 
         {/* Score Display */}
         <View style={styles.scoreSection}>
-          <Text style={styles.scoreLabel}>正解数</Text>
+          <Text style={styles.scoreLabel}>スコア</Text>
           <Animated.View style={styles.scoreContainer}>
-            <Text style={styles.scoreValue}>{displayedScore}</Text>
-            <Text style={styles.scoreUnit}>問</Text>
+            <Text style={styles.scoreValue}>{displayedScore.toLocaleString()}</Text>
+            <Text style={styles.scoreUnit}>点</Text>
           </Animated.View>
           
           {/* High Score Information */}
@@ -205,7 +229,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
           ) : previousHighScore > 0 ? (
             <View style={styles.previousScoreContainer}>
               <Text style={styles.previousScoreLabel}>ハイスコア</Text>
-              <Text style={styles.previousScoreValue}>{previousHighScore}問</Text>
+              <Text style={styles.previousScoreValue}>{previousHighScore.toLocaleString()}点</Text>
             </View>
           ) : null}
         </View>
@@ -233,37 +257,22 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
 
         {/* Action Buttons */}
         <View style={styles.buttonSection}>
-          {/* Retry Button */}
-          <TouchableOpacity
-            style={[styles.button, styles.retryButton]}
-            onPress={handleRetry}
-            activeOpacity={0.8}
-          >
-            <View style={styles.buttonIcon}>
-              <MaterialIcons
-                name="replay"
-                size={28}
-                color={ModernDesign.colors.background.primary}
-              />
-            </View>
-            <Text style={styles.retryButtonText}>もう一度</Text>
-          </TouchableOpacity>
-
-          {/* Back to Menu Button */}
-          <TouchableOpacity
-            style={[styles.button, styles.menuButton]}
+          <Button
+            icon="replay"
+            title="もう一度"
+            onPress={() => {
+              console.log('Button onPress triggered');
+              handleRetry();
+            }}
+            variant="primary"
+          />
+          
+          <Button
+            icon="home"
+            title="メニュー"
             onPress={handleBackToMenu}
-            activeOpacity={0.8}
-          >
-            <View style={styles.buttonIcon}>
-              <MaterialIcons
-                name="home"
-                size={28}
-                color={ModernDesign.colors.text.primary}
-              />
-            </View>
-            <Text style={styles.menuButtonText}>メニュー</Text>
-          </TouchableOpacity>
+            variant="default"
+          />
         </View>
       </Animated.View>
 
@@ -452,44 +461,6 @@ const styles = StyleSheet.create({
   buttonSection: {
     width: '100%',
     gap: ModernDesign.spacing[4],
-  },
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: ModernDesign.spacing[4],
-    paddingHorizontal: ModernDesign.spacing[6],
-    borderRadius: ModernDesign.borderRadius.xl,
-    borderWidth: 2,
-    ...ModernDesign.shadows.base,
-  },
-  retryButton: {
-    backgroundColor: ModernDesign.colors.accent.neon,
-    borderColor: ModernDesign.colors.accent.neon,
-    ...ModernDesign.shadows.glow,
-  },
-  menuButton: {
-    backgroundColor: ModernDesign.colors.background.secondary,
-    borderColor: ModernDesign.colors.border.medium,
-  },
-  buttonIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: ModernDesign.borderRadius.lg,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: ModernDesign.spacing[3],
-  },
-  retryButtonText: {
-    fontSize: ModernDesign.typography.fontSize.lg,
-    fontWeight: ModernDesign.typography.fontWeight.bold,
-    color: ModernDesign.colors.background.primary,
-  },
-  menuButtonText: {
-    fontSize: ModernDesign.typography.fontSize.lg,
-    fontWeight: ModernDesign.typography.fontWeight.semibold,
-    color: ModernDesign.colors.text.primary,
   },
   confettiContainer: {
     position: 'absolute',

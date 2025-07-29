@@ -3,9 +3,13 @@ import { ModernDesign, gameThemes } from '../design/modernDesignSystem';
 export const GAME_CONFIG = {
   CHALLENGE_MODE: {
     INITIAL_TIME: 60, // seconds
-    BONUS_TIME: 30, // seconds added per correct answer
+    BONUS_TIME: 10, // seconds added per correct answer
     SKIP_LIMIT: 2, // number of skips allowed
     WARNING_TIME: 10, // seconds before warning
+  },
+  INFINITE_MODE: {
+    INITIAL_TIME: 300, // 5 minutes (300 seconds)
+    WARNING_TIME: 30, // seconds before warning
   },
   NUMBERS: {
     MIN: 1,

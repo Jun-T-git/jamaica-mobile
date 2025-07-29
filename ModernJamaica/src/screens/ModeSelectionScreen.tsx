@@ -7,8 +7,8 @@ import {
   View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { BannerAdView } from '../components/ads/BannerAdView';
-import { Typography } from '../components/ui/Typography';
+import { BannerAdView } from '../components/molecules/BannerAdView';
+import { Typography } from '../components/atoms/Typography';
 import { ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
 import { GameMode } from '../types';
@@ -104,7 +104,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
                 color="secondary"
                 style={styles.statsText}
               >
-                ベスト: {challengeHighScore}問
+                ベスト: {challengeHighScore.toLocaleString()}点
               </Typography>
             </View>
           )}

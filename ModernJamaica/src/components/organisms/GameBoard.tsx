@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
   Animated,
   Dimensions,
   StyleSheet,
@@ -11,11 +10,12 @@ import {
 } from 'react-native';
 import Svg, { Line } from 'react-native-svg';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { ModernDesign } from '../constants';
-import { useGameStore } from '../store/gameStore';
-import { GameMode, Operator } from '../types';
+import { ModernDesign } from '../../constants';
+import { useGameStore } from '../../store/gameStore';
+import { GameMode, Operator } from '../../types';
+import { Dialog } from '../molecules/Dialog';
 
-interface UltraSimpleBoardProps {
+interface GameBoardProps {
   gameInfo: {
     target: number;
     instruction: string;
@@ -30,7 +30,7 @@ interface GridNode {
   nodeId: string;
 }
 
-export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
+export const GameBoard: React.FC<GameBoardProps> = ({
   gameInfo,
 }) => {
   const {
@@ -53,6 +53,8 @@ export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
     null,
   );
   const [animatedValue] = useState(new Animated.Value(0));
+  const [showSkipDialog, setShowSkipDialog] = useState(false);
+  const [skipMessage, setSkipMessage] = useState('');
 
   // Update dimensions on screen resize
   useEffect(() => {
@@ -120,14 +122,21 @@ export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
     const candidates: Array<{ col: number; priority: number }> = [];
     const midPoint = (leftCol + rightCol) / 2;
 
-    for (let col = minCol; col <= maxCol; col++) {
+    // 全グリッド範囲で検索（0-8列）
+    for (let col = 0; col < 9; col++) {
       if (!activeNodeCols.has(col) && !sameRowCols.has(col)) {
+        // 隣接禁止チェック
         if (col > 0 && sameRowCols.has(col - 1)) continue;
         if (col < 8 && sameRowCols.has(col + 1)) continue;
 
+        // 優先度計算：中点からの距離を最優先、中央からの距離を次に考慮
         const distanceFromMidpoint = Math.abs(col - midPoint);
         const distanceFromCenter = Math.abs(col - 4);
-        const priority = -(distanceFromMidpoint * 100 + distanceFromCenter);
+        
+        // 元の範囲内の位置にボーナスを与える
+        const inRangeBonus = (col >= minCol && col <= maxCol) ? 1000 : 0;
+        
+        const priority = inRangeBonus - (distanceFromMidpoint * 100 + distanceFromCenter);
         candidates.push({ col, priority });
       }
     }
@@ -205,6 +214,24 @@ export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
                   isActive: !node.isUsed,
                   nodeId: node.id,
                 };
+              } else if (targetCol === -1) {
+                // フォールバック：有効な位置が見つからない場合でも強制的に配置
+                console.warn(`No valid position found for node ${node.id}, attempting fallback placement`);
+                
+                // 空いている最初の位置を探す
+                for (let col = 0; col < 9; col++) {
+                  if (!newGrid[newRow][col]) {
+                    newPositions[node.id] = { row: newRow, col };
+                    newGrid[newRow][col] = {
+                      value: node.value,
+                      row: newRow,
+                      col,
+                      isActive: !node.isUsed,
+                      nodeId: node.id,
+                    };
+                    break;
+                  }
+                }
               }
             }
           }
@@ -361,8 +388,8 @@ export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
     (totalCellWidth - cellGap * (GRID_COLS - 1)) / GRID_COLS;
   const actualCellSize = Math.min(cellTotalSize, cellSize);
 
-  // Calculate vertical spacing for better visual hierarchy
-  const rowGap = actualCellSize * 0.9;
+  // Calculate vertical spacing - consistent spacing between all rows
+  const rowGap = actualCellSize * 1.0;
 
   // Grid container dimensions
   const gridContainerWidth =
@@ -552,26 +579,11 @@ export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
                   if (challengeState.skipCount <= 0) {
                     return;
                   }
-                  Alert.alert(
-                    'スキップ確認',
-                    `問題をスキップしますか？\n（残り${challengeState.skipCount}回）`,
-                    [
-                      { text: 'キャンセル', style: 'cancel' },
-                      { text: 'スキップ', onPress: skipProblem },
-                    ],
-                    { cancelable: false },
-                  );
+                  setSkipMessage(`問題をスキップしますか？\n（残り${challengeState.skipCount}回）`);
                 } else {
-                  Alert.alert(
-                    'スキップ確認',
-                    '問題をスキップしますか？',
-                    [
-                      { text: 'キャンセル', style: 'cancel' },
-                      { text: 'スキップ', onPress: skipProblem },
-                    ],
-                    { cancelable: false },
-                  );
+                  setSkipMessage('問題をスキップしますか？');
                 }
+                setShowSkipDialog(true);
               }}
               disabled={
                 mode === GameMode.CHALLENGE && challengeState?.skipCount === 0
@@ -597,6 +609,32 @@ export const UltraSimpleBoard: React.FC<UltraSimpleBoardProps> = ({
           </View>
         </View>
       </View>
+
+      {/* Skip Confirmation Dialog */}
+      <Dialog
+        visible={showSkipDialog}
+        title="スキップ確認"
+        message={skipMessage}
+        icon="skip-next"
+        iconColor={ModernDesign.colors.accent.neon}
+        buttons={[
+          {
+            icon: 'skip-next',
+            title: 'スキップ',
+            variant: 'danger',
+            onPress: () => {
+              setShowSkipDialog(false);
+              skipProblem();
+            },
+          },
+          {
+            icon: 'close',
+            title: 'キャンセル',
+            onPress: () => setShowSkipDialog(false),
+          },
+        ]}
+        onClose={() => setShowSkipDialog(false)}
+      />
     </View>
   );
 };
@@ -670,7 +708,7 @@ const styles = StyleSheet.create({
     ...ModernDesign.shadows.glow,
   },
   targetCell: {
-    borderColor: ModernDesign.colors.success,
+    borderColor: ModernDesign.colors.accent.neon,
     borderWidth: 3,
     borderStyle: 'dashed' as 'dashed',
   },

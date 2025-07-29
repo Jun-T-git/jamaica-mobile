@@ -37,8 +37,8 @@ export const BannerAdView: React.FC<BannerAdViewProps> = ({ style }) => {
       return BannerAdSize.LEADERBOARD; // 728x90 - タブレット最適化
     }
     
-    // デフォルトはスマートバナー
-    return BannerAdSize.SMART_BANNER;
+    // デフォルトはアンカー付きアダプティブバナー（次世代の動的サイズバナー）
+    return BannerAdSize.ANCHORED_ADAPTIVE_BANNER;
   };
 
   // 広告サイズに基づく推定高さ
@@ -49,7 +49,7 @@ export const BannerAdView: React.FC<BannerAdViewProps> = ({ style }) => {
     if (bannerSize === BannerAdSize.LARGE_BANNER) return 100;
     if (bannerSize === BannerAdSize.LEADERBOARD) return 90;
     
-    // スマートバナーのデフォルト高さ
+    // アンカー付きアダプティブバナーのデフォルト高さ
     return Platform.OS === 'ios' ? 50 : 50;
   };
 

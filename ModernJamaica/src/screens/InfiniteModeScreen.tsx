@@ -1,38 +1,35 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-  Animated,
-  Vibration,
-} from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { useGameStore } from '../store/gameStore';
-import { UltraSimpleBoard } from '../components/UltraSimpleBoard';
-import { GameStatus } from '../types';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, SafeAreaView, StyleSheet, Vibration } from 'react-native';
+import { Dialog } from '../components/molecules/Dialog';
+import { SuccessOverlay } from '../components/molecules/SuccessOverlay';
+import { GameBoard } from '../components/organisms/GameBoard';
+import { GameHeader } from '../components/organisms/GameHeader';
+import { PauseMenu } from '../components/organisms/PauseMenu';
 import { COLORS, ModernDesign } from '../constants';
+import { useGameStore } from '../store/gameStore';
+import { GameMode, GameStatus } from '../types';
 
-import { NavigationProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 type RootStackParamList = {
   ModeSelection: undefined;
-  Challenge: undefined;
-  Infinite: undefined;
+  ChallengeMode: undefined;
+  InfiniteMode: undefined;
   ChallengeResult: {
     finalScore: number;
     isNewHighScore: boolean;
     previousHighScore: number;
+    mode?: 'challenge' | 'infinite';
   };
 };
 
 interface InfiniteModeScreenProps {
-  navigation: NavigationProp<RootStackParamList>;
+  navigation: StackNavigationProp<RootStackParamList>;
 }
 
-export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({ navigation }) => {
+export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({
+  navigation,
+}) => {
   const {
     targetNumber,
     gameStatus,
@@ -40,17 +37,45 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({ navigati
     currentProblem,
     generateNewProblem,
     updateInfiniteStats,
+    updateInfiniteTime,
+    endInfiniteMode,
+    resetInfiniteStats,
   } = useGameStore();
 
   const [showMenu, setShowMenu] = useState(false);
+  const [showRestartDialog, setShowRestartDialog] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [scaleAnim] = useState(new Animated.Value(0.8));
   const [successAnim] = useState(new Animated.Value(0));
   const startTimeRef = useRef<number>(Date.now());
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     startTimeRef.current = Date.now();
   }, [currentProblem]);
+
+  // Timer effect for infinite mode
+  useEffect(() => {
+    if (infiniteStats?.isActive) {
+      timerRef.current = setInterval(() => {
+        if (infiniteStats.timeLeft > 0) {
+          updateInfiniteTime(infiniteStats.timeLeft - 1);
+        }
+      }, 1000);
+    } else {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [infiniteStats?.isActive, infiniteStats?.timeLeft, updateInfiniteTime]);
 
   // Menu animation effects
   useEffect(() => {
@@ -86,18 +111,18 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({ navigati
 
   // Track if we've processed correct answer for current problem
   const correctProcessedRef = useRef(false);
-  
+
   // Handle correct answer
   useEffect(() => {
     if (gameStatus === GameStatus.CORRECT && !correctProcessedRef.current) {
       correctProcessedRef.current = true;
-      
+
       const timeSpent = (Date.now() - startTimeRef.current) / 1000;
       updateInfiniteStats(true, timeSpent);
-      
+
       // 成功アニメーションと触覚フィードバック
       Vibration.vibrate([0, 50, 100, 50]);
-      
+
       // 成功アニメーション
       Animated.sequence([
         Animated.timing(successAnim, {
@@ -117,7 +142,7 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({ navigati
       });
     }
   }, [gameStatus, updateInfiniteStats, generateNewProblem, successAnim]);
-  
+
   // Reset flag when problem changes
   useEffect(() => {
     if (gameStatus !== GameStatus.CORRECT) {
@@ -125,201 +150,97 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({ navigati
     }
   }, [gameStatus]);
 
+  // Handle time up - use ref to prevent multiple navigations
+  const timeupHandledRef = useRef(false);
 
+  useEffect(() => {
+    if (
+      gameStatus === GameStatus.TIMEUP &&
+      infiniteStats &&
+      !timeupHandledRef.current
+    ) {
+      timeupHandledRef.current = true;
+
+      const finalScore = infiniteStats.correctAnswers;
+      const isNewHighScore = finalScore > infiniteStats.highScore;
+      const previousHighScore = infiniteStats.highScore;
+
+      // Navigate to result screen instead of showing alert
+      navigation.replace('ChallengeResult', {
+        finalScore,
+        isNewHighScore,
+        previousHighScore,
+        mode: 'infinite',
+      });
+    }
+  }, [gameStatus, infiniteStats, navigation]);
+
+  // Reset handled flag when game status changes away from TIMEUP
+  useEffect(() => {
+    if (gameStatus !== GameStatus.TIMEUP) {
+      timeupHandledRef.current = false;
+    }
+  }, [gameStatus]);
+
+  // Format time safely to prevent NaN
+  const formatTime = (seconds: number | undefined): string => {
+    if (typeof seconds !== 'number' || isNaN(seconds) || seconds < 0) {
+      return '0:00';
+    }
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   if (!infiniteStats) return null;
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <Text style={styles.statLabel}>連続正解</Text>
-            <Text style={styles.statValue}>{infiniteStats.currentStreak}</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statLabel}>最高記録</Text>
-            <Text style={styles.statValue}>{infiniteStats.longestStreak}</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statLabel}>平均時間</Text>
-            <Text style={styles.statValue}>{Math.round(infiniteStats.averageTime)}秒</Text>
-          </View>
-          
-          {/* Game Menu */}
-          <TouchableOpacity 
-            style={[styles.gameMenuButton, showMenu && styles.gameMenuButtonActive]}
-            onPress={() => {
-              Vibration.vibrate(50);
-              setShowMenu(!showMenu);
-            }}
-            activeOpacity={0.8}
-          >
-            <View style={styles.menuIconContainer}>
-              <MaterialIcons 
-                name={showMenu ? "close" : "menu"} 
-                size={20} 
-                color={ModernDesign.colors.text.primary} 
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
-        
-      </View>
+      <GameHeader
+        stats={[
+          {
+            label: '正解数',
+            value: infiniteStats.correctAnswers,
+            variant: 'default',
+            labelColor: COLORS.TEXT.SECONDARY,
+            valueColor: COLORS.TEXT.PRIMARY,
+          },
+          {
+            label: '残り時間',
+            value: formatTime(infiniteStats.timeLeft),
+            variant: 'timer',
+            labelColor: COLORS.TEXT.SECONDARY,
+            valueColor:
+              (infiniteStats.timeLeft || 0) <= 30
+                ? COLORS.DANGER
+                : COLORS.TEXT.PRIMARY,
+          },
+        ]}
+        showMenu={showMenu}
+        onMenuPress={() => setShowMenu(!showMenu)}
+      />
 
-      {/* Professional Puzzle Game Pause Overlay */}
-      {showMenu && (
-        <>
-          {/* Enhanced Backdrop with Blur Effect */}
-          <Animated.View
-            style={[
-              styles.pauseBackdrop,
-              {
-                opacity: fadeAnim,
-              },
-            ]}
-          >
-            <TouchableOpacity
-              style={StyleSheet.absoluteFillObject}
-              activeOpacity={1}
-              onPress={() => setShowMenu(false)}
-            />
-          </Animated.View>
-          
-          {/* Central Pause Menu Card */}
-          <Animated.View
-            style={[
-              styles.pauseMenuCard,
-              {
-                opacity: fadeAnim,
-                transform: [
-                  {
-                    scale: scaleAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0.8, 1],
-                    }),
-                  },
-                ],
-              },
-            ]}
-          >
-            {/* Pause Icon Header */}
-            <View style={styles.pauseHeader}>
-              <View style={styles.pauseIconContainer}>
-                <MaterialIcons
-                  name="pause-circle-filled"
-                  size={48}
-                  color={ModernDesign.colors.accent.neon}
-                />
-              </View>
-              <Text style={styles.pauseTitle}>練習を一時停止</Text>
-            </View>
+      <PauseMenu
+        visible={showMenu}
+        onClose={() => setShowMenu(false)}
+        onResume={() => {
+          Vibration.vibrate(50);
+          setShowMenu(false);
+        }}
+        onRestart={() => {
+          Vibration.vibrate(75);
+          setShowMenu(false);
+          setShowRestartDialog(true);
+        }}
+        onHome={() => {
+          Vibration.vibrate(100);
+          setShowMenu(false);
+          setShowExitDialog(true);
+        }}
+        gameMode={GameMode.INFINITE}
+      />
 
-            {/* Action Buttons Grid */}
-            <View style={styles.pauseActions}>
-              {/* Resume - Primary Action */}
-              <TouchableOpacity
-                style={[styles.pauseButton, styles.resumeButton]}
-                onPress={() => {
-                  Vibration.vibrate(50);
-                  setShowMenu(false);
-                }}
-                activeOpacity={0.8}
-              >
-                <View style={styles.pauseButtonIcon}>
-                  <MaterialIcons
-                    name="play-arrow"
-                    size={32}
-                    color={ModernDesign.colors.background.primary}
-                  />
-                </View>
-                <Text style={styles.resumeButtonText}>続ける</Text>
-              </TouchableOpacity>
-
-              {/* Reset Statistics */}
-              <TouchableOpacity
-                style={[styles.pauseButton, styles.secondaryButton]}
-                onPress={() => {
-                  Vibration.vibrate(75);
-                  setShowMenu(false);
-                  Alert.alert(
-                    '統計リセット',
-                    '練習の統計情報をリセットしますか？\n\n⚠️ 現在の記録が失われます',
-                    [
-                      {
-                        text: 'キャンセル',
-                        style: 'cancel',
-                        onPress: () => Vibration.vibrate(30),
-                      },
-                      {
-                        text: 'リセット',
-                        style: 'destructive',
-                        onPress: () => {
-                          Vibration.vibrate(100);
-                          // Add reset statistics logic here
-                          setShowMenu(false);
-                        },
-                      },
-                    ],
-                    { cancelable: false },
-                  );
-                }}
-                activeOpacity={0.8}
-              >
-                <View style={styles.pauseButtonIcon}>
-                  <MaterialIcons
-                    name="refresh"
-                    size={28}
-                    color={ModernDesign.colors.text.primary}
-                  />
-                </View>
-                <Text style={styles.secondaryButtonText}>統計リセット</Text>
-              </TouchableOpacity>
-
-              {/* Quit Game */}
-              <TouchableOpacity
-                style={[styles.pauseButton, styles.quitButton]}
-                onPress={() => {
-                  Vibration.vibrate(100);
-                  setShowMenu(false);
-                  Alert.alert(
-                    '練習中断',
-                    '練習を中断してメインメニューに戻りますか？\n\n✨ 統計情報が保存されます',
-                    [
-                      {
-                        text: 'キャンセル',
-                        style: 'cancel',
-                        onPress: () => Vibration.vibrate(30),
-                      },
-                      {
-                        text: '終了する',
-                        style: 'destructive',
-                        onPress: () => {
-                          Vibration.vibrate(200);
-                          navigation.goBack();
-                        },
-                      },
-                    ],
-                    { cancelable: false },
-                  );
-                }}
-                activeOpacity={0.8}
-              >
-                <View style={styles.pauseButtonIcon}>
-                  <MaterialIcons
-                    name="home"
-                    size={28}
-                    color={ModernDesign.colors.error}
-                  />
-                </View>
-                <Text style={styles.quitButtonText}>終了</Text>
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
-        </>
-      )}
-
-      <UltraSimpleBoard 
+      <GameBoard
         gameInfo={{
           target: targetNumber,
           instruction: '最初の数字をタップしてください',
@@ -327,29 +248,64 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({ navigati
       />
 
       {/* Success Feedback Overlay */}
-      <Animated.View
-        style={[
-          styles.successOverlay,
+      <SuccessOverlay
+        visible={gameStatus === GameStatus.CORRECT}
+        animationValue={successAnim}
+      />
+
+      {/* Restart Confirmation Dialog */}
+      <Dialog
+        visible={showRestartDialog}
+        title="最初からやり直し"
+        message="練習を最初からやり直しますか？現在の記録はリセットされます"
+        icon="refresh"
+        iconColor={ModernDesign.colors.accent.neon}
+        buttons={[
           {
-            opacity: successAnim,
-            transform: [
-              {
-                scale: successAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0.8, 1.2],
-                }),
-              },
-            ],
+            icon: 'refresh',
+            title: 'やり直す',
+            variant: 'danger',
+            onPress: async () => {
+              setShowRestartDialog(false);
+              await resetInfiniteStats();
+              generateNewProblem();
+            },
+          },
+          {
+            icon: 'close',
+            title: 'キャンセル',
+            onPress: () => setShowRestartDialog(false),
           },
         ]}
-        pointerEvents="none"
-      >
-        <View style={styles.successContent}>
-          <MaterialIcons name="check-circle" size={80} color={COLORS.SUCCESS} />
-          <Text style={styles.successText}>正解！</Text>
-        </View>
-      </Animated.View>
+        onClose={() => setShowRestartDialog(false)}
+      />
 
+      {/* Exit Confirmation Dialog */}
+      <Dialog
+        visible={showExitDialog}
+        title="練習中断"
+        message="練習を中断してメインメニューに戻りますか？現在の記録は失われます"
+        icon="home"
+        iconColor={ModernDesign.colors.accent.neon}
+        buttons={[
+          {
+            icon: 'home',
+            title: '終了する',
+            variant: 'danger',
+            onPress: async () => {
+              setShowExitDialog(false);
+              await resetInfiniteStats();
+              navigation.goBack();
+            },
+          },
+          {
+            icon: 'close',
+            title: 'キャンセル',
+            onPress: () => setShowExitDialog(false),
+          },
+        ]}
+        onClose={() => setShowExitDialog(false)}
+      />
     </SafeAreaView>
   );
 };
@@ -358,58 +314,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: COLORS.CARD,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statLabel: {
-    fontSize: 13,
-    color: COLORS.TEXT.SECONDARY,
-    marginBottom: 6,
-    fontWeight: '500',
-    letterSpacing: 0.3,
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.TEXT.PRIMARY,
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  // Game Menu Styles
-  gameMenuButton: {
-    borderRadius: ModernDesign.borderRadius.full,
-    backgroundColor: ModernDesign.colors.glass.background,
-    borderWidth: 1,
-    borderColor: ModernDesign.colors.glass.border,
-    ...ModernDesign.shadows.base,
-  },
-  gameMenuButtonActive: {
-    backgroundColor: ModernDesign.colors.accent.neon,
-    borderColor: ModernDesign.colors.accent.neon,
-    transform: [{ scale: 0.95 }],
-    ...ModernDesign.shadows.glow,
-  },
-  menuIconContainer: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   fullScreenOverlay: {
     position: 'absolute',
@@ -428,10 +332,8 @@ const styles = StyleSheet.create({
     marginLeft: -150,
     marginTop: -140,
     backgroundColor: ModernDesign.colors.background.tertiary,
-    borderRadius: ModernDesign.borderRadius['3xl'],
-    borderWidth: 1,
-    borderColor: ModernDesign.colors.border.subtle,
-    ...ModernDesign.shadows.xl,
+    borderRadius: ModernDesign.borderRadius['2xl'],
+    ...ModernDesign.shadows.lg,
     zIndex: 1000,
     overflow: 'hidden',
   },
@@ -440,21 +342,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: ModernDesign.spacing[6],
     paddingVertical: ModernDesign.spacing[5],
-    borderBottomWidth: 1,
-    borderBottomColor: ModernDesign.colors.border.subtle,
     backgroundColor: 'transparent',
   },
   lastMenuItem: {
     borderBottomWidth: 0,
   },
   dangerMenuItem: {
-    backgroundColor: 'rgba(255, 107, 107, 0.05)',
+    backgroundColor: 'rgba(252, 165, 165, 0.08)',
   },
   menuItemIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: ModernDesign.borderRadius.lg,
-    backgroundColor: ModernDesign.colors.background.secondary,
+    width: 40,
+    height: 40,
+    borderRadius: ModernDesign.borderRadius.md,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: ModernDesign.spacing[4],
@@ -476,128 +375,5 @@ const styles = StyleSheet.create({
   },
   dangerText: {
     color: ModernDesign.colors.error,
-  },
-  // Professional Puzzle Game Pause Menu
-  pauseBackdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(10, 14, 26, 0.85)',
-    zIndex: 999,
-  },
-  pauseMenuCard: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    width: 320,
-    marginLeft: -160,
-    marginTop: -140,
-    backgroundColor: ModernDesign.colors.background.tertiary,
-    borderRadius: ModernDesign.borderRadius['3xl'],
-    borderWidth: 2,
-    borderColor: ModernDesign.colors.accent.neon,
-    ...ModernDesign.shadows.xl,
-    zIndex: 1000,
-    paddingVertical: ModernDesign.spacing[8],
-    paddingHorizontal: ModernDesign.spacing[6],
-  },
-  pauseHeader: {
-    alignItems: 'center',
-    marginBottom: ModernDesign.spacing[8],
-  },
-  pauseIconContainer: {
-    marginBottom: ModernDesign.spacing[3],
-    opacity: 0.9,
-  },
-  pauseTitle: {
-    fontSize: ModernDesign.typography.fontSize['2xl'],
-    fontWeight: ModernDesign.typography.fontWeight.bold,
-    color: ModernDesign.colors.text.primary,
-    letterSpacing: ModernDesign.typography.letterSpacing.wide,
-  },
-  pauseActions: {
-    gap: ModernDesign.spacing[4],
-  },
-  pauseButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: ModernDesign.spacing[4],
-    paddingHorizontal: ModernDesign.spacing[6],
-    borderRadius: ModernDesign.borderRadius.xl,
-    borderWidth: 2,
-    ...ModernDesign.shadows.base,
-  },
-  resumeButton: {
-    backgroundColor: ModernDesign.colors.accent.neon,
-    borderColor: ModernDesign.colors.accent.neon,
-    ...ModernDesign.shadows.glow,
-  },
-  secondaryButton: {
-    backgroundColor: ModernDesign.colors.background.secondary,
-    borderColor: ModernDesign.colors.border.medium,
-  },
-  quitButton: {
-    backgroundColor: 'rgba(255, 107, 107, 0.15)',
-    borderColor: ModernDesign.colors.error,
-  },
-  pauseButtonIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: ModernDesign.borderRadius.lg,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: ModernDesign.spacing[4],
-  },
-  resumeButtonText: {
-    flex: 1,
-    fontSize: ModernDesign.typography.fontSize.xl,
-    fontWeight: ModernDesign.typography.fontWeight.bold,
-    color: ModernDesign.colors.background.primary,
-    textAlign: 'center',
-  },
-  secondaryButtonText: {
-    flex: 1,
-    fontSize: ModernDesign.typography.fontSize.lg,
-    fontWeight: ModernDesign.typography.fontWeight.semibold,
-    color: ModernDesign.colors.text.primary,
-    textAlign: 'center',
-  },
-  quitButtonText: {
-    flex: 1,
-    fontSize: ModernDesign.typography.fontSize.lg,
-    fontWeight: ModernDesign.typography.fontWeight.semibold,
-    color: ModernDesign.colors.error,
-    textAlign: 'center',
-  },
-  // Success Feedback Styles
-  successOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 2000,
-  },
-  successContent: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 20,
-    padding: 30,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 20,
-  },
-  successText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.SUCCESS,
-    marginTop: 10,
   },
 });

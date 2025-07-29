@@ -32,6 +32,9 @@ export interface ChallengeState {
   skipCount: number;  // Changed from resetCount to skipCount
   isActive: boolean;
   finalScore?: number;
+  currentScore: number;
+  currentCombo: number;
+  lastProblemScore: number;
 }
 
 export interface InfiniteStats {
@@ -40,6 +43,9 @@ export interface InfiniteStats {
   averageTime: number;
   longestStreak: number;
   currentStreak: number;
+  timeLeft: number;
+  highScore: number;
+  isActive: boolean;
 }
 
 export interface GameState {

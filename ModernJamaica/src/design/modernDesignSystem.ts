@@ -1,50 +1,50 @@
 // Modern Puzzle Game Design System - Inspired by Tetris Effect, Monument Valley, Alto's Odyssey
 
 export const ModernDesign = {
-  // Sophisticated Color Palette - Deep, Rich, Atmospheric
+  // Family-Friendly Dark Theme - Warm, Inviting, Accessible
   colors: {
-    // Dark mode first approach - sophisticated and modern
+    // Dark backgrounds with warmth and depth
     background: {
-      primary: '#0A0E1A',      // Deep space blue
-      secondary: '#131824',     // Slightly lighter dark
-      tertiary: '#1C2332',     // Card backgrounds
-      overlay: 'rgba(10, 14, 26, 0.95)',
+      primary: '#1A1B23',      // Warm dark blue-gray
+      secondary: '#242530',     // Slightly lighter warm dark
+      tertiary: '#2D2E3F',     // Card backgrounds with warmth
+      overlay: 'rgba(26, 27, 35, 0.95)',
     },
 
-    // Accent colors - Vibrant but sophisticated
+    // Warm, friendly accent colors that pop on dark
     accent: {
-      neon: '#00F5FF',         // Electric cyan - main brand
-      purple: '#8B5FBF',       // Deep purple
-      coral: '#FF6B6B',        // Warm coral
-      gold: '#FFD93D',         // Bright gold
-      mint: '#6BCF7F',         // Fresh mint
+      neon: '#60A5FA',         // Soft bright blue - friendly
+      purple: '#C084FC',       // Warm purple
+      coral: '#FB923C',        // Gentle orange
+      gold: '#FDE047',         // Warm yellow
+      mint: '#6EE7B7',         // Soft mint green
     },
 
-    // Semantic colors with personality
-    success: '#4ECDC4',        // Teal success
-    warning: '#FFB946',        // Warm orange
-    error: '#FF6B6B',          // Soft red
+    // Warm semantic colors for dark theme
+    success: '#6EE7B7',        // Soft mint green
+    warning: '#FCD34D',        // Warm golden yellow
+    error: '#FCA5A5',          // Soft coral red
     
-    // Text hierarchy - High contrast for readability
+    // Text hierarchy - High contrast but warm
     text: {
-      primary: '#FFFFFF',      // Pure white
-      secondary: '#B8C5D6',    // Light blue-gray
-      tertiary: '#7A8BA0',     // Medium blue-gray
-      disabled: '#4A5568',     // Dark gray
-      inverse: '#0A0E1A',      // Dark on light
+      primary: '#F9FAFB',      // Warm white
+      secondary: '#D1D5DB',    // Light warm gray
+      tertiary: '#9CA3AF',     // Medium warm gray
+      disabled: '#6B7280',     // Darker gray
+      inverse: '#1A1B23',      // Dark on light
     },
 
-    // UI elements
+    // UI elements - Subtle and warm
     border: {
-      subtle: 'rgba(184, 197, 214, 0.1)',
-      medium: 'rgba(184, 197, 214, 0.2)',
-      strong: 'rgba(184, 197, 214, 0.3)',
+      subtle: 'rgba(209, 213, 219, 0.1)',
+      medium: 'rgba(209, 213, 219, 0.15)',
+      strong: 'rgba(209, 213, 219, 0.2)',
     },
 
-    // Glass morphism effects
+    // Warm glass morphism effects
     glass: {
-      background: 'rgba(28, 35, 50, 0.8)',
-      border: 'rgba(255, 255, 255, 0.1)',
+      background: 'rgba(45, 46, 63, 0.8)',
+      border: 'rgba(96, 165, 250, 0.15)',
       shadow: 'rgba(0, 0, 0, 0.3)',
     },
   },
@@ -72,13 +72,13 @@ export const ModernDesign = {
     },
     
     fontWeight: {
-      light: '300',
-      normal: '400',
-      medium: '500',
-      semibold: '600',
-      bold: '700',
-      heavy: '800',
-      black: '900',
+      light: '300' as const,
+      normal: '400' as const,
+      medium: '500' as const,
+      semibold: '600' as const,
+      bold: '700' as const,
+      heavy: '800' as const,
+      black: '900' as const,
     },
     
     lineHeight: {
@@ -173,10 +173,10 @@ export const ModernDesign = {
       elevation: 12,
     },
     glow: {
-      shadowColor: '#00F5FF',
+      shadowColor: '#60A5FA',
       shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 0.6,
-      shadowRadius: 20,
+      shadowOpacity: 0.5,
+      shadowRadius: 18,
       elevation: 0,
     },
   },
@@ -202,19 +202,50 @@ export const ModernDesign = {
 
   // Component Specifications
   components: {
+    // Button System - 統一されたボタンの仕様
     button: {
+      // 標準の境界線半径
+      borderRadius: 16,
+      
+      // サイズごとの高さ（既存と新しい定義を統合）
       height: {
         sm: 36,
+        small: 40,
         md: 48,
+        medium: 56,
         lg: 56,
+        large: 64,
         xl: 64,
       },
-      borderRadius: 16,
+      
+      // フォントサイズ
       fontSize: {
         sm: 14,
         md: 16,
         lg: 18,
         xl: 20,
+      },
+      
+      // サイズごとのパディング
+      padding: {
+        small: {
+          vertical: 8,
+          horizontal: 16,
+        },
+        medium: {
+          vertical: 16,
+          horizontal: 24,
+        },
+        large: {
+          vertical: 20,
+          horizontal: 32,
+        },
+      },
+      
+      // アイコンボタンの統一サイズ
+      iconButton: {
+        size: 44,
+        borderRadius: 22,
       },
     },
     
@@ -242,26 +273,26 @@ export const ModernDesign = {
   },
 };
 
-// Gradient Definitions - Modern and Sophisticated
+// Gradient Definitions - Warm Dark Theme with Friendly Colors
 export const modernGradients = {
-  // Primary brand gradients
-  neonBlue: ['#00F5FF', '#0099CC'],
-  purpleNight: ['#8B5FBF', '#5A4FCF'],
-  coralSunset: ['#FF6B6B', '#FF8E53'],
-  goldRush: ['#FFD93D', '#FF9A56'],
-  mintFresh: ['#6BCF7F', '#4ECDC4'],
+  // Primary brand gradients - warmer and softer
+  neonBlue: ['#60A5FA', '#3B82F6'],
+  purpleNight: ['#C084FC', '#A855F7'],
+  coralSunset: ['#FB923C', '#F97316'],
+  goldRush: ['#FDE047', '#FCD34D'],
+  mintFresh: ['#6EE7B7', '#34D399'],
   
-  // Atmospheric gradients
-  deepSpace: ['#0A0E1A', '#131824'],
-  nebula: ['#1C2332', '#2D3748'],
-  aurora: ['#00F5FF', '#8B5FBF', '#FF6B6B'],
+  // Warm atmospheric gradients
+  deepSpace: ['#1A1B23', '#242530'],
+  nebula: ['#2D2E3F', '#374151'],
+  aurora: ['#60A5FA', '#C084FC', '#FB923C'],
   
-  // Game mode specific
-  challenge: ['#FF6B6B', '#FF8E53', '#FFB946'],
-  infinite: ['#00F5FF', '#8B5FBF', '#4ECDC4'],
+  // Game mode specific - warm and inviting
+  challenge: ['#FB923C', '#FDE047', '#6EE7B7'],
+  infinite: ['#60A5FA', '#C084FC', '#6EE7B7'],
   
-  // Glass morphism
-  glass: ['rgba(28, 35, 50, 0.8)', 'rgba(45, 55, 72, 0.6)'],
+  // Dark glass morphism
+  glass: ['rgba(45, 46, 63, 0.9)', 'rgba(36, 37, 48, 0.8)'],
 };
 
 // Modern Utility Functions
@@ -289,7 +320,7 @@ export const getModernShadow = (size: keyof typeof ModernDesign.shadows) => {
   return ModernDesign.shadows[size];
 };
 
-// Game specific color themes
+// Game specific color themes - Bright and Engaging
 export const gameThemes = {
   mathematical: {
     primary: ModernDesign.colors.accent.neon,
