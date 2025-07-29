@@ -305,11 +305,27 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   };
 
   const operators = [
-    { type: Operator.ADD, label: '+', color: ModernDesign.colors.accent.neon },
-    { type: Operator.SUBTRACT, label: '−', color: ModernDesign.colors.accent.neon },
-    { type: Operator.MULTIPLY, label: '×', color: ModernDesign.colors.accent.neon },
-    { type: Operator.DIVIDE, label: '÷', color: ModernDesign.colors.accent.neon },
+    { type: Operator.ADD, label: '+', color: ModernDesign.colors.accent.mint },
+    { type: Operator.SUBTRACT, label: '−', color: ModernDesign.colors.accent.coral },
+    { type: Operator.MULTIPLY, label: '×', color: ModernDesign.colors.accent.gold },
+    { type: Operator.DIVIDE, label: '÷', color: ModernDesign.colors.accent.purple },
   ];
+
+  // Get operator color based on operator type
+  const getOperatorColor = (operator?: Operator): string => {
+    switch (operator) {
+      case Operator.ADD:
+        return ModernDesign.colors.accent.mint;
+      case Operator.SUBTRACT:
+        return ModernDesign.colors.accent.coral;
+      case Operator.MULTIPLY:
+        return ModernDesign.colors.accent.gold;
+      case Operator.DIVIDE:
+        return ModernDesign.colors.accent.purple;
+      default:
+        return ModernDesign.colors.border.medium;
+    }
+  };
 
   // Calculate edges between parent and child nodes
   const getEdges = () => {
@@ -319,6 +335,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       childRow: number;
       childCol: number;
       key: string;
+      color: string;
     }> = [];
 
     const internalNodes = nodes.filter(n => !n.isLeaf);
@@ -352,12 +369,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         }
 
         if (parentRow !== -1 && leftChildRow !== -1 && rightChildRow !== -1) {
+          const edgeColor = getOperatorColor(node.operator);
+          
           edges.push({
             parentRow,
             parentCol,
             childRow: leftChildRow,
             childCol: leftChildCol,
             key: `${node.id}-${leftChild.id}`,
+            color: edgeColor,
           });
 
           edges.push({
@@ -366,6 +386,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             childRow: rightChildRow,
             childCol: rightChildCol,
             key: `${node.id}-${rightChild.id}`,
+            color: edgeColor,
           });
         }
       }
@@ -454,9 +475,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                     y1={parentPos.y}
                     x2={childPos.x}
                     y2={childPos.y}
-                    stroke={ModernDesign.colors.border.medium}
+                    stroke={edge.color}
                     strokeWidth={3}
-                    opacity={0.3}
+                    opacity={0.7}
                   />
                 );
               })}
@@ -534,6 +555,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                   selectedOperator === op.type && styles.activeOperator,
                   !firstNode && styles.disabledOperator,
                   selectedOperator === op.type && { backgroundColor: op.color },
+                  firstNode && selectedOperator !== op.type && { borderColor: op.color },
+                  !firstNode && { borderColor: `${op.color}40` }, // 25% opacity for disabled state
                 ]}
                 onPress={() => handleOperatorPress(op.type)}
                 disabled={!firstNode}
@@ -541,7 +564,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 <Text
                   style={[
                     styles.operatorText,
-                    !firstNode && styles.disabledOperatorText,
+                    firstNode && selectedOperator !== op.type && { color: op.color },
+                    selectedOperator === op.type && { color: ModernDesign.colors.background.primary },
+                    !firstNode && { color: `${op.color}60` }, // 37.5% opacity for disabled text
                   ]}
                 >
                   {op.label}
@@ -697,9 +722,8 @@ const styles = StyleSheet.create({
     borderColor: ModernDesign.colors.border.subtle,
   },
   inactiveCell: {
-    backgroundColor: ModernDesign.colors.background.secondary,
+    backgroundColor: ModernDesign.colors.background.primary,
     borderColor: ModernDesign.colors.border.subtle,
-    opacity: 0.5,
   },
   selectedCell: {
     backgroundColor: ModernDesign.colors.accent.neon,
@@ -782,7 +806,6 @@ const styles = StyleSheet.create({
     ...ModernDesign.shadows.glow,
   },
   disabledOperator: {
-    opacity: 0.3,
     backgroundColor: ModernDesign.colors.background.secondary,
   },
   operatorText: {
