@@ -1,5 +1,6 @@
 package com.modernjamaica
 
+import android.os.Bundle
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
@@ -19,4 +20,11 @@ class MainActivity : ReactActivity() {
    */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    // Change theme from SplashTheme to AppTheme before super.onCreate()
+    // This prevents white flash during React Native initialization
+    setTheme(R.style.AppTheme)
+    super.onCreate(savedInstanceState)
+  }
 }

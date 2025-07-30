@@ -17,6 +17,8 @@ interface GameStore extends GameState {
   
   // Actions
   initGame: (mode: GameMode) => void;
+  startCountdown: () => void;
+  completeCountdown: () => void;
   generateNewProblem: () => void;
   connectNodes: (firstNodeId: string, secondNodeId: string, operator: string) => void;
   updateChallengeTime: (timeLeft: number) => void;
@@ -39,6 +41,8 @@ const initialChallengeState: ChallengeState = {
   currentScore: 0,
   currentCombo: 0,
   lastProblemScore: 0,
+  totalTime: 0,
+  solvedProblems: 0,
 };
 
 const initialInfiniteStats: InfiniteStats = {
@@ -78,27 +82,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const stats = savedStats ? {
         ...savedStats,
         timeLeft: GAME_CONFIG.INFINITE_MODE.INITIAL_TIME,
-        isActive: true,
+        isActive: false, // Start inactive during countdown
         totalProblems: 0,
         correctAnswers: 0,
         averageTime: 0,
         currentStreak: 0,
-      } : { ...initialInfiniteStats, isActive: true };
+      } : { ...initialInfiniteStats, isActive: false }; // Start inactive during countdown
       
       set({
         mode,
-        gameStatus: GameStatus.BUILDING,
+        gameStatus: GameStatus.COUNTDOWN,
         infiniteStats: stats,
       });
     } else {
       get().comboTracker.reset();
       set({
         mode,
-        gameStatus: GameStatus.BUILDING,
-        challengeState: { ...initialChallengeState, isActive: true },
+        gameStatus: GameStatus.COUNTDOWN,
+        challengeState: { ...initialChallengeState, isActive: false }, // Start inactive during countdown
       });
     }
     get().generateNewProblem();
+  },
+  
+  startCountdown: () => {
+    set({ gameStatus: GameStatus.COUNTDOWN });
+  },
+  
+  completeCountdown: () => {
+    const state = get();
+    
+    // Activate game mode
+    if (state.mode === GameMode.CHALLENGE && state.challengeState) {
+      set({
+        gameStatus: GameStatus.BUILDING,
+        challengeState: { ...state.challengeState, isActive: true },
+        problemStartTime: Date.now(), // Reset problem start time after countdown
+      });
+    } else if (state.mode === GameMode.INFINITE && state.infiniteStats) {
+      set({
+        gameStatus: GameStatus.BUILDING,
+        infiniteStats: { ...state.infiniteStats, isActive: true },
+        problemStartTime: Date.now(), // Reset problem start time after countdown
+      });
+    }
   },
   
   generateNewProblem: () => {
@@ -119,12 +146,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isUsed: false,
     }));
     
+    const state = get();
     set({
       currentProblem: problem,
       targetNumber: problem.target,
       nodes,
       selectedNodeId: null,
-      gameStatus: GameStatus.BUILDING,
+      gameStatus: state.gameStatus === GameStatus.COUNTDOWN ? GameStatus.COUNTDOWN : GameStatus.BUILDING,
       history: [JSON.parse(JSON.stringify(nodes))], // Save initial state
       historyIndex: 0,
       problemStartTime: Date.now(),
@@ -224,6 +252,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           
           const newProblemCount = state.challengeState.problemCount + 1;
           const newTimeLeft = state.challengeState.timeLeft + GAME_CONFIG.CHALLENGE_MODE.BONUS_TIME;
+          const newSolvedProblems = state.challengeState.solvedProblems + 1;
+          const newTotalTime = state.challengeState.totalTime + solveTime;
           
           set({
             challengeState: {
@@ -233,6 +263,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScore: newTotalScore,
               currentCombo,
               lastProblemScore: problemScore,
+              solvedProblems: newSolvedProblems,
+              totalTime: newTotalTime,
             },
           });
           

@@ -5,6 +5,7 @@ export enum GameMode {
 
 export enum GameStatus {
   MENU = 'menu',
+  COUNTDOWN = 'countdown',
   BUILDING = 'building',
   COMPLETE = 'complete',
   CORRECT = 'correct',
@@ -35,6 +36,8 @@ export interface ChallengeState {
   currentScore: number;
   currentCombo: number;
   lastProblemScore: number;
+  totalTime: number;  // Total time spent on solved problems
+  solvedProblems: number;  // Number of problems correctly solved
 }
 
 export interface InfiniteStats {

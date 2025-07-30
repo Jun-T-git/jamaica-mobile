@@ -19,6 +19,7 @@ interface GameHeaderProps {
   stats: GameStatData[];
   onMenuPress: () => void;
   showMenu?: boolean;
+  menuDisabled?: boolean;
   menuIcon?: string;
   style?: ViewStyle;
 }
@@ -27,6 +28,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
   stats,
   onMenuPress,
   showMenu = false,
+  menuDisabled = false,
   menuIcon,
   style,
 }) => {
@@ -49,6 +51,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
         
         <GameMenuButton
           isActive={showMenu}
+          disabled={menuDisabled}
           onPress={() => {
             Vibration.vibrate(50);
             onMenuPress();

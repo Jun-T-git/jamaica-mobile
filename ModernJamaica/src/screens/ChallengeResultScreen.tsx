@@ -41,7 +41,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
   route,
 }) => {
   const { finalScore, isNewHighScore, previousHighScore, mode = 'challenge' } = route.params;
-  const { initGame } = useGameStore();
+  const { initGame, challengeState } = useGameStore();
   
   // Animation values
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -116,7 +116,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
         }
       }, 1500);
     }, 800);
-  }, [finalScore, isNewHighScore]);
+  }, [finalScore, isNewHighScore, fadeAnim, slideAnim, scaleAnim, scoreCountAnim, celebrationAnim]);
 
   const handleRetry = async () => {
     console.log('Retry button pressed, mode:', mode);
@@ -236,21 +236,21 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
 
         {/* Performance Stats */}
         <View style={styles.statsSection}>
-          {finalScore > 0 && (
-            <View style={styles.statItem}>
-              <MaterialIcons name="flash-on" size={24} color={ModernDesign.colors.accent.neon} />
-              <Text style={styles.statLabel}>平均時間</Text>
-              <Text style={styles.statValue}>
-                {Math.round(60 / Math.max(finalScore, 1))}秒/問
-              </Text>
-            </View>
-          )}
+          <View style={styles.statItem}>
+            <MaterialIcons name="timer" size={24} color={ModernDesign.colors.accent.neon} />
+            <Text style={styles.statLabel}>平均回答時間</Text>
+            <Text style={styles.statValue}>
+              {challengeState?.solvedProblems && challengeState.solvedProblems > 0
+                ? `${(challengeState.totalTime / challengeState.solvedProblems).toFixed(1)}秒`
+                : '---'}
+            </Text>
+          </View>
           
           <View style={styles.statItem}>
-            <MaterialIcons name="emoji-events" size={24} color={ModernDesign.colors.accent.gold} />
-            <Text style={styles.statLabel}>難易度</Text>
+            <MaterialIcons name="done" size={24} color={ModernDesign.colors.accent.gold} />
+            <Text style={styles.statLabel}>正解した問題数</Text>
             <Text style={styles.statValue}>
-              {finalScore >= 8 ? '上級' : finalScore >= 5 ? '中級' : '初級'}
+              {challengeState?.solvedProblems || 0}問
             </Text>
           </View>
         </View>
@@ -333,7 +333,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.BACKGROUND,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 120, // 広告スペースを確保
+    paddingBottom: 150, // 広告スペースを拡大
+    paddingHorizontal: ModernDesign.spacing[4], // 左右のマージンを追加
   },
   backgroundGradient: {
     position: 'absolute',
@@ -345,26 +346,26 @@ const styles = StyleSheet.create({
     opacity: 0.95,
   },
   resultCard: {
-    width: width * 0.9,
-    maxWidth: 400,
+    width: '100%',
+    maxWidth: 350, // 最大幅を縮小
     backgroundColor: ModernDesign.colors.background.tertiary,
     borderRadius: ModernDesign.borderRadius['3xl'],
     borderWidth: 2,
     borderColor: ModernDesign.colors.accent.neon,
-    padding: ModernDesign.spacing[8],
+    padding: ModernDesign.spacing[6], // パディングを少し縮小
     alignItems: 'center',
     ...ModernDesign.shadows.xl,
   },
   headerIconContainer: {
-    width: 100,
-    height: 100,
+    width: 80, // サイズを縮小
+    height: 80, // サイズを縮小
     borderRadius: ModernDesign.borderRadius.full,
     backgroundColor: ModernDesign.colors.glass.background,
     borderWidth: 1,
     borderColor: ModernDesign.colors.glass.border,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: ModernDesign.spacing[6],
+    marginBottom: ModernDesign.spacing[4], // マージンを縮小
     ...ModernDesign.shadows.base,
   },
   title: {
@@ -379,11 +380,11 @@ const styles = StyleSheet.create({
     fontSize: ModernDesign.typography.fontSize.lg,
     color: ModernDesign.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: ModernDesign.spacing[8],
+    marginBottom: ModernDesign.spacing[6], // マージンを縮小
   },
   scoreSection: {
     alignItems: 'center',
-    marginBottom: ModernDesign.spacing[8],
+    marginBottom: ModernDesign.spacing[6], // マージンを縮小
   },
   scoreLabel: {
     fontSize: ModernDesign.typography.fontSize.base,

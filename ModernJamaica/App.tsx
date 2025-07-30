@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import mobileAds from 'react-native-google-mobile-ads';
+import { SplashScreen } from './src/screens/SplashScreen';
 import { ModeSelectionScreen } from './src/screens/ModeSelectionScreen';
 import { ChallengeModeScreen } from './src/screens/ChallengeModeScreen';
 import { InfiniteModeScreen } from './src/screens/InfiniteModeScreen';
@@ -27,11 +28,12 @@ function App() {
     <ErrorBoundary>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="ModeSelection"
+          initialRouteName="Splash"
           screenOptions={{
             headerShown: false,
           }}
         >
+          <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen name="ModeSelection" component={ModeSelectionScreen} />
           <Stack.Screen name="ChallengeMode" component={ChallengeModeScreen} />
           <Stack.Screen name="InfiniteMode" component={InfiniteModeScreen} />

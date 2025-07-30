@@ -1,13 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, SafeAreaView, StyleSheet, Vibration } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { SafeAreaView, StyleSheet, Vibration } from 'react-native';
 import { Dialog } from '../components/molecules/Dialog';
 import { SuccessOverlay } from '../components/molecules/SuccessOverlay';
+import { CountdownOverlay } from '../components/molecules/CountdownOverlay';
 import { GameBoard } from '../components/organisms/GameBoard';
 import { GameHeader } from '../components/organisms/GameHeader';
 import { PauseMenu } from '../components/organisms/PauseMenu';
 import { COLORS, ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
 import { GameMode, GameStatus } from '../types';
+import { formatTime } from '../utils/gameUtils';
+import { useGameTimer } from '../hooks/useGameTimer';
+import { useSuccessAnimation } from '../hooks/useSuccessAnimation';
+import { useGameDialogs } from '../hooks/useGameDialogs';
+import { useGameMenu } from '../hooks/useGameMenu';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -38,110 +44,54 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({
     generateNewProblem,
     updateInfiniteStats,
     updateInfiniteTime,
-    endInfiniteMode,
-    resetInfiniteStats,
+    completeCountdown,
   } = useGameStore();
 
-  const [showMenu, setShowMenu] = useState(false);
-  const [showRestartDialog, setShowRestartDialog] = useState(false);
-  const [showExitDialog, setShowExitDialog] = useState(false);
-  const [fadeAnim] = useState(new Animated.Value(0));
-  const [scaleAnim] = useState(new Animated.Value(0.8));
-  const [successAnim] = useState(new Animated.Value(0));
   const startTimeRef = useRef<number>(Date.now());
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Use custom hook for timer management
+  const timerRef = useGameTimer(
+    infiniteStats?.isActive || false,
+    infiniteStats?.timeLeft || 0,
+    updateInfiniteTime,
+    showMenu,
+    gameStatus
+  );
+
+  // Use custom hook for success animation
+  const successAnim = useSuccessAnimation(gameStatus, 500, () => {
+    generateNewProblem();
+  });
+
+  // Use custom hook for dialog management
+  const {
+    showRestartDialog,
+    setShowRestartDialog,
+    showExitDialog,
+    setShowExitDialog,
+    handleRestart,
+    handleExit,
+  } = useGameDialogs(GameMode.INFINITE, navigation, timerRef);
+
+  // Use custom hook for menu management
+  const { showMenu, closeMenu, toggleMenu } = useGameMenu(gameStatus);
 
   useEffect(() => {
     startTimeRef.current = Date.now();
   }, [currentProblem]);
 
-  // Timer effect for infinite mode
-  useEffect(() => {
-    if (infiniteStats?.isActive) {
-      timerRef.current = setInterval(() => {
-        if (infiniteStats.timeLeft > 0) {
-          updateInfiniteTime(infiniteStats.timeLeft - 1);
-        }
-      }, 1000);
-    } else {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [infiniteStats?.isActive, infiniteStats?.timeLeft, updateInfiniteTime]);
-
-  // Menu animation effects
-  useEffect(() => {
-    if (showMenu) {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          tension: 100,
-          friction: 8,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    } else {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 150,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 0.8,
-          duration: 150,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }
-  }, [showMenu, fadeAnim, scaleAnim]);
 
   // Track if we've processed correct answer for current problem
   const correctProcessedRef = useRef(false);
 
-  // Handle correct answer
+  // Handle correct answer - track stats when user gets correct answer
   useEffect(() => {
     if (gameStatus === GameStatus.CORRECT && !correctProcessedRef.current) {
       correctProcessedRef.current = true;
-
       const timeSpent = (Date.now() - startTimeRef.current) / 1000;
       updateInfiniteStats(true, timeSpent);
-
-      // 成功アニメーションと触覚フィードバック
-      Vibration.vibrate([0, 50, 100, 50]);
-
-      // 成功アニメーション
-      Animated.sequence([
-        Animated.timing(successAnim, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(successAnim, {
-          toValue: 0,
-          duration: 200,
-          delay: 500,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        generateNewProblem();
-        correctProcessedRef.current = false;
-      });
     }
-  }, [gameStatus, updateInfiniteStats, generateNewProblem, successAnim]);
+  }, [gameStatus, updateInfiniteStats]);
 
   // Reset flag when problem changes
   useEffect(() => {
@@ -182,20 +132,21 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({
     }
   }, [gameStatus]);
 
-  // Format time safely to prevent NaN
-  const formatTime = (seconds: number | undefined): string => {
-    if (typeof seconds !== 'number' || isNaN(seconds) || seconds < 0) {
-      return '0:00';
-    }
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+
+  const handleCountdownComplete = () => {
+    completeCountdown();
   };
 
   if (!infiniteStats) return null;
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Countdown Overlay */}
+      <CountdownOverlay
+        visible={gameStatus === GameStatus.COUNTDOWN}
+        onComplete={handleCountdownComplete}
+      />
+
       <GameHeader
         stats={[
           {
@@ -207,34 +158,36 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({
           },
           {
             label: '残り時間',
-            value: formatTime(infiniteStats.timeLeft),
+            value: gameStatus === GameStatus.COUNTDOWN ? '--:--' : formatTime(infiniteStats.timeLeft),
             variant: 'timer',
             labelColor: COLORS.TEXT.SECONDARY,
-            valueColor:
-              (infiniteStats.timeLeft || 0) <= 30
+            valueColor: gameStatus === GameStatus.COUNTDOWN 
+              ? COLORS.TEXT.DISABLED
+              : (infiniteStats.timeLeft || 0) <= 30
                 ? COLORS.DANGER
                 : COLORS.TEXT.PRIMARY,
           },
         ]}
         showMenu={showMenu}
-        onMenuPress={() => setShowMenu(!showMenu)}
+        onMenuPress={toggleMenu}
+        menuDisabled={gameStatus !== GameStatus.BUILDING}
       />
 
       <PauseMenu
         visible={showMenu}
-        onClose={() => setShowMenu(false)}
+        onClose={closeMenu}
         onResume={() => {
           Vibration.vibrate(50);
-          setShowMenu(false);
+          closeMenu();
         }}
         onRestart={() => {
           Vibration.vibrate(75);
-          setShowMenu(false);
+          closeMenu();
           setShowRestartDialog(true);
         }}
         onHome={() => {
           Vibration.vibrate(100);
-          setShowMenu(false);
+          closeMenu();
           setShowExitDialog(true);
         }}
         gameMode={GameMode.INFINITE}
@@ -243,8 +196,11 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({
       <GameBoard
         gameInfo={{
           target: targetNumber,
-          instruction: '最初の数字をタップしてください',
+          instruction: gameStatus === GameStatus.COUNTDOWN 
+            ? 'ゲーム開始まで待機中...' 
+            : '最初の数字をタップしてください',
         }}
+        disabled={gameStatus === GameStatus.COUNTDOWN}
       />
 
       {/* Success Feedback Overlay */}
@@ -265,11 +221,7 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({
             icon: 'refresh',
             title: 'やり直す',
             variant: 'danger',
-            onPress: async () => {
-              setShowRestartDialog(false);
-              await resetInfiniteStats();
-              generateNewProblem();
-            },
+            onPress: handleRestart,
           },
           {
             icon: 'close',
@@ -292,11 +244,7 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({
             icon: 'home',
             title: '終了する',
             variant: 'danger',
-            onPress: async () => {
-              setShowExitDialog(false);
-              await resetInfiniteStats();
-              navigation.goBack();
-            },
+            onPress: handleExit,
           },
           {
             icon: 'close',
@@ -314,66 +262,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
-  },
-  fullScreenOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    zIndex: 999,
-  },
-  centeredMenu: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    width: 300,
-    marginLeft: -150,
-    marginTop: -140,
-    backgroundColor: ModernDesign.colors.background.tertiary,
-    borderRadius: ModernDesign.borderRadius['2xl'],
-    ...ModernDesign.shadows.lg,
-    zIndex: 1000,
-    overflow: 'hidden',
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: ModernDesign.spacing[6],
-    paddingVertical: ModernDesign.spacing[5],
-    backgroundColor: 'transparent',
-  },
-  lastMenuItem: {
-    borderBottomWidth: 0,
-  },
-  dangerMenuItem: {
-    backgroundColor: 'rgba(252, 165, 165, 0.08)',
-  },
-  menuItemIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: ModernDesign.borderRadius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: ModernDesign.spacing[4],
-  },
-  menuItemContent: {
-    flex: 1,
-  },
-  menuItemText: {
-    fontSize: ModernDesign.typography.fontSize.lg,
-    color: ModernDesign.colors.text.primary,
-    fontWeight: ModernDesign.typography.fontWeight.semibold,
-    letterSpacing: ModernDesign.typography.letterSpacing.normal,
-    marginBottom: ModernDesign.spacing[1],
-  },
-  menuItemSubtext: {
-    fontSize: ModernDesign.typography.fontSize.sm,
-    color: ModernDesign.colors.text.secondary,
-    fontWeight: ModernDesign.typography.fontWeight.normal,
-  },
-  dangerText: {
-    color: ModernDesign.colors.error,
   },
 });

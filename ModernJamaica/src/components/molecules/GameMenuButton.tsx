@@ -8,6 +8,7 @@ interface GameMenuButtonProps {
   onPress: () => void;
   iconName?: string;
   activeIconName?: string;
+  disabled?: boolean;
   style?: ViewStyle;
 }
 
@@ -16,23 +17,26 @@ export const GameMenuButton: React.FC<GameMenuButtonProps> = ({
   onPress,
   iconName = 'more-vert',
   activeIconName = 'close',
+  disabled = false,
   style,
 }) => {
   return (
     <TouchableOpacity
       style={[
         styles.button,
-        isActive && styles.buttonActive,
+        isActive && !disabled && styles.buttonActive,
+        disabled && styles.buttonDisabled,
         style,
       ]}
-      onPress={onPress}
-      activeOpacity={0.8}
+      onPress={disabled ? undefined : onPress}
+      activeOpacity={disabled ? 1 : 0.8}
+      disabled={disabled}
     >
       <View style={styles.iconContainer}>
         <MaterialIcons
           name={isActive ? activeIconName : iconName}
           size={20}
-          color={ModernDesign.colors.text.primary}
+          color={disabled ? ModernDesign.colors.text.disabled : ModernDesign.colors.text.primary}
         />
       </View>
     </TouchableOpacity>
@@ -54,6 +58,11 @@ const styles = StyleSheet.create({
     borderColor: ModernDesign.colors.accent.neon,
     transform: [{ scale: 0.95 }],
     ...ModernDesign.shadows.glow,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+    backgroundColor: ModernDesign.colors.background.secondary,
+    borderColor: ModernDesign.colors.border.subtle,
   },
   iconContainer: {
     width: '100%',

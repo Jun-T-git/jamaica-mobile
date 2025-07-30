@@ -9,6 +9,7 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { BannerAdView } from '../components/molecules/BannerAdView';
 import { Typography } from '../components/atoms/Typography';
+import { Logo } from '../components/atoms/Logo';
 import { ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
 import { GameMode } from '../types';
@@ -41,9 +42,10 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
         backgroundColor={ModernDesign.colors.background.primary}
       />
 
-      {/* Header with improved typography */}
+      {/* Header with logo and typography */}
       <View style={styles.header}>
-        <Typography variant="h3" textAlign="center" style={styles.title}>
+        <Logo size={100} style={styles.logo} />
+        <Typography variant="h4" textAlign="center" style={styles.title}>
           ジャマイカの木
         </Typography>
         <Typography
@@ -180,8 +182,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: ModernDesign.spacing[6],
     alignItems: 'center',
   },
+  logo: {
+    marginBottom: ModernDesign.spacing[4],
+  },
   title: {
-    marginBottom: ModernDesign.spacing[3],
+    marginBottom: ModernDesign.spacing[2], // マージンを少し縮小
     color: ModernDesign.colors.text.primary,
     fontWeight: ModernDesign.typography.fontWeight.black,
   },

@@ -20,6 +20,7 @@ interface GameBoardProps {
     target: number;
     instruction: string;
   };
+  disabled?: boolean;
 }
 
 interface GridNode {
@@ -32,6 +33,7 @@ interface GridNode {
 
 export const GameBoard: React.FC<GameBoardProps> = ({
   gameInfo,
+  disabled = false,
 }) => {
   const {
     nodes,
@@ -505,12 +507,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                       },
                     ]}
                     onPress={() => handleNodePress(node)}
-                    disabled={!node.isActive}
+                    disabled={!node.isActive || disabled}
                   >
                     <Text
                       style={[
                         styles.cellText,
                         !node.isActive && styles.inactiveCellText,
+                        disabled && styles.disabledCellText,
                         firstNode?.nodeId === node.nodeId &&
                           styles.selectedCellText,
                       ]}
@@ -553,20 +556,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 style={[
                   styles.operatorButton,
                   selectedOperator === op.type && styles.activeOperator,
-                  !firstNode && styles.disabledOperator,
+                  (!firstNode || disabled) && styles.disabledOperator,
                   selectedOperator === op.type && { backgroundColor: op.color },
-                  firstNode && selectedOperator !== op.type && { borderColor: op.color },
-                  !firstNode && { borderColor: `${op.color}40` }, // 25% opacity for disabled state
+                  firstNode && selectedOperator !== op.type && !disabled && { borderColor: op.color },
+                  (!firstNode || disabled) && { borderColor: `${op.color}40` }, // 25% opacity for disabled state
                 ]}
                 onPress={() => handleOperatorPress(op.type)}
-                disabled={!firstNode}
+                disabled={!firstNode || disabled}
               >
                 <Text
                   style={[
                     styles.operatorText,
-                    firstNode && selectedOperator !== op.type && { color: op.color },
+                    firstNode && selectedOperator !== op.type && !disabled && { color: op.color },
                     selectedOperator === op.type && { color: ModernDesign.colors.background.primary },
-                    !firstNode && { color: `${op.color}60` }, // 37.5% opacity for disabled text
+                    (!firstNode || disabled) && { color: `${op.color}60` }, // 37.5% opacity for disabled text
                   ]}
                 >
                   {op.label}
@@ -579,15 +582,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             <TouchableOpacity
               style={[
                 styles.iconButton,
-                !canUndo() && styles.disabledIconButton,
+                (!canUndo() || disabled) && styles.disabledIconButton,
               ]}
               onPress={undoLastMove}
-              disabled={!canUndo()}
+              disabled={!canUndo() || disabled}
             >
               <MaterialIcons
                 name="undo"
                 size={24}
-                color={canUndo() ? ModernDesign.colors.text.primary : ModernDesign.colors.text.disabled}
+                color={canUndo() && !disabled ? ModernDesign.colors.text.primary : ModernDesign.colors.text.disabled}
               />
             </TouchableOpacity>
 
@@ -595,8 +598,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               style={[
                 styles.iconButton,
                 styles.skipButton,
-                mode === GameMode.CHALLENGE &&
-                  challengeState?.skipCount === 0 &&
+                (disabled || (mode === GameMode.CHALLENGE &&
+                  challengeState?.skipCount === 0)) &&
                   styles.disabledIconButton,
               ]}
               onPress={() => {
@@ -611,7 +614,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 setShowSkipDialog(true);
               }}
               disabled={
-                mode === GameMode.CHALLENGE && challengeState?.skipCount === 0
+                disabled || (mode === GameMode.CHALLENGE && challengeState?.skipCount === 0)
               }
             >
               <MaterialIcons
@@ -743,6 +746,10 @@ const styles = StyleSheet.create({
   },
   inactiveCellText: {
     color: ModernDesign.colors.text.disabled,
+  },
+  disabledCellText: {
+    color: ModernDesign.colors.text.tertiary,
+    opacity: 0.6,
   },
   selectedCellText: {
     color: ModernDesign.colors.background.primary,
