@@ -1,0 +1,53 @@
+# GitHub Pages Configuration for Jamaica Mobile Privacy Policy
+
+# Site settings
+title: "ジャマイカの木 - プライバシーポリシー"
+description: "数字をつなげる計算パズルゲーム「ジャマイカの木」のプライバシーポリシー"
+author: "Jun Teraoka"
+email: "teraokajun@gmail.com"
+
+# GitHub Pages settings
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# SEO settings
+lang: ja
+timezone: Asia/Tokyo
+
+# Social media
+github_username: teraokajun
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+permalink: pretty
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+# Include files in build
+include:
+  - _pages
+
+# Collection settings
+collections:
+  pages:
+    output: true
+    permalink: /:name/
+
+# Default front matter
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "page"
+      author: "Jun Teraoka"
