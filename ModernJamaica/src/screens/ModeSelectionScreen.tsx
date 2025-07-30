@@ -7,9 +7,9 @@ import {
   View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { BannerAdView } from '../components/molecules/BannerAdView';
-import { Typography } from '../components/atoms/Typography';
 import { Logo } from '../components/atoms/Logo';
+import { Typography } from '../components/atoms/Typography';
+import { BannerAdView } from '../components/molecules/BannerAdView';
 import { ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
 import { GameMode } from '../types';
@@ -54,7 +54,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
           textAlign="center"
           style={styles.subtitle}
         >
-          5つの数字で目標を作ろう
+          数字をつなげる計算パズル
         </Typography>
       </View>
 

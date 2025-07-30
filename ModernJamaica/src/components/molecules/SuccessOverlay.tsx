@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, StyleSheet, Animated } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { COLORS } from '../../constants';
+import { Typography } from '../atoms/Typography';
+import { ModernDesign } from '../../constants';
 
 interface SuccessOverlayProps {
   visible: boolean;
@@ -16,28 +17,43 @@ export const SuccessOverlay: React.FC<SuccessOverlayProps> = ({
 }) => {
   if (!visible) return null;
 
+  const scaleAnimation = animationValue.interpolate({
+    inputRange: [0, 0.6, 1],
+    outputRange: [0.5, 1.05, 1],
+  });
+
   return (
     <Animated.View
       style={[
         styles.overlay,
         {
           opacity: animationValue,
-          transform: [
-            {
-              scale: animationValue.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0.8, 1.2],
-              }),
-            },
-          ],
         },
       ]}
       pointerEvents="none"
     >
-      <View style={styles.content}>
-        <MaterialIcons name="check-circle" size={80} color={COLORS.SUCCESS} />
-        <Text style={styles.text}>{message}</Text>
-      </View>
+      <Animated.View
+        style={[
+          styles.content,
+          {
+            transform: [{ scale: scaleAnimation }],
+          },
+        ]}
+      >
+        <MaterialIcons 
+          name="check-circle" 
+          size={48} 
+          color={ModernDesign.colors.success} 
+        />
+        
+        <Typography
+          variant="h4"
+          style={styles.messageText}
+          textAlign="center"
+        >
+          {message}
+        </Typography>
+      </Animated.View>
     </Animated.View>
   );
 };
@@ -54,20 +70,19 @@ const styles = StyleSheet.create({
     zIndex: 2000,
   },
   content: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 20,
-    padding: 30,
+    backgroundColor: ModernDesign.colors.background.tertiary,
+    borderRadius: ModernDesign.borderRadius.xl,
+    borderWidth: 1,
+    borderColor: ModernDesign.colors.success,
+    paddingVertical: ModernDesign.spacing[6],
+    paddingHorizontal: ModernDesign.spacing[8],
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 20,
+    minWidth: 160,
+    ...ModernDesign.shadows.lg,
   },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.SUCCESS,
-    marginTop: 10,
+  messageText: {
+    color: ModernDesign.colors.success,
+    fontWeight: ModernDesign.typography.fontWeight.semibold,
+    marginTop: ModernDesign.spacing[3],
   },
 });
