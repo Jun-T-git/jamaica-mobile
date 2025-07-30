@@ -30,19 +30,19 @@ export const StatValue: React.FC<StatValueProps> = ({
     style,
   ];
 
-  const combinedLabelStyle = [
+  const combinedLabelStyle = StyleSheet.flatten([
     styles.label,
     styles[`${variant}Label`],
     labelColor && { color: labelColor },
     labelStyle,
-  ];
+  ]);
 
-  const combinedValueStyle = [
+  const combinedValueStyle = StyleSheet.flatten([
     styles.value,
     styles[`${variant}Value`],
     valueColor && { color: valueColor },
     valueStyle,
-  ];
+  ]);
 
   return (
     <View style={containerStyle}>

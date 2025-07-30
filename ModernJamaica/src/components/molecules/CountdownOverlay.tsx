@@ -20,7 +20,8 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
   startCount = 3,
 }) => {
   const [currentCount, setCurrentCount] = useState(startCount);
-  const [phase, setPhase] = useState<'enter' | 'counting' | 'start' | 'exit'>('enter');
+  type CountdownPhase = 'enter' | 'counting' | 'start' | 'exit';
+  const [phase, setPhase] = useState<CountdownPhase>('enter');
   
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;

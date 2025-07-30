@@ -46,6 +46,6 @@ const styles = StyleSheet.create({
     backgroundColor: ModernDesign.colors.glass.background,
     borderWidth: 1,
     borderColor: ModernDesign.colors.glass.border,
-    backdropFilter: 'blur(10px)',
+    // Note: backdropFilter is not supported in React Native
   },
 });

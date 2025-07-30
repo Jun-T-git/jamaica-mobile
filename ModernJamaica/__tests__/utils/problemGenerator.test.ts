@@ -9,7 +9,7 @@ describe('problemGenerator', () => {
       
       expect(problem.numbers).toHaveLength(GAME_CONFIG.NUMBERS.COUNT);
       expect(problem.target).toBeGreaterThan(0);
-      expect(problem.solutions.length).toBeGreaterThan(0);
+      expect(problem.solutions?.length).toBeGreaterThan(0);
     });
 
     it('生成される数字が範囲内である', () => {

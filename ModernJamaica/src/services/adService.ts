@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, Dimensions } from 'react-native';
 import {
   AdEventType,
   BannerAdSize,
@@ -105,7 +105,6 @@ class AdService {
 
   // デバイス別の最適なバナーサイズを取得
   getOptimalBannerSize(): BannerAdSize {
-    const { Platform, Dimensions } = require('react-native');
     const { width } = Dimensions.get('window');
 
     // iPhoneの場合

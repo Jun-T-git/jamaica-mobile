@@ -9,7 +9,20 @@ import { InfiniteModeScreen } from './src/screens/InfiniteModeScreen';
 import { ChallengeResultScreen } from './src/screens/ChallengeResultScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 
-const Stack = createStackNavigator();
+type RootStackParamList = {
+  Splash: undefined;
+  ModeSelection: undefined;
+  ChallengeMode: undefined;
+  InfiniteMode: undefined;
+  ChallengeResult: {
+    finalScore: number;
+    isNewHighScore: boolean;
+    previousHighScore: number;
+    mode?: 'challenge' | 'infinite';
+  };
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
 
 function App() {
   useEffect(() => {

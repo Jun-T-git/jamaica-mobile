@@ -70,11 +70,11 @@ export const Button: React.FC<ButtonProps> = ({
       />
       <Typography
         variant="body1"
-        style={[
+        style={StyleSheet.flatten([
           styles.title,
           { color: getTextColor() },
           variant === 'primary' && styles.primaryTitle,
-        ]}
+        ])}
       >
         {title}
       </Typography>

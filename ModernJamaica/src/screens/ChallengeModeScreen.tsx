@@ -49,6 +49,8 @@ export const ChallengeModeScreen: React.FC<ChallengeModeScreenProps> = ({
     completeCountdown,
   } = useGameStore();
 
+  // Use custom hook for menu management
+  const { showMenu, closeMenu, toggleMenu } = useGameMenu(gameStatus);
   
   // Use custom hook for timer management
   const timerRef = useGameTimer(
@@ -71,9 +73,6 @@ export const ChallengeModeScreen: React.FC<ChallengeModeScreenProps> = ({
     handleRestart,
     handleExit,
   } = useGameDialogs(GameMode.CHALLENGE, navigation, timerRef);
-
-  // Use custom hook for menu management
-  const { showMenu, closeMenu, toggleMenu } = useGameMenu(gameStatus);
 
 
   // Handle time up - use ref to prevent multiple navigations

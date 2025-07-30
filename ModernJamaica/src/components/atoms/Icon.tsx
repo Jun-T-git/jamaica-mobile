@@ -23,10 +23,10 @@ export const Icon: React.FC<IconProps> = ({
   style,
 }) => {
   // Convert string sizes to numbers
-  const getContainerSize = (size: number | string): number => {
-    if (typeof size === 'number') return size;
+  const getContainerSize = (containerSizeValue: number | string): number => {
+    if (typeof containerSizeValue === 'number') return containerSizeValue;
     
-    switch (size) {
+    switch (containerSizeValue) {
       case 'small': return 32;
       case 'medium': return 48;
       case 'large': return 64;
@@ -37,7 +37,7 @@ export const Icon: React.FC<IconProps> = ({
   const actualContainerSize = containerSize ? getContainerSize(containerSize) : undefined;
 
   if (actualContainerSize || backgroundColor || variant !== 'default') {
-    const containerStyle = [
+    const containerStyle: ViewStyle = StyleSheet.flatten([
       styles.container,
       variant === 'circular' && styles.circular,
       variant === 'square' && styles.square,
@@ -47,7 +47,7 @@ export const Icon: React.FC<IconProps> = ({
       },
       backgroundColor && { backgroundColor },
       style,
-    ];
+    ].filter(Boolean)) as ViewStyle;
 
     return (
       <View style={containerStyle}>

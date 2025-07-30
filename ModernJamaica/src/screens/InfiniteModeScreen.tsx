@@ -49,6 +49,9 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({
 
   const startTimeRef = useRef<number>(Date.now());
 
+  // Use custom hook for menu management
+  const { showMenu, closeMenu, toggleMenu } = useGameMenu(gameStatus);
+
   // Use custom hook for timer management
   const timerRef = useGameTimer(
     infiniteStats?.isActive || false,
@@ -72,9 +75,6 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({
     handleRestart,
     handleExit,
   } = useGameDialogs(GameMode.INFINITE, navigation, timerRef);
-
-  // Use custom hook for menu management
-  const { showMenu, closeMenu, toggleMenu } = useGameMenu(gameStatus);
 
   useEffect(() => {
     startTimeRef.current = Date.now();
