@@ -21,7 +21,7 @@ interface ModeSelectionScreenProps {
 export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   navigation,
 }) => {
-  const { initGame, loadStoredData, challengeHighScore, infiniteStats } =
+  const { initGame, loadStoredData, highScores } =
     useGameStore();
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               />
             </View>
           </View>
-          {challengeHighScore > 0 && (
+          {highScores[GameMode.CHALLENGE] > 0 && (
             <View style={styles.statsBadge}>
               <MaterialIcons
                 name="emoji-events"
@@ -106,7 +106,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
                 color="secondary"
                 style={styles.statsText}
               >
-                ベスト: {challengeHighScore.toLocaleString()}点
+                ベスト: {highScores[GameMode.CHALLENGE].toLocaleString()}点
               </Typography>
             </View>
           )}
@@ -146,7 +146,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               />
             </View>
           </View>
-          {infiniteStats && infiniteStats.longestStreak > 0 && (
+          {highScores[GameMode.INFINITE] > 0 && (
             <View style={styles.statsBadge}>
               <MaterialIcons
                 name="local-fire-department"
@@ -158,7 +158,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
                 color="secondary"
                 style={styles.statsText}
               >
-                最長: {infiniteStats.longestStreak}問連続
+                ベスト: {highScores[GameMode.INFINITE]}問
               </Typography>
             </View>
           )}

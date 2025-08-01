@@ -27,37 +27,36 @@ export interface ProblemData {
   difficulty: 'easy' | 'normal' | 'hard';
 }
 
-export interface ChallengeState {
+// 統一されたゲーム状態
+export interface UnifiedGameState {
+  // 共通フィールド
+  mode: GameMode;
   timeLeft: number;
-  problemCount: number;
-  skipCount: number;  // Changed from resetCount to skipCount
   isActive: boolean;
+  score: number;           // チャレンジ: 計算スコア, 無限: 正解数
+  problemCount: number;    // 試行した問題数
+  
+  // チャレンジモード専用
+  skipCount: number;       // 残りスキップ回数（無限モードでは999）
+  currentCombo: number;    // 現在のコンボ数（無限モードでは0）
+  lastProblemScore: number; // 直前の問題のスコア（無限モードでは0）
+  
+  // 終了時のスコア
   finalScore?: number;
-  currentScore: number;
-  currentCombo: number;
-  lastProblemScore: number;
-  totalTime: number;  // Total time spent on solved problems
-  solvedProblems: number;  // Number of problems correctly solved
-}
-
-export interface InfiniteStats {
-  totalProblems: number;
-  correctAnswers: number;
-  averageTime: number;
-  longestStreak: number;
-  currentStreak: number;
-  timeLeft: number;
-  highScore: number;
-  isActive: boolean;
 }
 
 export interface GameState {
-  mode: GameMode;
-  targetNumber: number;
+  // ゲーム状態
+  gameState: UnifiedGameState;
   gameStatus: GameStatus;
+  targetNumber: number;
   currentProblem: ProblemData;
-  challengeState?: ChallengeState;
-  infiniteStats?: InfiniteStats;
+  
+  // ハイスコア管理
+  highScores: {
+    challenge: number;
+    infinite: number;
+  };
 }
 
 export interface Position {

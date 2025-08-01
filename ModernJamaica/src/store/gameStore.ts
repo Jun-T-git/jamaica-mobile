@@ -1,136 +1,166 @@
 import { create } from 'zustand';
-import { GameState, GameMode, GameStatus, ChallengeState, InfiniteStats, NodeData } from '../types';
+import { GameState, GameMode, GameStatus, UnifiedGameState, NodeData } from '../types';
 import { generateProblemExhaustive } from '../utils/problemGenerator';
-import { GAME_CONFIG } from '../constants';
-import { saveInfiniteStats, saveChallengeHighScore, loadInfiniteStats, loadChallengeHighScore } from '../utils/storage';
+import { getGameModeConfig } from '../config';
+import { saveHighScore, loadHighScore } from '../utils/storage';
+import { adService } from '../services/adService';
 import { ComboTracker, calculateProblemScore, calculateFinalBonus } from '../utils/scoreCalculator';
 import { ProblemResult } from '../constants/scoreConfig';
 
 interface GameStore extends GameState {
+  // UI関連の状態
   nodes: NodeData[];
   selectedNodeId: string | null;
   history: NodeData[][];
   historyIndex: number;
-  challengeHighScore: number;
+  
+  // 内部管理
   comboTracker: ComboTracker;
   problemStartTime: number;
+  navigationCallback: ((params: any) => void) | null;
+  timerInterval: NodeJS.Timeout | null;
   
-  // Actions
-  initGame: (mode: GameMode) => void;
+  // シンプルなアクション
+  initGame: (mode: GameMode) => Promise<void>;
   startCountdown: () => void;
   completeCountdown: () => void;
   generateNewProblem: () => void;
   connectNodes: (firstNodeId: string, secondNodeId: string, operator: string) => void;
-  updateChallengeTime: (timeLeft: number) => void;
-  endChallenge: (isManual?: boolean) => void;
-  updateInfiniteTime: (timeLeft: number) => void;
-  endInfiniteMode: (isManual?: boolean) => void;
-  updateInfiniteStats: (correct: boolean, timeSpent: number) => void;
-  resetInfiniteStats: () => Promise<void>;
+  pauseGame: () => void;
+  resumeGame: () => void;
+  skipProblem: () => void;
+  endGame: (isManual?: boolean) => Promise<void>;
+  
+  // ユーティリティ
+  setNavigationCallback: (callback: (params: any) => void) => void;
   undoLastMove: () => void;
   canUndo: () => boolean;
-  skipProblem: () => void;
   loadStoredData: () => Promise<void>;
+  
+  // 内部メソッド
+  startTimer: () => void;
+  stopTimer: () => void;
+  tick: () => void;
 }
 
-const initialChallengeState: ChallengeState = {
-  timeLeft: GAME_CONFIG.CHALLENGE_MODE.INITIAL_TIME,
-  problemCount: 0,
-  skipCount: GAME_CONFIG.CHALLENGE_MODE.SKIP_LIMIT,
-  isActive: false,
-  currentScore: 0,
-  currentCombo: 0,
-  lastProblemScore: 0,
-  totalTime: 0,
-  solvedProblems: 0,
-};
-
-const initialInfiniteStats: InfiniteStats = {
-  totalProblems: 0,
-  correctAnswers: 0,
-  averageTime: 0,
-  longestStreak: 0,
-  currentStreak: 0,
-  timeLeft: GAME_CONFIG.INFINITE_MODE.INITIAL_TIME,
-  highScore: 0,
-  isActive: false,
+// 初期ゲーム状態を作成
+const createInitialGameState = (mode: GameMode): UnifiedGameState => {
+  const config = getGameModeConfig(mode);
+  return {
+    mode,
+    timeLeft: config.time.initial,
+    isActive: false,
+    score: 0,
+    problemCount: 0,
+    skipCount: mode === GameMode.CHALLENGE ? config.gameplay.skipLimit : 999,
+    currentCombo: 0,
+    lastProblemScore: 0,
+  };
 };
 
 export const useGameStore = create<GameStore>((set, get) => ({
-  mode: GameMode.CHALLENGE,
-  targetNumber: 0,
+  // 初期状態
+  gameState: createInitialGameState(GameMode.CHALLENGE),
   gameStatus: GameStatus.MENU,
+  targetNumber: 0,
   currentProblem: {
     numbers: [],
     target: 0,
     difficulty: 'normal',
   },
-  challengeState: initialChallengeState,
-  infiniteStats: initialInfiniteStats,
+  highScores: {
+    challenge: 0,
+    infinite: 0,
+  },
   nodes: [],
   selectedNodeId: null,
   history: [],
   historyIndex: -1,
-  challengeHighScore: 0,
   comboTracker: new ComboTracker(),
   problemStartTime: Date.now(),
+  navigationCallback: null,
+  timerInterval: null,
   
-  initGame: async (mode: GameMode) => {
-    // 保存されたデータを読み込む
-    if (mode === GameMode.INFINITE) {
-      const savedStats = await loadInfiniteStats();
-      const stats = savedStats ? {
-        ...savedStats,
-        timeLeft: GAME_CONFIG.INFINITE_MODE.INITIAL_TIME,
-        isActive: false, // Start inactive during countdown
-        totalProblems: 0,
-        correctAnswers: 0,
-        averageTime: 0,
-        currentStreak: 0,
-      } : { ...initialInfiniteStats, isActive: false }; // Start inactive during countdown
-      
+  // タイマー管理（内部メソッド）
+  startTimer: () => {
+    const state = get();
+    if (state.timerInterval) return; // 既に動作中
+    
+    const interval = setInterval(() => get().tick(), 1000);
+    set({ timerInterval: interval });
+  },
+  
+  stopTimer: () => {
+    const state = get();
+    if (state.timerInterval) {
+      clearInterval(state.timerInterval);
+      set({ timerInterval: null });
+    }
+  },
+  
+  tick: () => {
+    const state = get();
+    const { gameState: game } = state;
+    
+    if (!game.isActive || state.gameStatus !== GameStatus.BUILDING) return;
+    
+    if (game.timeLeft <= 1) {
+      // タイムアップ
       set({
-        mode,
-        gameStatus: GameStatus.COUNTDOWN,
-        infiniteStats: stats,
+        gameState: { ...game, timeLeft: 0, isActive: false },
+        gameStatus: GameStatus.TIMEUP,
       });
+      get().stopTimer();
+      get().endGame(false);
     } else {
-      get().comboTracker.reset();
+      // 時間を減らす
       set({
-        mode,
-        gameStatus: GameStatus.COUNTDOWN,
-        challengeState: { ...initialChallengeState, isActive: false }, // Start inactive during countdown
+        gameState: { ...game, timeLeft: game.timeLeft - 1 }
       });
     }
+  },
+  
+  // ゲーム初期化
+  initGame: async (mode: GameMode) => {
+    const savedHighScores = {
+      challenge: await loadHighScore(GameMode.CHALLENGE) || 0,
+      infinite: await loadHighScore(GameMode.INFINITE) || 0,
+    };
+    
+    // コンボトラッカーをリセット
+    if (mode === GameMode.CHALLENGE) {
+      get().comboTracker.reset();
+    }
+    
+    set({
+      gameState: createInitialGameState(mode),
+      gameStatus: GameStatus.COUNTDOWN,
+      highScores: savedHighScores,
+    });
+    
     get().generateNewProblem();
   },
   
+  // カウントダウン開始
   startCountdown: () => {
     set({ gameStatus: GameStatus.COUNTDOWN });
   },
   
+  // カウントダウン完了
   completeCountdown: () => {
     const state = get();
-    
-    // Activate game mode
-    if (state.mode === GameMode.CHALLENGE && state.challengeState) {
-      set({
-        gameStatus: GameStatus.BUILDING,
-        challengeState: { ...state.challengeState, isActive: true },
-        problemStartTime: Date.now(), // Reset problem start time after countdown
-      });
-    } else if (state.mode === GameMode.INFINITE && state.infiniteStats) {
-      set({
-        gameStatus: GameStatus.BUILDING,
-        infiniteStats: { ...state.infiniteStats, isActive: true },
-        problemStartTime: Date.now(), // Reset problem start time after countdown
-      });
-    }
+    set({
+      gameStatus: GameStatus.BUILDING,
+      gameState: { ...state.gameState, isActive: true },
+      problemStartTime: Date.now(),
+    });
+    get().startTimer();
   },
   
+  // 新しい問題を生成
   generateNewProblem: () => {
     const problem = generateProblemExhaustive();
-    const screenWidth = 350; // Approximate game board width
+    const screenWidth = 350;
     const nodeSpacing = screenWidth / 6;
     const startX = nodeSpacing;
     
@@ -139,7 +169,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       value: num,
       position: {
         x: startX + (index * nodeSpacing),
-        y: 250, // Bottom of game area
+        y: 250,
       },
       isLeaf: true,
       depth: 0,
@@ -153,13 +183,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       nodes,
       selectedNodeId: null,
       gameStatus: state.gameStatus === GameStatus.COUNTDOWN ? GameStatus.COUNTDOWN : GameStatus.BUILDING,
-      history: [JSON.parse(JSON.stringify(nodes))], // Save initial state
+      history: [JSON.parse(JSON.stringify(nodes))],
       historyIndex: 0,
       problemStartTime: Date.now(),
     });
   },
   
-  
+  // ノード接続処理
   connectNodes: (firstNodeId: string, secondNodeId: string, operator: string) => {
     const state = get();
     const firstNode = state.nodes.find(n => n.id === firstNodeId);
@@ -169,7 +199,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     
-    // Calculate the result
+    // 計算結果
     let result: number;
     switch (operator) {
       case '+':
@@ -177,30 +207,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       case '-':
         result = firstNode.value - secondNode.value;
-        // 負の数の処理
-        if (result < 0) {
-          // Alert.alert('注意', '結果が負の数になります');
-          // 負の数でも継続する
-        }
         break;
       case '×':
         result = firstNode.value * secondNode.value;
         break;
       case '÷':
-        if (secondNode.value === 0) {
-          // ゼロ除算エラーを防ぐ
-          // Alert.alert('エラー', 'ゼロで割ることはできません');
-          return; // ゼロ除算は禁止のまま
-        }
-        result = firstNode.value / secondNode.value;
-        // 結果が整数でない場合は小数点以下2桁に丸める
-        result = Math.round(result * 100) / 100;
+        if (secondNode.value === 0) return;
+        result = Math.round((firstNode.value / secondNode.value) * 100) / 100;
         break;
       default:
         return;
     }
     
-    // Create new internal node
+    // 新しいノードを作成
     const newNode: NodeData = {
       id: `internal-${Date.now()}`,
       value: result,
@@ -216,7 +235,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isUsed: false,
     };
     
-    // Update nodes
+    // ノードを更新
     const updatedNodes = state.nodes.map(node => {
       if (node.id === firstNodeId || node.id === secondNodeId) {
         return { ...node, isUsed: true, parentId: newNode.id };
@@ -226,7 +245,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     updatedNodes.push(newNode);
     
-    // Check if puzzle is complete
+    // パズル完成チェック
     const activeNodes = updatedNodes.filter(n => !n.isUsed);
     if (activeNodes.length === 1) {
       const finalValue = activeNodes[0].value;
@@ -235,9 +254,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (isCorrect) {
         set({ gameStatus: GameStatus.CORRECT });
         
-        if (state.mode === GameMode.CHALLENGE && state.challengeState) {
-          // スコア計算
-          const solveTime = (Date.now() - state.problemStartTime) / 1000;
+        // スコア更新
+        const { gameState: game } = state;
+        const config = getGameModeConfig(game.mode);
+        const solveTime = (Date.now() - state.problemStartTime) / 1000;
+        
+        if (game.mode === GameMode.CHALLENGE) {
+          // チャレンジモードのスコア計算
           const problemResult: ProblemResult = {
             numbers: state.currentProblem.numbers,
             target: state.currentProblem.target,
@@ -248,35 +271,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
           
           const currentCombo = state.comboTracker.onCorrectAnswer(Date.now());
           const problemScore = calculateProblemScore(problemResult, currentCombo);
-          const newTotalScore = state.challengeState.currentScore + problemScore;
-          
-          const newProblemCount = state.challengeState.problemCount + 1;
-          const newTimeLeft = state.challengeState.timeLeft + GAME_CONFIG.CHALLENGE_MODE.BONUS_TIME;
-          const newSolvedProblems = state.challengeState.solvedProblems + 1;
-          const newTotalTime = state.challengeState.totalTime + solveTime;
           
           set({
-            challengeState: {
-              ...state.challengeState,
-              problemCount: newProblemCount,
-              timeLeft: newTimeLeft,
-              currentScore: newTotalScore,
+            gameState: {
+              ...game,
+              score: game.score + problemScore,
+              problemCount: game.problemCount + 1,
+              timeLeft: game.timeLeft + config.time.bonus,
               currentCombo,
               lastProblemScore: problemScore,
-              solvedProblems: newSolvedProblems,
-              totalTime: newTotalTime,
             },
           });
-          
-          // Generate new problem after a delay
-          setTimeout(() => {
-            get().generateNewProblem();
-          }, 1500);
+        } else {
+          // 無限モードの正解数更新
+          set({
+            gameState: {
+              ...game,
+              score: game.score + 1,
+              problemCount: game.problemCount + 1,
+            },
+          });
         }
+        
+        // 次の問題を生成
+        setTimeout(() => {
+          get().generateNewProblem();
+        }, 1500);
       }
     }
     
-    // Save state to history before updating
+    // 履歴を保存
     const currentState = get();
     const newHistory = [...currentState.history.slice(0, currentState.historyIndex + 1), JSON.parse(JSON.stringify(updatedNodes))];
     
@@ -288,129 +312,115 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
   
-  updateChallengeTime: (timeLeft: number) => {
+  // ゲーム一時停止
+  pauseGame: () => {
     const state = get();
-    if (state.challengeState) {
-      if (timeLeft <= 0) {
-        get().endChallenge();
-      } else {
-        set({
-          challengeState: {
-            ...state.challengeState,
-            timeLeft,
-          },
-        });
-      }
-    }
-  },
-  
-  endChallenge: async (isManual: boolean = false) => {
-    const state = get();
-    if (state.challengeState) {
-      // 最終ボーナスを追加してスコアを確定
-      const finalBonus = calculateFinalBonus(state.challengeState.currentScore, state.challengeState.problemCount);
-      const finalScore = state.challengeState.currentScore + finalBonus;
-      
+    if (state.gameState.isActive) {
       set({
-        gameStatus: isManual ? GameStatus.MANUALLY_ENDED : GameStatus.TIMEUP,
-        challengeState: {
-          ...state.challengeState,
-          isActive: false,
-          finalScore,
-        },
+        gameState: { ...state.gameState, isActive: false }
       });
-      
-      // ハイスコアを保存（スコア制に変更）
-      await saveChallengeHighScore(finalScore);
-      const highScore = await loadChallengeHighScore();
-      if (highScore !== null) {
-        set({ challengeHighScore: highScore });
-      }
+      get().stopTimer();
     }
   },
-
-  updateInfiniteTime: (timeLeft: number) => {
+  
+  // ゲーム再開
+  resumeGame: () => {
     const state = get();
-    if (state.infiniteStats) {
-      if (timeLeft <= 0) {
-        get().endInfiniteMode();
-      } else {
-        set({
-          infiniteStats: {
-            ...state.infiniteStats,
-            timeLeft,
-          },
-        });
-      }
-    }
-  },
-
-  endInfiniteMode: async (isManual: boolean = false) => {
-    const state = get();
-    if (state.infiniteStats) {
-      const finalScore = state.infiniteStats.correctAnswers;
-      const newHighScore = Math.max(state.infiniteStats.highScore, finalScore);
-      
+    if (!state.gameState.isActive && state.gameStatus === GameStatus.BUILDING) {
       set({
-        gameStatus: isManual ? GameStatus.MANUALLY_ENDED : GameStatus.TIMEUP,
-        infiniteStats: {
-          ...state.infiniteStats,
-          isActive: false,
-          highScore: newHighScore,
-        },
+        gameState: { ...state.gameState, isActive: true }
       });
-      
-      // 最高記録を保存
-      const statsToSave = {
-        ...state.infiniteStats,
-        highScore: newHighScore,
-        isActive: false,
-      };
-      await saveInfiniteStats(statsToSave);
+      get().startTimer();
     }
   },
   
-  
-  updateInfiniteStats: async (correct: boolean, timeSpent: number) => {
+  // 問題をスキップ
+  skipProblem: () => {
     const state = get();
-    if (state.infiniteStats) {
-      const newTotalProblems = state.infiniteStats.totalProblems + 1;
-      const newCorrectAnswers = state.infiniteStats.correctAnswers + (correct ? 1 : 0);
-      const newCurrentStreak = correct ? state.infiniteStats.currentStreak + 1 : 0;
-      const newLongestStreak = Math.max(state.infiniteStats.longestStreak, newCurrentStreak);
-      const newAverageTime = 
-        (state.infiniteStats.averageTime * state.infiniteStats.totalProblems + timeSpent) / newTotalProblems;
-      
-      const newStats = {
-        ...state.infiniteStats,
-        totalProblems: newTotalProblems,
-        correctAnswers: newCorrectAnswers,
-        averageTime: newAverageTime,
-        longestStreak: newLongestStreak,
-        currentStreak: newCurrentStreak,
-      };
-      
-      set({ infiniteStats: newStats });
-      
-      // 統計を保存
-      await saveInfiniteStats(newStats);
-    }
-  },
-
-  resetInfiniteStats: async () => {
-    const state = get();
-    const resetStats = { 
-      ...initialInfiniteStats, 
-      isActive: true,
-      timeLeft: GAME_CONFIG.INFINITE_MODE.INITIAL_TIME,
-      highScore: state.infiniteStats?.highScore || 0,
-    };
-    set({ infiniteStats: resetStats });
+    const { gameState: game } = state;
     
-    // 最高記録は保持してリセット
-    await saveInfiniteStats(resetStats);
+    // スキップ可能かチェック
+    if (game.skipCount <= 0) return;
+    
+    set({
+      gameState: {
+        ...game,
+        skipCount: game.skipCount - 1,
+        problemCount: game.problemCount + 1,
+      }
+    });
+    
+    get().generateNewProblem();
   },
-
+  
+  // ゲーム終了処理
+  endGame: async (isManual: boolean = false) => {
+    const state = get();
+    const { gameState: game } = state;
+    const config = getGameModeConfig(game.mode);
+    
+    // タイマー停止
+    get().stopTimer();
+    
+    let finalScore = game.score;
+    let isNewHighScore = false;
+    let previousHighScore = state.highScores[game.mode];
+    
+    if (game.mode === GameMode.CHALLENGE) {
+      // 最終ボーナスを追加
+      const finalBonus = calculateFinalBonus(game.score, game.problemCount);
+      finalScore = game.score + finalBonus;
+    }
+    
+    // ハイスコア判定
+    isNewHighScore = finalScore > previousHighScore;
+    
+    // 状態を更新
+    set({
+      gameStatus: isManual ? GameStatus.MANUALLY_ENDED : GameStatus.TIMEUP,
+      gameState: {
+        ...game,
+        isActive: false,
+        finalScore,
+      },
+    });
+    
+    // ハイスコア保存
+    if (isNewHighScore) {
+      await saveHighScore(game.mode, finalScore);
+      set({
+        highScores: {
+          ...state.highScores,
+          [game.mode]: finalScore,
+        },
+      });
+    }
+    
+    // 広告表示（手動終了以外）
+    if (config.ad.enabled && !isManual) {
+      await adService.showInterstitialAd();
+    }
+    
+    // リザルト画面への遷移
+    const navigationCallback = state.navigationCallback;
+    if (navigationCallback && !isManual) {
+      setTimeout(() => {
+        navigationCallback({
+          finalScore,
+          isNewHighScore,
+          previousHighScore,
+          mode: game.mode === GameMode.CHALLENGE ? 'challenge' : 'infinite',
+        });
+      }, 100);
+    }
+  },
+  
+  // ナビゲーションコールバック設定
+  setNavigationCallback: (callback: (params: any) => void) => {
+    set({ navigationCallback: callback });
+  },
+  
+  // 最後の操作を取り消し
   undoLastMove: () => {
     const state = get();
     if (state.historyIndex > 0) {
@@ -423,46 +433,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     }
   },
-
+  
+  // 取り消し可能かチェック
   canUndo: () => {
     const state = get();
     return state.historyIndex > 0;
   },
-
-
-  skipProblem: () => {
-    const state = get();
-    
-    // Check skip limit for challenge mode
-    if (state.mode === GameMode.CHALLENGE && state.challengeState) {
-      if (state.challengeState.skipCount <= 0) {
-        return; // No skips remaining
-      }
-      
-      // Decrement skip count
-      set({
-        challengeState: {
-          ...state.challengeState,
-          skipCount: state.challengeState.skipCount - 1,
-        }
-      });
-    }
-    
-    get().generateNewProblem();
-  },
   
+  // 保存されたデータを読み込み
   loadStoredData: async () => {
-    const [savedInfiniteStats, savedHighScore] = await Promise.all([
-      loadInfiniteStats(),
-      loadChallengeHighScore(),
+    const [challengeHighScore, infiniteHighScore] = await Promise.all([
+      loadHighScore(GameMode.CHALLENGE),
+      loadHighScore(GameMode.INFINITE),
     ]);
     
-    if (savedInfiniteStats) {
-      set({ infiniteStats: savedInfiniteStats });
-    }
-    
-    if (savedHighScore !== null) {
-      set({ challengeHighScore: savedHighScore });
-    }
+    set({
+      highScores: {
+        challenge: challengeHighScore || 0,
+        infinite: infiniteHighScore || 0,
+      },
+    });
   },
 }));

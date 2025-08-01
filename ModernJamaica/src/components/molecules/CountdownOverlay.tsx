@@ -267,7 +267,7 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
   const getCountdownColor = () => {
     if (phase === 'start') return ModernDesign.colors.accent.mint;
     // Use color based on the displayed number, not the internal count
-    const displayCount = phase === 'start' ? 0 : currentCount;
+    const displayCount = currentCount;
     if (displayCount === 1) return ModernDesign.colors.accent.coral;
     if (displayCount === 2) return ModernDesign.colors.accent.gold;
     if (displayCount === 3) return ModernDesign.colors.accent.neon;

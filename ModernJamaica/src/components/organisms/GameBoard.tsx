@@ -41,8 +41,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     undoLastMove,
     canUndo,
     skipProblem,
-    mode,
-    challengeState,
+    gameState,
   } = useGameStore();
 
   const [grid, setGrid] = useState<(GridNode | null)[][]>([]);
@@ -598,38 +597,38 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               style={[
                 styles.iconButton,
                 styles.skipButton,
-                (disabled || (mode === GameMode.CHALLENGE &&
-                  challengeState?.skipCount === 0)) &&
+                (disabled || (gameState?.mode === GameMode.CHALLENGE &&
+                  gameState?.skipCount === 0)) &&
                   styles.disabledIconButton,
               ]}
               onPress={() => {
-                if (mode === GameMode.CHALLENGE && challengeState) {
-                  if (challengeState.skipCount <= 0) {
+                if (gameState?.mode === GameMode.CHALLENGE) {
+                  if (gameState.skipCount <= 0) {
                     return;
                   }
-                  setSkipMessage(`問題をスキップしますか？\n（残り${challengeState.skipCount}回）`);
+                  setSkipMessage(`問題をスキップしますか？\n（残り${gameState.skipCount}回）`);
                 } else {
                   setSkipMessage('問題をスキップしますか？');
                 }
                 setShowSkipDialog(true);
               }}
               disabled={
-                disabled || (mode === GameMode.CHALLENGE && challengeState?.skipCount === 0)
+                disabled || (gameState?.mode === GameMode.CHALLENGE && gameState?.skipCount === 0)
               }
             >
               <MaterialIcons
                 name="skip-next"
                 size={24}
                 color={
-                  mode === GameMode.CHALLENGE && challengeState?.skipCount === 0
+                  gameState?.mode === GameMode.CHALLENGE && gameState?.skipCount === 0
                     ? ModernDesign.colors.text.disabled
                     : ModernDesign.colors.text.primary
                 }
               />
-              {mode === GameMode.CHALLENGE && challengeState && (
+              {gameState?.mode === GameMode.CHALLENGE && gameState && (
                 <View style={styles.skipBadge}>
                   <Text style={styles.skipBadgeText}>
-                    {challengeState.skipCount}
+                    {gameState.skipCount}
                   </Text>
                 </View>
               )}

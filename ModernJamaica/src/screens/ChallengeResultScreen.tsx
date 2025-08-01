@@ -16,6 +16,7 @@ import { BannerAdView } from '../components/molecules/BannerAdView';
 import { useGameStore } from '../store/gameStore';
 import { GameMode } from '../types';
 import { Button } from '../components/atoms/Button';
+import { getGameModeConfig } from '../config/gameMode';
 
 const { width } = Dimensions.get('window');
 
@@ -41,7 +42,11 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
   route,
 }) => {
   const { finalScore, isNewHighScore, previousHighScore, mode = 'challenge' } = route.params;
-  const { initGame, challengeState } = useGameStore();
+  const { initGame, gameState } = useGameStore();
+  
+  // ゲームモード設定を取得
+  const gameMode = mode === 'infinite' ? GameMode.INFINITE : GameMode.CHALLENGE;
+  const config = getGameModeConfig(gameMode);
   
   // Animation values
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -199,10 +204,10 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
 
         {/* Score Display */}
         <View style={styles.scoreSection}>
-          <Text style={styles.scoreLabel}>スコア</Text>
+          <Text style={styles.scoreLabel}>{config.display.headerLabel}</Text>
           <Animated.View style={styles.scoreContainer}>
-            <Text style={styles.scoreValue}>{displayedScore.toLocaleString()}</Text>
-            <Text style={styles.scoreUnit}>点</Text>
+            <Text style={styles.scoreValue}>{mode === 'infinite' ? displayedScore : displayedScore.toLocaleString()}</Text>
+            <Text style={styles.scoreUnit}>{mode === 'infinite' ? '問' : '点'}</Text>
           </Animated.View>
           
           {/* High Score Information */}
@@ -229,7 +234,9 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
           ) : previousHighScore > 0 ? (
             <View style={styles.previousScoreContainer}>
               <Text style={styles.previousScoreLabel}>ハイスコア</Text>
-              <Text style={styles.previousScoreValue}>{previousHighScore.toLocaleString()}点</Text>
+              <Text style={styles.previousScoreValue}>
+                {mode === 'infinite' ? `${previousHighScore}問` : `${previousHighScore.toLocaleString()}点`}
+              </Text>
             </View>
           ) : null}
         </View>
@@ -240,8 +247,8 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
             <MaterialIcons name="timer" size={24} color={ModernDesign.colors.accent.neon} />
             <Text style={styles.statLabel}>平均回答時間</Text>
             <Text style={styles.statValue}>
-              {challengeState?.solvedProblems && challengeState.solvedProblems > 0
-                ? `${(challengeState.totalTime / challengeState.solvedProblems).toFixed(1)}秒`
+              {gameState?.problemCount && gameState.problemCount > 0
+                ? `${(60 / gameState.problemCount).toFixed(1)}秒`
                 : '---'}
             </Text>
           </View>
@@ -250,7 +257,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
             <MaterialIcons name="done" size={24} color={ModernDesign.colors.accent.gold} />
             <Text style={styles.statLabel}>正解した問題数</Text>
             <Text style={styles.statValue}>
-              {challengeState?.solvedProblems || 0}問
+              {gameState?.problemCount || 0}問
             </Text>
           </View>
         </View>

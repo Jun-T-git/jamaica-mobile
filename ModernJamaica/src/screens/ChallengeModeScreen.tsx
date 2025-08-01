@@ -1,5 +1,5 @@
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -11,15 +11,9 @@ import { GameHeader } from '../components/organisms/GameHeader';
 import { SuccessOverlay } from '../components/molecules/SuccessOverlay';
 import { Dialog } from '../components/molecules/Dialog';
 import { CountdownOverlay } from '../components/molecules/CountdownOverlay';
-import { COLORS, GAME_CONFIG, ModernDesign } from '../constants';
-import { adService } from '../services/adService';
-import { useGameStore } from '../store/gameStore';
+import { COLORS, ModernDesign } from '../constants';
+import { useSimpleGameScreen } from '../hooks/useSimpleGameScreen';
 import { GameMode, GameStatus } from '../types';
-import { formatTime, getTimeColor } from '../utils/gameUtils';
-import { useGameTimer } from '../hooks/useGameTimer';
-import { useSuccessAnimation } from '../hooks/useSuccessAnimation';
-import { useGameDialogs } from '../hooks/useGameDialogs';
-import { useGameMenu } from '../hooks/useGameMenu';
 
 type RootStackParamList = {
   ModeSelection: undefined;
@@ -40,149 +34,57 @@ interface ChallengeModeScreenProps {
 export const ChallengeModeScreen: React.FC<ChallengeModeScreenProps> = ({
   navigation,
 }) => {
+  // シンプルなゲーム画面フック
   const {
-    targetNumber,
+    gameState,
     gameStatus,
-    challengeState,
-    challengeHighScore,
-    updateChallengeTime,
-    completeCountdown,
-  } = useGameStore();
-
-  // Use custom hook for menu management
-  const { showMenu, closeMenu, toggleMenu } = useGameMenu(gameStatus);
-  
-  // Use custom hook for timer management
-  const timerRef = useGameTimer(
-    challengeState?.isActive || false,
-    challengeState?.timeLeft || 0,
-    updateChallengeTime,
     showMenu,
-    gameStatus
-  );
+    headerStats,
+    gameInfo,
+    successAnim,
+    dialogs,
+    handlers,
+  } = useSimpleGameScreen(GameMode.CHALLENGE, navigation);
 
-  // Use custom hook for success animation
-  const successAnim = useSuccessAnimation(gameStatus, 200);
-
-  // Use custom hook for dialog management
-  const {
-    showRestartDialog,
-    setShowRestartDialog,
-    showExitDialog,
-    setShowExitDialog,
-    handleRestart,
-    handleExit,
-  } = useGameDialogs(GameMode.CHALLENGE, navigation, timerRef);
-
-
-  // Handle time up - use ref to prevent multiple navigations
-  const timeupHandledRef = useRef(false);
-  
-  useEffect(() => {
-    if (
-      gameStatus === GameStatus.TIMEUP &&
-      challengeState?.finalScore !== undefined &&
-      !timeupHandledRef.current
-    ) {
-      timeupHandledRef.current = true;
-      const isNewHighScore = challengeState.finalScore > challengeHighScore;
-
-      // インタースティシャル広告を表示してからリザルト画面へ
-      const showResultScreen = async () => {
-        const adShown = await adService.showInterstitialAd();
-
-        // 広告表示後、または広告がない場合はすぐにリザルト画面へ
-        setTimeout(
-          () => {
-            navigation.replace('ChallengeResult', {
-              finalScore: challengeState.finalScore!,
-              isNewHighScore,
-              previousHighScore: challengeHighScore,
-              mode: 'challenge',
-            });
-          },
-          adShown ? 100 : 0,
-        ); // 広告表示後は少し待機
-      };
-
-      showResultScreen();
-    }
-  }, [gameStatus, challengeState?.finalScore, challengeHighScore, navigation]);
-  
-  // Reset handled flag when game status changes away from TIMEUP
-  useEffect(() => {
-    if (gameStatus !== GameStatus.TIMEUP) {
-      timeupHandledRef.current = false;
-    }
-  }, [gameStatus]);
-
-
-
-  if (!challengeState) return null;
-
-  const handleCountdownComplete = () => {
-    completeCountdown();
-  };
+  if (!gameState) return null;
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Countdown Overlay */}
       <CountdownOverlay
         visible={gameStatus === GameStatus.COUNTDOWN}
-        onComplete={handleCountdownComplete}
+        onComplete={handlers.onCountdownComplete}
       />
 
       <GameHeader
-        stats={[
-          {
-            label: 'スコア',
-            value: challengeState.currentScore.toLocaleString(),
-            variant: 'default',
-            labelColor: COLORS.TEXT.SECONDARY,
-            valueColor: COLORS.TEXT.PRIMARY,
-          },
-          {
-            label: '残り時間',
-            value: gameStatus === GameStatus.COUNTDOWN ? '--:--' : formatTime(challengeState.timeLeft),
-            variant: 'timer',
-            labelColor: COLORS.TEXT.SECONDARY,
-            valueColor: gameStatus === GameStatus.COUNTDOWN 
-              ? COLORS.TEXT.DISABLED 
-              : getTimeColor(challengeState.timeLeft, GAME_CONFIG.CHALLENGE_MODE.WARNING_TIME, COLORS.TEXT.PRIMARY, COLORS.DANGER),
-          },
-        ]}
+        stats={headerStats}
         showMenu={showMenu}
-        onMenuPress={toggleMenu}
+        onMenuPress={handlers.onMenuToggle}
         menuDisabled={gameStatus !== GameStatus.BUILDING}
       />
 
       <PauseMenu
         visible={showMenu}
-        onClose={closeMenu}
+        onClose={handlers.onMenuClose}
         onResume={() => {
           Vibration.vibrate(50);
-          closeMenu();
+          handlers.onMenuClose();
         }}
         onRestart={() => {
           Vibration.vibrate(75);
-          closeMenu();
-          setShowRestartDialog(true);
+          handlers.onMenuClose();
+          dialogs.setShowRestartDialog(true);
         }}
         onHome={() => {
           Vibration.vibrate(100);
-          closeMenu();
-          setShowExitDialog(true);
+          handlers.onMenuClose();
+          dialogs.setShowExitDialog(true);
         }}
         gameMode={GameMode.CHALLENGE}
       />
 
       <GameBoard
-        gameInfo={{
-          target: targetNumber,
-          instruction: gameStatus === GameStatus.COUNTDOWN 
-            ? 'ゲーム開始まで待機中...' 
-            : '最初の数字をタップしてください',
-        }}
+        gameInfo={gameInfo}
         disabled={gameStatus === GameStatus.COUNTDOWN}
       />
 
@@ -194,52 +96,48 @@ export const ChallengeModeScreen: React.FC<ChallengeModeScreenProps> = ({
 
       {/* Restart Confirmation Dialog */}
       <Dialog
-        visible={showRestartDialog}
-        title="チャレンジをリスタート"
-        message="新しいチャレンジを開始しますか？
-
-現在の進行状況が失われます"
+        visible={dialogs.showRestartDialog}
+        title={dialogs.config.restart.title}
+        message={dialogs.config.restart.message}
         icon="refresh"
         iconColor={ModernDesign.colors.accent.neon}
         buttons={[
           {
             icon: 'refresh',
-            title: 'リスタート',
+            title: dialogs.config.restart.confirmText,
             variant: 'danger',
-            onPress: handleRestart,
+            onPress: dialogs.handleRestart,
           },
           {
             icon: 'close',
             title: 'キャンセル',
-            onPress: () => setShowRestartDialog(false),
+            onPress: () => dialogs.setShowRestartDialog(false),
           },
         ]}
-        onClose={() => setShowRestartDialog(false)}
+        onClose={() => dialogs.setShowRestartDialog(false)}
       />
 
       {/* Exit Confirmation Dialog */}
       <Dialog
-        visible={showExitDialog}
-        title="チャレンジ終了"
-        message="チャレンジを終了してメインメニューに戻りますか？
-
-達成したスコアが保存されます"
+        visible={dialogs.showExitDialog}
+        title={dialogs.config.exit.title}
+        message={dialogs.config.exit.message}
         icon="home"
         iconColor={ModernDesign.colors.accent.neon}
         buttons={[
           {
             icon: 'home',
-            title: '終了する',
+            title: dialogs.config.exit.confirmText,
             variant: 'danger',
-            onPress: handleExit,
+            onPress: dialogs.handleExit,
           },
           {
             icon: 'close',
             title: 'キャンセル',
-            onPress: () => setShowExitDialog(false),
+            onPress: () => dialogs.setShowExitDialog(false),
           },
         ]}
-        onClose={() => setShowExitDialog(false)}
+        onClose={() => dialogs.setShowExitDialog(false)}
       />
 
     </SafeAreaView>

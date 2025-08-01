@@ -1,36 +1,29 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { GameMode } from '../types';
 import { useGameStore } from '../store/gameStore';
 
 /**
- * Custom hook for managing game dialog states
- * Handles restart and exit confirmation dialogs
+ * シンプルなゲームダイアログ管理フック
+ * タイマー管理の複雑性を削除
  */
 export const useGameDialogs = (
   gameMode: GameMode,
   navigation: any,
-  timerRef: React.MutableRefObject<NodeJS.Timeout | null>
+  _timerRef: any // もう使用しないが互換性のため残す
 ) => {
   const [showRestartDialog, setShowRestartDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
 
-  const { initGame, endChallenge, resetInfiniteStats } = useGameStore();
+  const { initGame, endGame } = useGameStore();
 
   const handleRestart = async () => {
     setShowRestartDialog(false);
     
     try {
-      // Clear timer and reset reference properly
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-      
-      // Reinitialize the game with countdown
+      // タイマーはStore内で管理されるため、ここでの処理は不要
       await initGame(gameMode);
     } catch (error) {
       console.error('Failed to restart game:', error);
-      // Reset dialog state if restart fails
       setShowRestartDialog(false);
     }
   };
@@ -39,21 +32,11 @@ export const useGameDialogs = (
     setShowExitDialog(false);
     
     try {
-      // Clear timer before exiting
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-      
-      if (gameMode === GameMode.CHALLENGE) {
-        endChallenge(true);
-      } else {
-        await resetInfiniteStats();
-      }
+      // タイマーはStore内で管理されるため、ここでの処理は不要
+      await endGame(true);
       navigation.goBack();
     } catch (error) {
       console.error('Failed to exit game:', error);
-      // Force navigation back even if cleanup fails
       navigation.goBack();
     }
   };
