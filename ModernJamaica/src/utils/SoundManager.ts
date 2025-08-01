@@ -1,9 +1,12 @@
 import Sound from 'react-native-sound';
 
 export enum SoundType {
-  TAP = 'tap',
+  TAP = 'tap',           // ゲーム内操作音（ノード、演算子など）
   CONNECT = 'connect', 
   CORRECT = 'correct',
+  COUNTDOWN = 'countdown',
+  START = 'start',
+  BUTTON = 'button',     // 一般的なボタン操作音（メニュー、設定など）
 }
 
 class SoundManager {
@@ -11,6 +14,9 @@ class SoundManager {
     [SoundType.TAP]: null,
     [SoundType.CONNECT]: null,
     [SoundType.CORRECT]: null,
+    [SoundType.COUNTDOWN]: null,
+    [SoundType.START]: null,
+    [SoundType.BUTTON]: null,
   };
   
   private isEnabled: boolean = true;
@@ -44,6 +50,27 @@ class SoundManager {
       if (error) {
         console.warn('Failed to load correct sound:', error);
         this.sounds[SoundType.CORRECT] = null;
+      }
+    });
+    
+    this.sounds[SoundType.COUNTDOWN] = new Sound('countdown.mp3', Sound.MAIN_BUNDLE, (error) => {
+      if (error) {
+        console.warn('Failed to load countdown sound:', error);
+        this.sounds[SoundType.COUNTDOWN] = null;
+      }
+    });
+    
+    this.sounds[SoundType.START] = new Sound('start.mp3', Sound.MAIN_BUNDLE, (error) => {
+      if (error) {
+        console.warn('Failed to load start sound:', error);
+        this.sounds[SoundType.START] = null;
+      }
+    });
+    
+    this.sounds[SoundType.BUTTON] = new Sound('button.mp3', Sound.MAIN_BUNDLE, (error) => {
+      if (error) {
+        console.warn('Failed to load button sound:', error);
+        this.sounds[SoundType.BUTTON] = null;
       }
     });
   }

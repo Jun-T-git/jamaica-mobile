@@ -3,6 +3,7 @@ import { TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import { Icon } from './Icon';
 import { Typography } from './Typography';
 import { ModernDesign } from '../../constants';
+import { soundManager, SoundType } from '../../utils/SoundManager';
 
 interface ButtonProps {
   icon: string;
@@ -13,6 +14,8 @@ interface ButtonProps {
   style?: ViewStyle;
   dynamicType?: boolean; // Dynamic Type対応
   accessibilityScale?: number; // アクセシビリティスケール
+  soundType?: SoundType; // 効果音タイプ（デフォルト: BUTTON）
+  playSound?: boolean; // 効果音再生制御（デフォルト: true）
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -24,6 +27,8 @@ export const Button: React.FC<ButtonProps> = ({
   style,
   dynamicType = true, // デフォルトでDynamic Type有効
   accessibilityScale = 1.0,
+  soundType = SoundType.BUTTON, // デフォルトで一般的なボタン音
+  playSound = true, // デフォルトで効果音有効
 }) => {
   const buttonStyle = [
     styles.button,
@@ -58,10 +63,18 @@ export const Button: React.FC<ButtonProps> = ({
     }
   };
 
+  const handlePress = () => {
+    // コンポーネント内で効果音を制御
+    if (playSound && !disabled) {
+      soundManager.play(soundType);
+    }
+    onPress();
+  };
+
   return (
     <TouchableOpacity
       style={buttonStyle}
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled}
       activeOpacity={0.7}
     >

@@ -6,6 +6,7 @@ import {
   Easing,
 } from 'react-native';
 import { ModernDesign } from '../../constants';
+import { soundManager, SoundType } from '../../utils/SoundManager';
 
 interface CountdownOverlayProps {
   visible: boolean;
@@ -102,7 +103,8 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
   };
 
   const showNumberAnimation = () => {
-    // Visual feedback only (vibration removed for UX simplification)
+    // カウントダウン数字効果音
+    soundManager.play(SoundType.COUNTDOWN);
     
     // Reset and animate the number
     scaleAnim.setValue(0);
@@ -165,7 +167,8 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
   };
 
   const showStartAnimation = () => {
-    // Visual feedback only (vibration removed for UX simplification)
+    // START効果音
+    soundManager.play(SoundType.START);
     
     // Reset animations
     scaleAnim.setValue(0);

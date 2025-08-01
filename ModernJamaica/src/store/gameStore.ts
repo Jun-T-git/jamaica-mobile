@@ -115,8 +115,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().endGame(false);
     } else {
       // 時間を減らす
+      const newTimeLeft = game.timeLeft - 1;
+      
+      // 残り時間が5秒以下になったら毎秒countdown.mp3を再生
+      if (newTimeLeft <= 5 && newTimeLeft > 0) {
+        soundManager.play(SoundType.COUNTDOWN);
+      }
+      
       set({
-        gameState: { ...game, timeLeft: game.timeLeft - 1 }
+        gameState: { ...game, timeLeft: newTimeLeft }
       });
     }
   },

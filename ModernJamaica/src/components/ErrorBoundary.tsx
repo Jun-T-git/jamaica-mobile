@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { COLORS } from '../constants';
+import { soundManager, SoundType } from '../utils/SoundManager';
 
 interface Props {
   children: ReactNode;
@@ -34,6 +35,8 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   handleReset = () => {
+    // エラー画面リセットボタン効果音
+    soundManager.play(SoundType.BUTTON);
     this.setState({ hasError: false, error: null });
   };
 

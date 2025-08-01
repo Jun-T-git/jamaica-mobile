@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, View, StyleSheet, ViewStyle } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ModernDesign } from '../../constants';
+import { soundManager, SoundType } from '../../utils/SoundManager';
 
 interface GameMenuButtonProps {
   isActive: boolean;
@@ -10,6 +11,7 @@ interface GameMenuButtonProps {
   activeIconName?: string;
   disabled?: boolean;
   style?: ViewStyle;
+  soundType?: SoundType; // 効果音タイプ（デフォルト: BUTTON）
 }
 
 export const GameMenuButton: React.FC<GameMenuButtonProps> = ({
@@ -19,7 +21,14 @@ export const GameMenuButton: React.FC<GameMenuButtonProps> = ({
   activeIconName = 'close',
   disabled = false,
   style,
+  soundType = SoundType.BUTTON, // デフォルトで一般的なボタン音
 }) => {
+  const handlePress = () => {
+    // ボタンタップ効果音を再生
+    soundManager.play(soundType);
+    onPress();
+  };
+
   return (
     <TouchableOpacity
       style={[
@@ -28,7 +37,7 @@ export const GameMenuButton: React.FC<GameMenuButtonProps> = ({
         disabled && styles.buttonDisabled,
         style,
       ]}
-      onPress={disabled ? undefined : onPress}
+      onPress={disabled ? undefined : handlePress}
       activeOpacity={disabled ? 1 : 0.8}
       disabled={disabled}
     >

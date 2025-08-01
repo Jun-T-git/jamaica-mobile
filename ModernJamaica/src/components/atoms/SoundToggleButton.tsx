@@ -3,6 +3,7 @@ import { TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSettingsStore } from '../../store/settingsStore';
 import { ModernDesign } from '../../constants';
+import { soundManager, SoundType } from '../../utils/SoundManager';
 
 interface SoundToggleButtonProps {
   size?: number;
@@ -15,10 +16,16 @@ export const SoundToggleButton: React.FC<SoundToggleButtonProps> = ({
 }) => {
   const { soundEnabled, toggleSound } = useSettingsStore();
   
+  const handlePress = () => {
+    // 音声設定ボタンは常に効果音を再生（ユーザーフィードバックのため）
+    soundManager.play(SoundType.BUTTON);
+    toggleSound();
+  };
+  
   return (
     <TouchableOpacity 
       style={[styles.button, style]}
-      onPress={toggleSound}
+      onPress={handlePress}
       activeOpacity={0.7}
     >
       <MaterialIcons

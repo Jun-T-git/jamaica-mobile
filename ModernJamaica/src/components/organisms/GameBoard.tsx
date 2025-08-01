@@ -254,7 +254,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const handleNodePress = (node: GridNode) => {
     if (!node.isActive) return;
 
-    // ノードタップ効果音
+    // ノードタップ時は特別な効果音（TAP）を使用
     soundManager.play(SoundType.TAP);
 
     if (!firstNode) {
@@ -273,7 +273,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const handleOperatorPress = (operator: Operator) => {
     if (!firstNode) return;
 
-    // 演算子ボタンタップ効果音
+    // 演算子ボタンタップ時は特別な効果音（TAP）を使用
     soundManager.play(SoundType.TAP);
 
     if (selectedOperator === operator) {
@@ -582,7 +582,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 styles.iconButton,
                 (!canUndo() || disabled) && styles.disabledIconButton,
               ]}
-              onPress={undoLastMove}
+              onPress={() => {
+                // Undoボタンタップ時は特別な効果音（TAP）を使用
+                soundManager.play(SoundType.TAP);
+                undoLastMove();
+              }}
               disabled={!canUndo() || disabled}
             >
               <MaterialIcons
@@ -601,6 +605,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                   styles.disabledIconButton,
               ]}
               onPress={() => {
+                // スキップボタンタップ時は特別な効果音（TAP）を使用
+                soundManager.play(SoundType.TAP);
+                
                 if (gameState?.mode === GameMode.CHALLENGE) {
                   if (gameState.skipCount <= 0) {
                     return;

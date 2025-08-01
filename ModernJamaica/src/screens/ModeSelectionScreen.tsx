@@ -13,6 +13,7 @@ import { BannerAdView } from '../components/molecules/BannerAdView';
 import { ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
 import { GameMode } from '../types';
+import { soundManager, SoundType } from '../utils/SoundManager';
 
 interface ModeSelectionScreenProps {
   navigation: any;
@@ -29,6 +30,9 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   }, [loadStoredData]);
 
   const handleModeSelect = (mode: GameMode) => {
+    // ゲームモード選択ボタン効果音
+    soundManager.play(SoundType.BUTTON);
+    
     initGame(mode);
     navigation.navigate(
       mode === GameMode.CHALLENGE ? 'ChallengeMode' : 'InfiniteMode',

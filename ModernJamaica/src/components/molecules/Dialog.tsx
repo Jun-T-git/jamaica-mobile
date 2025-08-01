@@ -4,6 +4,7 @@ import { Button } from '../atoms/Button';
 import { Icon } from '../atoms/Icon';
 import { Typography } from '../atoms/Typography';
 import { ModernDesign } from '../../constants';
+import { soundManager, SoundType } from '../../utils/SoundManager';
 
 interface DialogButton {
   icon: string;
@@ -50,11 +51,19 @@ export const Dialog: React.FC<DialogProps> = ({
 
   const hasStructuredContent = title || message || icon || buttons;
 
+  const handleBackdropPress = () => {
+    if (closeOnOverlayPress && onClose) {
+      // ダイアログ背景タップ効果音
+      soundManager.play(SoundType.BUTTON);
+      onClose();
+    }
+  };
+
   return (
     <View style={styles.overlay}>
       <TouchableOpacity
         style={styles.backdrop}
-        onPress={closeOnOverlayPress && onClose ? onClose : undefined}
+        onPress={handleBackdropPress}
         activeOpacity={1}
       />
       <View style={cardStyle}>
