@@ -12,6 +12,8 @@ interface StatValueProps {
   style?: ViewStyle;
   labelStyle?: TextStyle;
   valueStyle?: TextStyle;
+  dynamicType?: boolean; // Dynamic Type対応を有効にするか
+  accessibilityScale?: number; // アクセシビリティスケール
 }
 
 export const StatValue: React.FC<StatValueProps> = ({
@@ -23,6 +25,8 @@ export const StatValue: React.FC<StatValueProps> = ({
   style,
   labelStyle,
   valueStyle,
+  dynamicType = true, // デフォルトでDynamic Type有効
+  accessibilityScale = 1.0,
 }) => {
   const containerStyle = [
     styles.container,
@@ -49,12 +53,16 @@ export const StatValue: React.FC<StatValueProps> = ({
       <Typography
         variant="caption"
         style={combinedLabelStyle}
+        dynamicType={dynamicType}
+        accessibilityScale={accessibilityScale}
       >
         {label}
       </Typography>
       <Typography
         variant="body1"
         style={combinedValueStyle}
+        dynamicType={dynamicType}
+        accessibilityScale={accessibilityScale}
       >
         {value}
       </Typography>
@@ -68,14 +76,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    fontSize: 13, // Maintain original exact size from InfiniteModeScreen  
+    fontSize: ModernDesign.typography.fontSize.sm, // Use design system sm (14pt)
     color: ModernDesign.colors.text.secondary,
     fontWeight: '500', // Maintain original exact weight
     marginBottom: 6, // Maintain original exact margin
     letterSpacing: 0.3,
   },
   value: {
-    fontSize: 20, // Maintain original exact size from screens
+    fontSize: ModernDesign.typography.fontSize.xl, // Use design system xl (19pt, close to original 20pt)
     fontWeight: 'bold', // Maintain original exact weight
     color: ModernDesign.colors.text.primary,
     textShadowColor: 'rgba(0, 0, 0, 0.1)',
@@ -112,14 +120,14 @@ const styles = StyleSheet.create({
 
   // Variant-specific value styles
   defaultValue: {
-    fontSize: 20, // Maintain original exact size from InfiniteModeScreen
+    fontSize: ModernDesign.typography.fontSize.xl, // Use design system xl (19pt)
     textShadowColor: 'rgba(0, 0, 0, 0.1)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
   
   timerValue: {
-    fontSize: 22, // サイズを少し小さくして重なりを防ぐ
+    fontSize: ModernDesign.typography.fontSize['2xl'], // Use design system 2xl (22pt)
     fontFamily: 'SF Mono',
     lineHeight: 26, // 行の高さを設定してテキストクリップを防ぐ
     // colorは外部から渡される色を優先するため削除

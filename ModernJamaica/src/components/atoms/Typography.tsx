@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, StyleSheet, TextStyle } from 'react-native';
-import { ModernDesign } from '../../design/modernDesignSystem';
+import { ModernDesign, getDynamicLineHeight } from '../../design/modernDesignSystem';
 
 type TypographyVariant = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'body1' | 'body2' | 'caption' | 'overline';
 type TypographyColor = 'primary' | 'secondary' | 'tertiary' | 'inverse';
@@ -12,6 +12,8 @@ interface TypographyProps {
   style?: TextStyle;
   numberOfLines?: number;
   textAlign?: 'left' | 'center' | 'right';
+  dynamicType?: boolean; // Dynamic Type対応を有効にするかどうか（オプトイン）
+  accessibilityScale?: number; // ユーザーのアクセシビリティ設定倍率
 }
 
 export const Typography: React.FC<TypographyProps> = ({
@@ -21,16 +23,33 @@ export const Typography: React.FC<TypographyProps> = ({
   style,
   numberOfLines,
   textAlign = 'left',
+  dynamicType = false,
+  accessibilityScale = 1.0,
 }) => {
   const getTextStyle = (): TextStyle => {
     const variantStyle = styles[variant];
     const colorStyle = styles[`${color}Color`];
     
-    return {
+    const baseStyle: TextStyle = {
       ...variantStyle,
       ...colorStyle,
       textAlign,
     };
+
+    // Dynamic Type対応（オプトイン）
+    if (dynamicType && accessibilityScale > 1.0) {
+      const baseFontSize = variantStyle.fontSize as number;
+      const scaledFontSize = baseFontSize * Math.min(accessibilityScale, 1.3); // 最大30%まで拡大
+      const scaledLineHeight = getDynamicLineHeight(scaledFontSize);
+      
+      return {
+        ...baseStyle,
+        fontSize: scaledFontSize,
+        lineHeight: scaledLineHeight,
+      };
+    }
+    
+    return baseStyle;
   };
 
   return (

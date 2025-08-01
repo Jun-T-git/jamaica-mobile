@@ -28,8 +28,8 @@ export const ModernDesign = {
     // Text hierarchy - High contrast but warm
     text: {
       primary: '#F9FAFB',      // Warm white
-      secondary: '#D1D5DB',    // Light warm gray
-      tertiary: '#9CA3AF',     // Medium warm gray
+      secondary: '#E5E7EB',    // Lighter warm gray (improved contrast)
+      tertiary: '#CBD5E1',     // Much lighter warm gray (safe contrast ratio)
       disabled: '#6B7280',     // Darker gray
       inverse: '#1A1B23',      // Dark on light
     },
@@ -58,9 +58,9 @@ export const ModernDesign = {
     },
     
     fontSize: {
-      xs: 11,
-      sm: 13,
-      base: 15,
+      xs: 12,
+      sm: 14,
+      base: 16,
       lg: 17,
       xl: 19,
       '2xl': 22,
@@ -318,6 +318,24 @@ export const getModernSpacing = (size: keyof typeof ModernDesign.spacing): numbe
 
 export const getModernShadow = (size: keyof typeof ModernDesign.shadows) => {
   return ModernDesign.shadows[size];
+};
+
+// Dynamic Type Support - 既存レイアウトへの影響を最小化
+export const getDynamicFontSize = (
+  baseSize: keyof typeof ModernDesign.typography.fontSize,
+  scale: number = 1.0, // iOS設定による倍率（1.0-1.5程度を想定）
+  maxScale: number = 1.3 // レイアウト破綻防止のための最大倍率
+): number => {
+  const actualScale = Math.min(scale, maxScale);
+  return ModernDesign.typography.fontSize[baseSize] * actualScale;
+};
+
+// アクセシビリティ対応のライン高さ計算
+export const getDynamicLineHeight = (
+  fontSize: number,
+  baseLineHeight: keyof typeof ModernDesign.typography.lineHeight = 'normal'
+): number => {
+  return fontSize * ModernDesign.typography.lineHeight[baseLineHeight];
 };
 
 // Game specific color themes - Bright and Engaging

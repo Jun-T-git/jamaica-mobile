@@ -11,6 +11,8 @@ interface ButtonProps {
   variant?: 'default' | 'primary' | 'danger';
   disabled?: boolean;
   style?: ViewStyle;
+  dynamicType?: boolean; // Dynamic Type対応
+  accessibilityScale?: number; // アクセシビリティスケール
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -20,6 +22,8 @@ export const Button: React.FC<ButtonProps> = ({
   variant = 'default',
   disabled = false,
   style,
+  dynamicType = true, // デフォルトでDynamic Type有効
+  accessibilityScale = 1.0,
 }) => {
   const buttonStyle = [
     styles.button,
@@ -75,6 +79,8 @@ export const Button: React.FC<ButtonProps> = ({
           { color: getTextColor() },
           variant === 'primary' && styles.primaryTitle,
         ])}
+        dynamicType={dynamicType}
+        accessibilityScale={accessibilityScale}
       >
         {title}
       </Typography>
