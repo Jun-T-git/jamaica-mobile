@@ -6,6 +6,7 @@ import { saveHighScore, loadHighScore } from '../utils/storage';
 import { adService } from '../services/adService';
 import { ComboTracker, calculateProblemScore, calculateFinalBonus } from '../utils/scoreCalculator';
 import { ProblemResult } from '../constants/scoreConfig';
+import { soundManager, SoundType } from '../utils/SoundManager';
 
 interface GameStore extends GameState {
   // UI関連の状態
@@ -245,6 +246,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     updatedNodes.push(newNode);
     
+    // ノード結合効果音
+    soundManager.play(SoundType.CONNECT);
+    
     // パズル完成チェック
     const activeNodes = updatedNodes.filter(n => !n.isUsed);
     if (activeNodes.length === 1) {
@@ -253,6 +257,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       
       if (isCorrect) {
         set({ gameStatus: GameStatus.CORRECT });
+        
+        // 問題正解効果音
+        soundManager.play(SoundType.CORRECT);
         
         // スコア更新
         const { gameState: game } = state;

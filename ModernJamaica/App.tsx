@@ -8,6 +8,7 @@ import { ChallengeModeScreen } from './src/screens/ChallengeModeScreen';
 import { InfiniteModeScreen } from './src/screens/InfiniteModeScreen';
 import { ChallengeResultScreen } from './src/screens/ChallengeResultScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { useSettingsStore } from './src/store/settingsStore';
 
 type RootStackParamList = {
   Splash: undefined;
@@ -25,6 +26,8 @@ type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 function App() {
+  const { loadSoundSetting } = useSettingsStore();
+
   useEffect(() => {
     // AdMob SDKの初期化
     mobileAds()
@@ -35,7 +38,10 @@ function App() {
       .catch((error) => {
         console.error('AdMob SDK initialization error:', error);
       });
-  }, []);
+
+    // 音声設定の読み込み
+    loadSoundSetting();
+  }, [loadSoundSetting]);
 
   return (
     <ErrorBoundary>

@@ -13,6 +13,7 @@ import { ModernDesign } from '../../constants';
 import { useGameStore } from '../../store/gameStore';
 import { GameMode, Operator } from '../../types';
 import { Dialog } from '../molecules/Dialog';
+import { soundManager, SoundType } from '../../utils/SoundManager';
 
 interface GameBoardProps {
   gameInfo: {
@@ -253,6 +254,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const handleNodePress = (node: GridNode) => {
     if (!node.isActive) return;
 
+    // ノードタップ効果音
+    soundManager.play(SoundType.TAP);
+
     if (!firstNode) {
       setFirstNode(node);
     } else if (firstNode.nodeId === node.nodeId) {
@@ -268,6 +272,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   const handleOperatorPress = (operator: Operator) => {
     if (!firstNode) return;
+
+    // 演算子ボタンタップ効果音
+    soundManager.play(SoundType.TAP);
 
     if (selectedOperator === operator) {
       setSelectedOperator(null);

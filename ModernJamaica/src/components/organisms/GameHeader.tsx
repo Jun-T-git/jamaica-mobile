@@ -2,7 +2,8 @@ import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { GameStat } from '../molecules/GameStat';
 import { GameMenuButton } from '../molecules/GameMenuButton';
-import { COLORS } from '../../constants';
+import { SoundToggleButton } from '../atoms/SoundToggleButton';
+import { COLORS, ModernDesign } from '../../constants';
 
 interface GameStatData {
   label: string;
@@ -49,14 +50,17 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
           />
         ))}
         
-        <GameMenuButton
-          isActive={showMenu}
-          disabled={menuDisabled}
-          onPress={() => {
-            onMenuPress();
-          }}
-          iconName={menuIcon || 'more-vert'}
-        />
+        <View style={styles.rightButtons}>
+          <SoundToggleButton size={20} style={styles.soundButton} />
+          <GameMenuButton
+            isActive={showMenu}
+            disabled={menuDisabled}
+            onPress={() => {
+              onMenuPress();
+            }}
+            iconName={menuIcon || 'more-vert'}
+          />
+        </View>
       </View>
     </View>
   );
@@ -79,5 +83,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: 60, // 十分な高さを確保
     paddingVertical: 4, // 上下にパディングを追加
+  },
+  rightButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: ModernDesign.spacing[2],
+  },
+  soundButton: {
+    backgroundColor: 'transparent',
   },
 });
