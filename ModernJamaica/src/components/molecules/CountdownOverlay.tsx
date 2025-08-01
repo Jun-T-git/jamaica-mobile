@@ -386,16 +386,16 @@ const styles = StyleSheet.create({
   countdownContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 150, // Increased to prevent text wrapping
-    height: 120,
-    borderRadius: 60,
+    width: 150, // Perfect circle
+    height: 150,
+    borderRadius: 75,
     position: 'relative',
   },
   glowEffect: {
     position: 'absolute',
     width: 170,
-    height: 140,
-    borderRadius: 70,
+    height: 170,
+    borderRadius: 85,
     top: -10,
     left: -10,
   },
