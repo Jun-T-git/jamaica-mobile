@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Vibration } from 'react-native';
+import { Animated } from 'react-native';
 import { GameStatus } from '../types';
 
 /**
@@ -18,8 +18,7 @@ export const useSuccessAnimation = (
     if (gameStatus === GameStatus.CORRECT && !correctProcessedRef.current) {
       correctProcessedRef.current = true;
       
-      // Success vibration feedback
-      Vibration.vibrate([0, 50, 100, 50]);
+      // Visual feedback only (vibration removed for UX simplification)
       
       // Success animation sequence
       Animated.sequence([

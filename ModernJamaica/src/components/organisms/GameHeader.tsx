@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle, Vibration } from 'react-native';
+import { View, StyleSheet, ViewStyle } from 'react-native';
 import { GameStat } from '../molecules/GameStat';
 import { GameMenuButton } from '../molecules/GameMenuButton';
 import { COLORS } from '../../constants';
@@ -53,7 +53,6 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
           isActive={showMenu}
           disabled={menuDisabled}
           onPress={() => {
-            Vibration.vibrate(50);
             onMenuPress();
           }}
           iconName={menuIcon || 'more-vert'}

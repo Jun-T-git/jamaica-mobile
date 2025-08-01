@@ -5,7 +5,6 @@ import {
   StyleSheet,
   SafeAreaView,
   Animated,
-  Vibration,
   Dimensions,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -100,7 +99,6 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
         
         // Celebration animation if new high score
         if (isNewHighScore) {
-          Vibration.vibrate([0, 100, 200, 100, 200, 100]);
           Animated.sequence([
             Animated.timing(celebrationAnim, {
               toValue: 1,
@@ -125,13 +123,12 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
 
   const handleRetry = async () => {
     console.log('Retry button pressed, mode:', mode);
-    Vibration.vibrate(50);
     
     try {
       // ゲーム状態をリセットしてから新しいゲームを開始
-      const gameMode = mode === 'infinite' ? GameMode.INFINITE : GameMode.CHALLENGE;
-      console.log('Initializing game with mode:', gameMode);
-      await initGame(gameMode);
+      const targetGameMode = mode === 'infinite' ? GameMode.INFINITE : GameMode.CHALLENGE;
+      console.log('Initializing game with mode:', targetGameMode);
+      await initGame(targetGameMode);
       
       // 初期化完了を待つ
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -147,7 +144,6 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
   };
 
   const handleBackToMenu = () => {
-    Vibration.vibrate(50);
     // replaceを使用して戻るボタンでリザルト画面に戻らないようにする
     navigation.replace('ModeSelection');
   };

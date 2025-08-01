@@ -3,7 +3,6 @@ import {
   Text,
   StyleSheet,
   Animated,
-  Vibration,
   Easing,
 } from 'react-native';
 import { ModernDesign } from '../../constants';
@@ -103,8 +102,7 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
   };
 
   const showNumberAnimation = () => {
-    // Gentle vibration
-    Vibration.vibrate(30);
+    // Visual feedback only (vibration removed for UX simplification)
     
     // Reset and animate the number
     scaleAnim.setValue(0);
@@ -167,8 +165,7 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
   };
 
   const showStartAnimation = () => {
-    // More prominent vibration for start
-    Vibration.vibrate([0, 50, 100, 50]);
+    // Visual feedback only (vibration removed for UX simplification)
     
     // Reset animations
     scaleAnim.setValue(0);

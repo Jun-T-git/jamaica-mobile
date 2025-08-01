@@ -6,7 +6,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Vibration,
 } from 'react-native';
 import Svg, { Line } from 'react-native-svg';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -254,16 +253,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const handleNodePress = (node: GridNode) => {
     if (!node.isActive) return;
 
-    // Haptic feedback for better user experience
-    Vibration.vibrate(50);
-
     if (!firstNode) {
       setFirstNode(node);
     } else if (firstNode.nodeId === node.nodeId) {
       setFirstNode(null);
       setSelectedOperator(null);
     } else if (selectedOperator) {
-      Vibration.vibrate(100);
       connectNodes(firstNode.nodeId, node.nodeId, selectedOperator);
       reset();
     } else {
@@ -273,9 +268,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   const handleOperatorPress = (operator: Operator) => {
     if (!firstNode) return;
-
-    // Haptic feedback for operator selection
-    Vibration.vibrate(50);
 
     if (selectedOperator === operator) {
       setSelectedOperator(null);

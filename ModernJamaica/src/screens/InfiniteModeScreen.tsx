@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, Vibration } from 'react-native';
+import { SafeAreaView, StyleSheet } from 'react-native';
 import { Dialog } from '../components/molecules/Dialog';
 import { SuccessOverlay } from '../components/molecules/SuccessOverlay';
 import { CountdownOverlay } from '../components/molecules/CountdownOverlay';
@@ -64,16 +64,13 @@ export const InfiniteModeScreen: React.FC<InfiniteModeScreenProps> = ({
         visible={showMenu}
         onClose={handlers.onMenuClose}
         onResume={() => {
-          Vibration.vibrate(50);
           handlers.onMenuClose();
         }}
         onRestart={() => {
-          Vibration.vibrate(75);
           handlers.onMenuClose();
           dialogs.setShowRestartDialog(true);
         }}
         onHome={() => {
-          Vibration.vibrate(100);
           handlers.onMenuClose();
           dialogs.setShowExitDialog(true);
         }}

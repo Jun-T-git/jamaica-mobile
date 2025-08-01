@@ -3,7 +3,6 @@ import React from 'react';
 import {
   SafeAreaView,
   StyleSheet,
-  Vibration,
 } from 'react-native';
 import { GameBoard } from '../components/organisms/GameBoard';
 import { PauseMenu } from '../components/organisms/PauseMenu';
@@ -67,16 +66,13 @@ export const ChallengeModeScreen: React.FC<ChallengeModeScreenProps> = ({
         visible={showMenu}
         onClose={handlers.onMenuClose}
         onResume={() => {
-          Vibration.vibrate(50);
           handlers.onMenuClose();
         }}
         onRestart={() => {
-          Vibration.vibrate(75);
           handlers.onMenuClose();
           dialogs.setShowRestartDialog(true);
         }}
         onHome={() => {
-          Vibration.vibrate(100);
           handlers.onMenuClose();
           dialogs.setShowExitDialog(true);
         }}
