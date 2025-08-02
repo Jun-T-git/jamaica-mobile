@@ -12,7 +12,7 @@ import { Typography } from '../components/atoms/Typography';
 import { BannerAdView } from '../components/molecules/BannerAdView';
 import { ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
-import { GameMode } from '../types';
+import { GameMode, DifficultyLevel } from '../types';
 import { soundManager, SoundType } from '../utils/SoundManager';
 
 interface ModeSelectionScreenProps {
@@ -22,8 +22,7 @@ interface ModeSelectionScreenProps {
 export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   navigation,
 }) => {
-  const { initGame, loadStoredData, highScores } =
-    useGameStore();
+  const { loadStoredData, highScores } = useGameStore();
 
   useEffect(() => {
     loadStoredData();
@@ -33,10 +32,8 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
     // ゲームモード選択ボタン効果音
     soundManager.play(SoundType.BUTTON);
     
-    initGame(mode);
-    navigation.navigate(
-      mode === GameMode.CHALLENGE ? 'ChallengeMode' : 'InfiniteMode',
-    );
+    // 難易度選択画面へ遷移
+    navigation.navigate('DifficultySelection', { mode });
   };
 
   return (
@@ -98,7 +95,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               />
             </View>
           </View>
-          {highScores[GameMode.CHALLENGE] > 0 && (
+          {highScores.challenge[DifficultyLevel.NORMAL] > 0 && (
             <View style={styles.statsBadge}>
               <MaterialIcons
                 name="emoji-events"
@@ -110,7 +107,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
                 color="secondary"
                 style={styles.statsText}
               >
-                ベスト: {highScores[GameMode.CHALLENGE].toLocaleString()}点
+                ベスト: {highScores.challenge[DifficultyLevel.NORMAL].toLocaleString()}点
               </Typography>
             </View>
           )}
@@ -150,7 +147,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               />
             </View>
           </View>
-          {highScores[GameMode.INFINITE] > 0 && (
+          {highScores.infinite[DifficultyLevel.NORMAL] > 0 && (
             <View style={styles.statsBadge}>
               <MaterialIcons
                 name="local-fire-department"
@@ -162,7 +159,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
                 color="secondary"
                 style={styles.statsText}
               >
-                ベスト: {highScores[GameMode.INFINITE]}問
+                ベスト: {highScores.infinite[DifficultyLevel.NORMAL]}問
               </Typography>
             </View>
           )}

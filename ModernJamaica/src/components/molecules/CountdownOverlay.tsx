@@ -170,80 +170,61 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
     // START効果音
     soundManager.play(SoundType.START);
     
-    // Reset animations
+    // Reset animations - same as number animation
     scaleAnim.setValue(0);
+    pulseAnim.setValue(1);
     glowAnim.setValue(0);
+    circleScaleAnim.setValue(0);
     
-    // Particle burst animation
-    particleAnims.forEach((anim, index) => {
-      anim.scale.setValue(0);
-      anim.opacity.setValue(0);
-      anim.rotate.setValue(0);
-      
-      const delay = index * 50;
-      const angle = (index / particleAnims.length) * 360;
-      
-      Animated.sequence([
-        Animated.delay(delay),
-        Animated.parallel([
-          Animated.spring(anim.scale, {
-            toValue: 1,
-            tension: 200,
-            friction: 8,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim.opacity, {
-            toValue: 1,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim.rotate, {
-            toValue: angle,
-            duration: 600,
-            easing: Easing.out(Easing.quad),
-            useNativeDriver: true,
-          }),
-        ]),
-        Animated.parallel([
-          Animated.timing(anim.opacity, {
-            toValue: 0,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim.scale, {
-            toValue: 0.5,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-        ]),
-      ]).start();
-    });
-    
-    // START text animation
+    // Number entrance with bounce - same as numbers
     Animated.sequence([
       Animated.spring(scaleAnim, {
-        toValue: 1.1,
-        tension: 120,
-        friction: 8,
+        toValue: 1,
+        tension: 180,
+        friction: 12,
         useNativeDriver: true,
       }),
-      Animated.timing(scaleAnim, {
+      // Subtle pulse
+      Animated.timing(pulseAnim, {
+        toValue: 1.05,
+        duration: 200,
+        easing: Easing.inOut(Easing.quad),
+        useNativeDriver: true,
+      }),
+      Animated.timing(pulseAnim, {
         toValue: 1,
         duration: 200,
+        easing: Easing.inOut(Easing.quad),
         useNativeDriver: true,
       }),
     ]).start();
 
-    // Glow effect for START
+    // Background circle animation - same as numbers
+    Animated.sequence([
+      Animated.timing(circleScaleAnim, {
+        toValue: 1,
+        duration: 300,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }),
+      Animated.timing(circleScaleAnim, {
+        toValue: 0,
+        duration: 400,
+        easing: Easing.in(Easing.quad),
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Subtle glow effect - same as numbers
     Animated.sequence([
       Animated.timing(glowAnim, {
         toValue: 1,
-        duration: 300,
+        duration: 200,
         useNativeDriver: true,
       }),
       Animated.timing(glowAnim, {
         toValue: 0,
-        duration: 500,
+        duration: 600,
         useNativeDriver: true,
       }),
     ]).start();

@@ -1,8 +1,9 @@
 import { create } from 'zustand';
-import { GameState, GameMode, GameStatus, UnifiedGameState, NodeData } from '../types';
-import { generateProblemExhaustive } from '../utils/problemGenerator';
+import { GameState, GameMode, GameStatus, UnifiedGameState, NodeData, DifficultyLevel } from '../types';
+import { generateProblem } from '../utils/problemGenerator';
 import { getGameModeConfig } from '../config';
-import { saveHighScore, loadHighScore } from '../utils/storage';
+import { getDifficultyConfig, DEFAULT_DIFFICULTY } from '../config/difficulty';
+import { saveHighScoreWithDifficulty, loadAllHighScoresWithDifficulty } from '../utils/storage';
 import { adService } from '../services/adService';
 import { ComboTracker, calculateProblemScore, calculateFinalBonus } from '../utils/scoreCalculator';
 import { ProblemResult } from '../constants/scoreConfig';
@@ -22,7 +23,7 @@ interface GameStore extends GameState {
   timerInterval: NodeJS.Timeout | null;
   
   // シンプルなアクション
-  initGame: (mode: GameMode) => Promise<void>;
+  initGame: (mode: GameMode, difficulty?: DifficultyLevel) => Promise<void>;
   startCountdown: () => void;
   completeCountdown: () => void;
   generateNewProblem: () => void;
@@ -45,15 +46,23 @@ interface GameStore extends GameState {
 }
 
 // 初期ゲーム状態を作成
-const createInitialGameState = (mode: GameMode): UnifiedGameState => {
-  const config = getGameModeConfig(mode);
+const createInitialGameState = (mode: GameMode, difficulty: DifficultyLevel = DEFAULT_DIFFICULTY): UnifiedGameState => {
+  const modeConfig = getGameModeConfig(mode);
+  const difficultyConfig = getDifficultyConfig(difficulty);
+  
+  // チャレンジモードの場合は難易度に応じた時間設定を使用
+  const timeLeft = mode === GameMode.CHALLENGE 
+    ? difficultyConfig.time.initial 
+    : modeConfig.time.initial;
+  
   return {
     mode,
-    timeLeft: config.time.initial,
+    difficulty,
+    timeLeft,
     isActive: false,
     score: 0,
     problemCount: 0,
-    skipCount: mode === GameMode.CHALLENGE ? config.gameplay.skipLimit : 999,
+    skipCount: mode === GameMode.CHALLENGE ? modeConfig.gameplay.skipLimit : 999,
     currentCombo: 0,
     lastProblemScore: 0,
   };
@@ -61,17 +70,25 @@ const createInitialGameState = (mode: GameMode): UnifiedGameState => {
 
 export const useGameStore = create<GameStore>((set, get) => ({
   // 初期状態
-  gameState: createInitialGameState(GameMode.CHALLENGE),
+  gameState: createInitialGameState(GameMode.CHALLENGE, DEFAULT_DIFFICULTY),
   gameStatus: GameStatus.MENU,
   targetNumber: 0,
   currentProblem: {
     numbers: [],
     target: 0,
-    difficulty: 'normal',
+    difficulty: DEFAULT_DIFFICULTY,
   },
   highScores: {
-    challenge: 0,
-    infinite: 0,
+    challenge: {
+      [DifficultyLevel.EASY]: 0,
+      [DifficultyLevel.NORMAL]: 0,
+      [DifficultyLevel.HARD]: 0,
+    },
+    infinite: {
+      [DifficultyLevel.EASY]: 0,
+      [DifficultyLevel.NORMAL]: 0,
+      [DifficultyLevel.HARD]: 0,
+    },
   },
   nodes: [],
   selectedNodeId: null,
@@ -129,11 +146,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   
   // ゲーム初期化
-  initGame: async (mode: GameMode) => {
-    const savedHighScores = {
-      challenge: await loadHighScore(GameMode.CHALLENGE) || 0,
-      infinite: await loadHighScore(GameMode.INFINITE) || 0,
-    };
+  initGame: async (mode: GameMode, difficulty: DifficultyLevel = DEFAULT_DIFFICULTY) => {
+    // 難易度別のハイスコアを読み込み
+    const savedHighScores = await loadAllHighScoresWithDifficulty();
     
     // コンボトラッカーをリセット
     if (mode === GameMode.CHALLENGE) {
@@ -141,7 +156,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     
     set({
-      gameState: createInitialGameState(mode),
+      gameState: createInitialGameState(mode, difficulty),
       gameStatus: GameStatus.COUNTDOWN,
       highScores: savedHighScores,
     });
@@ -167,7 +182,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   
   // 新しい問題を生成
   generateNewProblem: () => {
-    const problem = generateProblemExhaustive();
+    const state = get();
+    const difficulty = state.gameState.difficulty;
+    const problem = generateProblem(difficulty);
     const screenWidth = 350;
     const nodeSpacing = screenWidth / 6;
     const startX = nodeSpacing;
@@ -184,7 +201,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isUsed: false,
     }));
     
-    const state = get();
     set({
       currentProblem: problem,
       targetNumber: problem.target,
@@ -270,7 +286,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         
         // スコア更新
         const { gameState: game } = state;
-        const config = getGameModeConfig(game.mode);
+        const difficultyConfig = getDifficultyConfig(game.difficulty);
         const solveTime = (Date.now() - state.problemStartTime) / 1000;
         
         if (game.mode === GameMode.CHALLENGE) {
@@ -286,12 +302,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const currentCombo = state.comboTracker.onCorrectAnswer(Date.now());
           const problemScore = calculateProblemScore(problemResult, currentCombo);
           
+          // 難易度に応じたボーナス時間を使用
+          const bonusTime = difficultyConfig.time.bonus;
+          
           set({
             gameState: {
               ...game,
               score: game.score + problemScore,
               problemCount: game.problemCount + 1,
-              timeLeft: game.timeLeft + config.time.bonus,
+              timeLeft: game.timeLeft + bonusTime,
               currentCombo,
               lastProblemScore: problemScore,
             },
@@ -378,7 +397,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     let finalScore = game.score;
     let isNewHighScore = false;
-    let previousHighScore = state.highScores[game.mode];
+    let previousHighScore = state.highScores[game.mode][game.difficulty];
     
     if (game.mode === GameMode.CHALLENGE) {
       // 最終ボーナスを追加
@@ -401,11 +420,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     // ハイスコア保存
     if (isNewHighScore) {
-      await saveHighScore(game.mode, finalScore);
+      await saveHighScoreWithDifficulty(game.mode, game.difficulty, finalScore);
       set({
         highScores: {
           ...state.highScores,
-          [game.mode]: finalScore,
+          [game.mode]: {
+            ...state.highScores[game.mode],
+            [game.difficulty]: finalScore,
+          },
         },
       });
     }
@@ -424,6 +446,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           isNewHighScore,
           previousHighScore,
           mode: game.mode === GameMode.CHALLENGE ? 'challenge' : 'infinite',
+          difficulty: game.difficulty,
         });
       }, 100);
     }
@@ -456,16 +479,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   
   // 保存されたデータを読み込み
   loadStoredData: async () => {
-    const [challengeHighScore, infiniteHighScore] = await Promise.all([
-      loadHighScore(GameMode.CHALLENGE),
-      loadHighScore(GameMode.INFINITE),
-    ]);
-    
-    set({
-      highScores: {
-        challenge: challengeHighScore || 0,
-        infinite: infiniteHighScore || 0,
-      },
-    });
+    const highScores = await loadAllHighScoresWithDifficulty();
+    set({ highScores });
   },
 }));

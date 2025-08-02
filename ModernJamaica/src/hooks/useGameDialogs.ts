@@ -34,10 +34,10 @@ export const useGameDialogs = (
     try {
       // タイマーはStore内で管理されるため、ここでの処理は不要
       await endGame(true);
-      navigation.goBack();
+      navigation.navigate('ModeSelection');
     } catch (error) {
       console.error('Failed to exit game:', error);
-      navigation.goBack();
+      navigation.navigate('ModeSelection');
     }
   };
 

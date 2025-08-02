@@ -20,17 +20,24 @@ export enum Operator {
   DIVIDE = '÷',
 }
 
+export enum DifficultyLevel {
+  EASY = 'easy',
+  NORMAL = 'normal',
+  HARD = 'hard',
+}
+
 export interface ProblemData {
   numbers: number[];
   target: number;
   solutions?: string[];
-  difficulty: 'easy' | 'normal' | 'hard';
+  difficulty: DifficultyLevel;
 }
 
 // 統一されたゲーム状態
 export interface UnifiedGameState {
   // 共通フィールド
   mode: GameMode;
+  difficulty: DifficultyLevel;  // 難易度設定
   timeLeft: number;
   isActive: boolean;
   score: number;           // チャレンジ: 計算スコア, 無限: 正解数
@@ -52,10 +59,10 @@ export interface GameState {
   targetNumber: number;
   currentProblem: ProblemData;
   
-  // ハイスコア管理
+  // ハイスコア管理（難易度別）
   highScores: {
-    challenge: number;
-    infinite: number;
+    challenge: Record<DifficultyLevel, number>;
+    infinite: Record<DifficultyLevel, number>;
   };
 }
 

@@ -13,21 +13,23 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, ModernDesign } from '../constants';
 import { BannerAdView } from '../components/molecules/BannerAdView';
 import { useGameStore } from '../store/gameStore';
-import { GameMode } from '../types';
+import { GameMode, DifficultyLevel } from '../types';
 import { Button } from '../components/atoms/Button';
 import { getGameModeConfig } from '../config/gameMode';
+import { getDifficultyConfig } from '../config/difficulty';
 
 const { width } = Dimensions.get('window');
 
 type RootStackParamList = {
   ModeSelection: undefined;
-  ChallengeMode: undefined;
-  InfiniteMode: undefined;
+  ChallengeMode: { difficulty: DifficultyLevel };
+  InfiniteMode: { difficulty: DifficultyLevel };
   ChallengeResult: {
     finalScore: number;
     isNewHighScore: boolean;
     previousHighScore: number;
     mode?: 'challenge' | 'infinite';
+    difficulty?: DifficultyLevel;
   };
 };
 
@@ -40,12 +42,16 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { finalScore, isNewHighScore, previousHighScore, mode = 'challenge' } = route.params;
+  const { finalScore, isNewHighScore, previousHighScore, mode = 'challenge', difficulty } = route.params;
   const { initGame, gameState } = useGameStore();
   
   // ゲームモード設定を取得
   const gameMode = mode === 'infinite' ? GameMode.INFINITE : GameMode.CHALLENGE;
   const config = getGameModeConfig(gameMode);
+  
+  // 難易度設定を取得（gameStateからか、route paramsから）
+  const currentDifficulty = difficulty || gameState.difficulty;
+  const difficultyConfig = getDifficultyConfig(currentDifficulty);
   
   // Animation values
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -128,7 +134,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
       // ゲーム状態をリセットしてから新しいゲームを開始
       const targetGameMode = mode === 'infinite' ? GameMode.INFINITE : GameMode.CHALLENGE;
       console.log('Initializing game with mode:', targetGameMode);
-      await initGame(targetGameMode);
+      await initGame(targetGameMode, currentDifficulty);
       
       // 初期化完了を待つ
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -136,7 +142,11 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
       // replaceを使用して戻るボタンでリザルト画面に戻らないようにする
       const screenName = mode === 'infinite' ? 'InfiniteMode' : 'ChallengeMode';
       console.log('Navigating to screen:', screenName);
-      navigation.replace(screenName);
+      if (screenName === 'ChallengeMode') {
+        navigation.replace('ChallengeMode', { difficulty: currentDifficulty });
+      } else {
+        navigation.replace('InfiniteMode', { difficulty: currentDifficulty });
+      }
       console.log('Navigation completed');
     } catch (error) {
       console.error('Error in handleRetry:', error);
@@ -205,6 +215,19 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
             <Text style={styles.scoreValue}>{mode === 'infinite' ? displayedScore : displayedScore.toLocaleString()}</Text>
             <Text style={styles.scoreUnit}>{mode === 'infinite' ? '問' : '点'}</Text>
           </Animated.View>
+          
+          {/* Difficulty Badge */}
+          <View style={[
+            styles.difficultyBadge, 
+            { 
+              backgroundColor: difficultyConfig.theme.primary + '20',
+              borderColor: difficultyConfig.theme.primary + '40'
+            }
+          ]}>
+            <Text style={[styles.difficultyText, { color: difficultyConfig.theme.primary }]}>
+              {difficultyConfig.label.ja}
+            </Text>
+          </View>
           
           {/* High Score Information */}
           {isNewHighScore ? (
@@ -465,6 +488,20 @@ const styles = StyleSheet.create({
   buttonSection: {
     width: '100%',
     gap: ModernDesign.spacing[4],
+  },
+  difficultyBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: ModernDesign.borderRadius.full,
+    paddingHorizontal: ModernDesign.spacing[3],
+    paddingVertical: ModernDesign.spacing[1],
+    marginTop: ModernDesign.spacing[2],
+    borderWidth: 1,
+  },
+  difficultyText: {
+    fontSize: ModernDesign.typography.fontSize.sm,
+    fontWeight: ModernDesign.typography.fontWeight.medium,
+    letterSpacing: ModernDesign.typography.letterSpacing.wide,
   },
   confettiContainer: {
     position: 'absolute',

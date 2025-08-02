@@ -4,22 +4,26 @@ import { createStackNavigator } from '@react-navigation/stack';
 import mobileAds from 'react-native-google-mobile-ads';
 import { SplashScreen } from './src/screens/SplashScreen';
 import { ModeSelectionScreen } from './src/screens/ModeSelectionScreen';
+import DifficultySelectionScreen from './src/screens/DifficultySelectionScreen';
 import { ChallengeModeScreen } from './src/screens/ChallengeModeScreen';
 import { InfiniteModeScreen } from './src/screens/InfiniteModeScreen';
 import { ChallengeResultScreen } from './src/screens/ChallengeResultScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { useSettingsStore } from './src/store/settingsStore';
+import { GameMode, DifficultyLevel } from './src/types';
 
 type RootStackParamList = {
   Splash: undefined;
   ModeSelection: undefined;
-  ChallengeMode: undefined;
-  InfiniteMode: undefined;
+  DifficultySelection: { mode: GameMode };
+  ChallengeMode: { difficulty: DifficultyLevel };
+  InfiniteMode: { difficulty: DifficultyLevel };
   ChallengeResult: {
     finalScore: number;
     isNewHighScore: boolean;
     previousHighScore: number;
     mode?: 'challenge' | 'infinite';
+    difficulty?: DifficultyLevel;
   };
 };
 
@@ -54,6 +58,7 @@ function App() {
         >
           <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen name="ModeSelection" component={ModeSelectionScreen} />
+          <Stack.Screen name="DifficultySelection" component={DifficultySelectionScreen} />
           <Stack.Screen name="ChallengeMode" component={ChallengeModeScreen} />
           <Stack.Screen name="InfiniteMode" component={InfiniteModeScreen} />
           <Stack.Screen name="ChallengeResult" component={ChallengeResultScreen} />
