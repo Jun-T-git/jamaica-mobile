@@ -12,6 +12,7 @@ import { Typography } from '../components/atoms/Typography';
 import { BannerAdView } from '../components/molecules/BannerAdView';
 import { ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
+import { useSettingsStore } from '../store/settingsStore';
 import { GameMode } from '../types';
 import { soundManager, SoundType } from '../utils/SoundManager';
 
@@ -23,10 +24,21 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   navigation,
 }) => {
   const { loadStoredData, highScores } = useGameStore();
+  const { loadDisplayName, loadSoundSetting, displayName } = useSettingsStore();
 
   useEffect(() => {
+    // ゲームデータを読み込み
     loadStoredData();
-  }, [loadStoredData]);
+    // 表示名を読み込み（未設定の場合は自動生成）
+    loadDisplayName();
+    // 音声設定を読み込み
+    loadSoundSetting();
+  }, [loadStoredData, loadDisplayName, loadSoundSetting]);
+
+  useEffect(() => {
+    // 表示名の状態をログに出力（デバッグ用）
+    console.log('🏠 ModeSelectionScreen: Current displayName:', displayName);
+  }, [displayName]);
 
   const handleModeSelect = (mode: GameMode) => {
     // ゲームモード選択ボタン効果音
