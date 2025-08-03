@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  Animated,
-  Dimensions,
-} from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { COLORS, ModernDesign } from '../constants';
-import { BannerAdView } from '../components/molecules/BannerAdView';
-import { useGameStore } from '../store/gameStore';
-import { GameMode, DifficultyLevel } from '../types';
+import React, { useEffect, useState } from 'react';
+import {
+  Animated,
+  Dimensions,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Button } from '../components/atoms/Button';
-import { getGameModeConfig } from '../config/gameMode';
+import { BannerAdView } from '../components/molecules/BannerAdView';
 import { getDifficultyConfig } from '../config/difficulty';
+import { getGameModeConfig } from '../config/gameMode';
+import { COLORS, ModernDesign } from '../constants';
+import { useGameStore } from '../store/gameStore';
+import { DifficultyLevel, GameMode } from '../types';
 
 const { width } = Dimensions.get('window');
 
@@ -42,24 +42,30 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { finalScore, isNewHighScore, previousHighScore, mode = 'challenge', difficulty } = route.params;
+  const {
+    finalScore,
+    isNewHighScore,
+    previousHighScore,
+    mode = 'challenge',
+    difficulty,
+  } = route.params;
   const { initGame, gameState } = useGameStore();
-  
+
   // ゲームモード設定を取得
   const gameMode = mode === 'infinite' ? GameMode.INFINITE : GameMode.CHALLENGE;
   const config = getGameModeConfig(gameMode);
-  
+
   // 難易度設定を取得（gameStateからか、route paramsから）
   const currentDifficulty = difficulty || gameState.difficulty;
   const difficultyConfig = getDifficultyConfig(currentDifficulty);
-  
+
   // Animation values
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
   const [scaleAnim] = useState(new Animated.Value(0.8));
   const [scoreCountAnim] = useState(new Animated.Value(0));
   const [celebrationAnim] = useState(new Animated.Value(0));
-  
+
   // Animated score counter
   const [displayedScore, setDisplayedScore] = useState(0);
 
@@ -91,7 +97,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
         duration: 1500,
         useNativeDriver: false,
       }).start();
-      
+
       // Animate score counter
       const scoreInterval = setInterval(() => {
         scoreCountAnim.addListener(({ value }) => {
@@ -102,7 +108,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
       setTimeout(() => {
         clearInterval(scoreInterval);
         setDisplayedScore(finalScore);
-        
+
         // Celebration animation if new high score
         if (isNewHighScore) {
           Animated.sequence([
@@ -125,20 +131,29 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
         }
       }, 1500);
     }, 800);
-  }, [finalScore, isNewHighScore, fadeAnim, slideAnim, scaleAnim, scoreCountAnim, celebrationAnim]);
+  }, [
+    finalScore,
+    isNewHighScore,
+    fadeAnim,
+    slideAnim,
+    scaleAnim,
+    scoreCountAnim,
+    celebrationAnim,
+  ]);
 
   const handleRetry = async () => {
     console.log('Retry button pressed, mode:', mode);
-    
+
     try {
       // ゲーム状態をリセットしてから新しいゲームを開始
-      const targetGameMode = mode === 'infinite' ? GameMode.INFINITE : GameMode.CHALLENGE;
+      const targetGameMode =
+        mode === 'infinite' ? GameMode.INFINITE : GameMode.CHALLENGE;
       console.log('Initializing game with mode:', targetGameMode);
       await initGame(targetGameMode, currentDifficulty);
-      
+
       // 初期化完了を待つ
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       // replaceを使用して戻るボタンでリザルト画面に戻らないようにする
       const screenName = mode === 'infinite' ? 'InfiniteMode' : 'ChallengeMode';
       console.log('Navigating to screen:', screenName);
@@ -162,17 +177,14 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
     <SafeAreaView style={styles.container}>
       {/* Background Gradient Effect */}
       <View style={styles.backgroundGradient} />
-      
+
       {/* Result Card */}
       <Animated.View
         style={[
           styles.resultCard,
           {
             opacity: fadeAnim,
-            transform: [
-              { translateY: slideAnim },
-              { scale: scaleAnim },
-            ],
+            transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
           },
         ]}
       >
@@ -193,9 +205,13 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
           ]}
         >
           <MaterialIcons
-            name={isNewHighScore ? "star" : "timer-off"}
-            size={64}
-            color={isNewHighScore ? ModernDesign.colors.accent.gold : ModernDesign.colors.accent.neon}
+            name={isNewHighScore ? 'star' : 'timer-off'}
+            size={40}
+            color={
+              isNewHighScore
+                ? ModernDesign.colors.accent.gold
+                : ModernDesign.colors.accent.neon
+            }
           />
         </Animated.View>
 
@@ -203,7 +219,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
         <Text style={styles.title}>
           {isNewHighScore ? '新記録達成！' : 'タイムアップ！'}
         </Text>
-        
+
         <Text style={styles.subtitle}>
           {isNewHighScore ? '素晴らしい結果です！' : 'お疲れ様でした！'}
         </Text>
@@ -212,23 +228,36 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
         <View style={styles.scoreSection}>
           <Text style={styles.scoreLabel}>{config.display.headerLabel}</Text>
           <Animated.View style={styles.scoreContainer}>
-            <Text style={styles.scoreValue}>{mode === 'infinite' ? displayedScore : displayedScore.toLocaleString()}</Text>
-            <Text style={styles.scoreUnit}>{mode === 'infinite' ? '問' : '点'}</Text>
+            <Text style={styles.scoreValue}>
+              {mode === 'infinite'
+                ? displayedScore
+                : displayedScore.toLocaleString()}
+            </Text>
+            <Text style={styles.scoreUnit}>
+              {mode === 'infinite' ? '問' : '点'}
+            </Text>
           </Animated.View>
-          
+
           {/* Difficulty Badge */}
-          <View style={[
-            styles.difficultyBadge, 
-            { 
-              backgroundColor: difficultyConfig.theme.primary + '20',
-              borderColor: difficultyConfig.theme.primary + '40'
-            }
-          ]}>
-            <Text style={[styles.difficultyText, { color: difficultyConfig.theme.primary }]}>
+          <View
+            style={[
+              styles.difficultyBadge,
+              {
+                backgroundColor: difficultyConfig.theme.primary + '20',
+                borderColor: difficultyConfig.theme.primary + '40',
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.difficultyText,
+                { color: difficultyConfig.theme.primary },
+              ]}
+            >
               {difficultyConfig.label.ja}
             </Text>
           </View>
-          
+
           {/* High Score Information */}
           {isNewHighScore ? (
             <Animated.View
@@ -247,14 +276,20 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
                 },
               ]}
             >
-              <MaterialIcons name="trending-up" size={20} color={ModernDesign.colors.accent.gold} />
+              <MaterialIcons
+                name="trending-up"
+                size={20}
+                color={ModernDesign.colors.accent.gold}
+              />
               <Text style={styles.newRecordText}>新記録！</Text>
             </Animated.View>
           ) : previousHighScore > 0 ? (
             <View style={styles.previousScoreContainer}>
               <Text style={styles.previousScoreLabel}>ハイスコア</Text>
               <Text style={styles.previousScoreValue}>
-                {mode === 'infinite' ? `${previousHighScore}問` : `${previousHighScore.toLocaleString()}点`}
+                {mode === 'infinite'
+                  ? `${previousHighScore}問`
+                  : `${previousHighScore.toLocaleString()}点`}
               </Text>
             </View>
           ) : null}
@@ -263,7 +298,11 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
         {/* Performance Stats */}
         <View style={styles.statsSection}>
           <View style={styles.statItem}>
-            <MaterialIcons name="timer" size={24} color={ModernDesign.colors.accent.neon} />
+            <MaterialIcons
+              name="timer"
+              size={24}
+              color={ModernDesign.colors.accent.neon}
+            />
             <Text style={styles.statLabel}>平均回答時間</Text>
             <Text style={styles.statValue}>
               {gameState?.problemCount && gameState.problemCount > 0
@@ -271,9 +310,13 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
                 : '---'}
             </Text>
           </View>
-          
+
           <View style={styles.statItem}>
-            <MaterialIcons name="done" size={24} color={ModernDesign.colors.accent.gold} />
+            <MaterialIcons
+              name="done"
+              size={24}
+              color={ModernDesign.colors.accent.gold}
+            />
             <Text style={styles.statLabel}>正解した問題数</Text>
             <Text style={styles.statValue}>
               {gameState?.problemCount || 0}問
@@ -292,7 +335,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
             }}
             variant="primary"
           />
-          
+
           <Button
             icon="home"
             title="メニュー"
@@ -359,7 +402,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.BACKGROUND,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 150, // 広告スペースを拡大
+    paddingBottom: 120, // 広告スペースを縮小
     paddingHorizontal: ModernDesign.spacing[4], // 左右のマージンを追加
   },
   backgroundGradient: {
@@ -373,25 +416,25 @@ const styles = StyleSheet.create({
   },
   resultCard: {
     width: '100%',
-    maxWidth: 350, // 最大幅を縮小
+    maxWidth: 340, // 最大幅をさらに縮小
     backgroundColor: ModernDesign.colors.background.tertiary,
     borderRadius: ModernDesign.borderRadius['3xl'],
     borderWidth: 2,
     borderColor: ModernDesign.colors.accent.neon,
-    padding: ModernDesign.spacing[6], // パディングを少し縮小
+    padding: ModernDesign.spacing[5], // パディングをさらに縮小
     alignItems: 'center',
     ...ModernDesign.shadows.xl,
   },
   headerIconContainer: {
-    width: 80, // サイズを縮小
-    height: 80, // サイズを縮小
+    width: 56, // サイズをさらに縮小
+    height: 56, // サイズをさらに縮小
     borderRadius: ModernDesign.borderRadius.full,
     backgroundColor: ModernDesign.colors.glass.background,
     borderWidth: 1,
     borderColor: ModernDesign.colors.glass.border,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: ModernDesign.spacing[4], // マージンを縮小
+    marginBottom: ModernDesign.spacing[3], // マージンを縮小
     ...ModernDesign.shadows.base,
   },
   title: {
@@ -406,11 +449,11 @@ const styles = StyleSheet.create({
     fontSize: ModernDesign.typography.fontSize.lg,
     color: ModernDesign.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: ModernDesign.spacing[6], // マージンを縮小
+    marginBottom: ModernDesign.spacing[4], // マージンをさらに縮小
   },
   scoreSection: {
     alignItems: 'center',
-    marginBottom: ModernDesign.spacing[6], // マージンを縮小
+    marginBottom: ModernDesign.spacing[4], // マージンをさらに縮小
   },
   scoreLabel: {
     fontSize: ModernDesign.typography.fontSize.base,
@@ -467,7 +510,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginBottom: ModernDesign.spacing[8],
+    marginBottom: ModernDesign.spacing[6], // マージンを縮小
     paddingHorizontal: ModernDesign.spacing[4],
   },
   statItem: {
@@ -496,6 +539,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: ModernDesign.spacing[3],
     paddingVertical: ModernDesign.spacing[1],
     marginTop: ModernDesign.spacing[2],
+    marginBottom: ModernDesign.spacing[3], // 新記録バッジとの間隔を広げる
     borderWidth: 1,
   },
   difficultyText: {

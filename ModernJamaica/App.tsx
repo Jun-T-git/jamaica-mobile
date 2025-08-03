@@ -8,6 +8,8 @@ import DifficultySelectionScreen from './src/screens/DifficultySelectionScreen';
 import { ChallengeModeScreen } from './src/screens/ChallengeModeScreen';
 import { InfiniteModeScreen } from './src/screens/InfiniteModeScreen';
 import { ChallengeResultScreen } from './src/screens/ChallengeResultScreen';
+import { RankingScreen } from './src/screens/RankingScreen';
+import { SettingsScreen } from './src/screens/SettingsScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { useSettingsStore } from './src/store/settingsStore';
 import { GameMode, DifficultyLevel } from './src/types';
@@ -25,6 +27,8 @@ type RootStackParamList = {
     mode?: 'challenge' | 'infinite';
     difficulty?: DifficultyLevel;
   };
+  Ranking: undefined;
+  Settings: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -62,6 +66,8 @@ function App() {
           <Stack.Screen name="ChallengeMode" component={ChallengeModeScreen} />
           <Stack.Screen name="InfiniteMode" component={InfiniteModeScreen} />
           <Stack.Screen name="ChallengeResult" component={ChallengeResultScreen} />
+          <Stack.Screen name="Ranking" component={RankingScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </ErrorBoundary>

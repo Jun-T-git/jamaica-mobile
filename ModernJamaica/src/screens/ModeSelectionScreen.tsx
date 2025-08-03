@@ -12,7 +12,7 @@ import { Typography } from '../components/atoms/Typography';
 import { BannerAdView } from '../components/molecules/BannerAdView';
 import { ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
-import { GameMode, DifficultyLevel } from '../types';
+import { GameMode } from '../types';
 import { soundManager, SoundType } from '../utils/SoundManager';
 
 interface ModeSelectionScreenProps {
@@ -31,9 +31,25 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   const handleModeSelect = (mode: GameMode) => {
     // ゲームモード選択ボタン効果音
     soundManager.play(SoundType.BUTTON);
-    
+
     // 難易度選択画面へ遷移
     navigation.navigate('DifficultySelection', { mode });
+  };
+
+  const handleRankingPress = () => {
+    // ボタン効果音
+    soundManager.play(SoundType.BUTTON);
+
+    // ランキング画面へ遷移
+    navigation.navigate('Ranking');
+  };
+
+  const handleSettingsPress = () => {
+    // ボタン効果音
+    soundManager.play(SoundType.BUTTON);
+
+    // 設定画面へ遷移
+    navigation.navigate('Settings');
   };
 
   return (
@@ -95,22 +111,6 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               />
             </View>
           </View>
-          {highScores.challenge[DifficultyLevel.NORMAL] > 0 && (
-            <View style={styles.statsBadge}>
-              <MaterialIcons
-                name="emoji-events"
-                size={16}
-                color={ModernDesign.colors.accent.gold}
-              />
-              <Typography
-                variant="caption"
-                color="secondary"
-                style={styles.statsText}
-              >
-                ベスト: {highScores.challenge[DifficultyLevel.NORMAL].toLocaleString()}点
-              </Typography>
-            </View>
-          )}
         </TouchableOpacity>
 
         {/* Infinite Mode Button */}
@@ -147,22 +147,39 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               />
             </View>
           </View>
-          {highScores.infinite[DifficultyLevel.NORMAL] > 0 && (
-            <View style={styles.statsBadge}>
-              <MaterialIcons
-                name="local-fire-department"
-                size={16}
-                color={ModernDesign.colors.accent.coral}
-              />
-              <Typography
-                variant="caption"
-                color="secondary"
-                style={styles.statsText}
-              >
-                ベスト: {highScores.infinite[DifficultyLevel.NORMAL]}問
-              </Typography>
-            </View>
-          )}
+        </TouchableOpacity>
+      </View>
+
+      {/* セカンダリナビゲーション */}
+      <View style={styles.secondaryNavigation}>
+        <TouchableOpacity
+          onPress={handleRankingPress}
+          style={styles.navButton}
+          activeOpacity={0.8}
+        >
+          <MaterialIcons
+            name="leaderboard"
+            size={20}
+            color={ModernDesign.colors.text.tertiary}
+          />
+          <Typography variant="body2" style={styles.navButtonText}>
+            スコア
+          </Typography>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleSettingsPress}
+          style={styles.navButton}
+          activeOpacity={0.8}
+        >
+          <MaterialIcons
+            name="settings"
+            size={20}
+            color={ModernDesign.colors.text.tertiary}
+          />
+          <Typography variant="body2" style={styles.navButtonText}>
+            設定
+          </Typography>
         </TouchableOpacity>
       </View>
 
@@ -179,7 +196,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: ModernDesign.spacing[16],
-    paddingBottom: ModernDesign.spacing[12],
+    paddingBottom: ModernDesign.spacing[4],
     paddingHorizontal: ModernDesign.spacing[6],
     alignItems: 'center',
   },
@@ -199,8 +216,37 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: ModernDesign.spacing[6],
     paddingTop: ModernDesign.spacing[8],
-    paddingBottom: ModernDesign.spacing[24], // 広告スペースを確保
+    paddingBottom: ModernDesign.spacing[8],
     gap: ModernDesign.spacing[4],
+  },
+  secondaryNavigation: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: ModernDesign.spacing[6],
+    paddingTop: ModernDesign.spacing[6],
+    paddingBottom: ModernDesign.spacing[20], // 広告スペースを確保
+    backgroundColor: ModernDesign.colors.background.primary,
+  },
+  navButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: ModernDesign.colors.background.secondary,
+    borderRadius: ModernDesign.borderRadius.xl,
+    paddingHorizontal: ModernDesign.spacing[5],
+    paddingVertical: ModernDesign.spacing[4], // タップしやすくするため縦幅を拡大
+    borderWidth: 1,
+    borderColor: ModernDesign.colors.border.subtle,
+    width: '47%', // 画面の半分弱でボタンサイズを統一
+    flexDirection: 'row',
+    gap: ModernDesign.spacing[2],
+    minHeight: 48, // 最小タップ領域を確保
+    ...ModernDesign.shadows.sm,
+  },
+  navButtonText: {
+    color: ModernDesign.colors.text.secondary,
+    fontWeight: ModernDesign.typography.fontWeight.medium,
+    fontSize: ModernDesign.typography.fontSize.sm,
+    letterSpacing: ModernDesign.typography.letterSpacing.wide,
   },
   modeButton: {
     backgroundColor: ModernDesign.colors.background.tertiary,
@@ -237,19 +283,6 @@ const styles = StyleSheet.create({
   },
   modeArrow: {
     marginLeft: ModernDesign.spacing[2],
-  },
-  statsBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: ModernDesign.spacing[4],
-    paddingTop: ModernDesign.spacing[4],
-    borderTopWidth: 1,
-    borderTopColor: ModernDesign.colors.border.subtle,
-    gap: ModernDesign.spacing[2],
-  },
-  statsText: {
-    fontSize: ModernDesign.typography.fontSize.xs,
-    fontWeight: ModernDesign.typography.fontWeight.medium,
   },
   bannerAd: {
     position: 'absolute',
