@@ -96,7 +96,9 @@ export const RankingScreen: React.FC<RankingScreenProps> = ({ navigation }) => {
           <>
             <Typography variant="h3" style={styles.bestScoreValue}>
               {currentBestScore.toLocaleString()}
-              <Typography variant="body2" style={styles.bestScoreUnit}>点</Typography>
+              <Typography variant="body2" style={styles.bestScoreUnit}>
+                点
+              </Typography>
             </Typography>
             {bestScoreRecord && bestScoreRecord.score > 0 && (
               <View style={styles.bestScoreDetails}>

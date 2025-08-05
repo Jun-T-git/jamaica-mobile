@@ -226,7 +226,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 {newDisplayName.length}/20文字
               </Typography>
               <Typography variant="caption" style={styles.editHint}>
-                ランキングに表示されるあなたの名前です。他のプレイヤーからも見ることができます。
+                ランキングに表示されるあなたの名前です。他のプレイヤーも見ることができます。
               </Typography>
             </View>
           </View>
@@ -237,7 +237,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     return renderSettingRow(
       'person',
       'ニックネーム',
-      'ランキングに表示されるあなたの名前です。他のプレイヤーからも見ることができます。',
+      'ランキングに表示されるあなたの名前です。他のプレイヤーも見ることができます。',
       <Typography
         variant="body2"
         style={styles.currentValue}
