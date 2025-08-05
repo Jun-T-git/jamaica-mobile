@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Modern Jamaica** (モダンジャマイカ) is a React Native mathematical puzzle game where players construct expression trees to reach target numbers using exactly 5 given numbers (1-6) and mathematical operations (+, -, ×, ÷).
+**Modern Jamaica** (モダンジャマイカ/ジャマイカの木) is a React Native 0.80.2 mathematical puzzle game where players construct expression trees to reach target numbers using exactly 5 given numbers (1-6) and mathematical operations (+, -, ×, ÷).
 
 ## Development Commands
 
@@ -17,109 +17,150 @@ npm run ios                 # Build and run iOS app (requires Xcode)
 # Code Quality 
 npm run lint                # Run ESLint
 npm test                    # Run Jest tests
+npm test -- --coverage      # Run tests with coverage
 
 # iOS Setup (if needed)
+cd ios
 bundle install              # Install Ruby dependencies
-bundle exec pod install    # Install CocoaPods dependencies
+bundle exec pod install     # Install CocoaPods dependencies
+cd ..
 ```
 
 ## Architecture Overview
 
-### State Management
-- **Zustand store** (`src/store/gameStore.ts`) manages all game state
-- Central store handles game modes, problem generation, node connections, and statistics
-- No Redux - uses Zustand for simplicity and performance
+### Technology Stack
+- **React Native 0.80.2** with TypeScript
+- **Zustand** for state management (no Redux)
+- **React Navigation 7.x** for screen navigation
+- **react-native-gesture-handler** for touch interactions
+- **react-native-google-mobile-ads** for monetization
+- **react-native-sound** for audio feedback
+
+### Project Structure
+```
+src/
+├── components/          # Atomic design pattern
+│   ├── atoms/          # Basic UI elements
+│   ├── molecules/      # Combined components
+│   └── organisms/      # Complex features
+├── screens/            # Main game screens
+├── store/              # Zustand stores
+├── utils/              # Core game logic
+├── types/              # TypeScript definitions
+├── constants/          # Game configuration
+├── config/             # Mode configurations
+├── design/             # Design system themes
+├── hooks/              # Custom React hooks
+└── services/           # External services
+```
+
+### State Management Architecture
+- **gameStore.ts**: Central store managing all game state
+  - Supports both Challenge and Infinite modes in unified state
+  - Handles timer, scores, problem generation, node connections
+  - Undo/Redo with full history tracking
+  - Real-time validation and combo scoring
+- **settingsStore.ts**: User preferences and sound toggles
+- No prop drilling - use Zustand hooks directly in components
 
 ### Expression Tree System
-- **TreeNode classes** (`src/models/TreeNode.ts`) implement mathematical expression trees
-- `LeafNode`: Initial numbers (1-6)
-- `InternalNode`: Operations combining two child nodes 
-- `ExpressionTree`: Container with evaluation and validation methods
-- Players build trees by connecting nodes with operators until one root node remains
+Core game mechanics in `utils/` and `store/gameStore.ts`:
+- **Node Data Structure**: Each node has position, value, depth, parent/child relationships
+- **Tree Building**: `connectNodes()` validates connections, calculates results, creates InternalNodes
+- **Problem Types**: Addition-only, Multiplication-only, Mixed operations
+- **Tree Validation**: Checks single root node equals target value
 
 ### Game Flow Architecture
 ```
-Problem Generation → Node Display → User Tree Building → Validation → Next Problem
+Mode Selection → Problem Generation → Node Display → Tree Building → Validation → Next/Score
 ```
-
-### Screen Navigation
-- `ModeSelectionScreen`: Choose Challenge or Infinite mode
-- `ChallengeModeScreen`: Timed gameplay with scoring
-- `InfiniteModeScreen`: Practice mode with statistics
-- All screens use custom headers (headerShown: false)
 
 ## Key Technical Patterns
 
 ### Node Connection Logic
-The core game mechanic in `gameStore.ts` `connectNodes()`:
-1. Validates two unconnected nodes can be combined
+The `connectNodes()` function in gameStore:
+1. Validates two nodes can be combined (not already used)
 2. Calculates result based on selected operator
-3. Creates new `InternalNode` with result value
-4. Marks original nodes as "used" (becomes children)
-5. Updates tree positioning and checks for puzzle completion
+3. Creates new InternalNode with calculated value
+4. Marks original nodes as "used" (become children)
+5. Updates tree structure and checks completion
 
 ### Problem Generation Strategy
-Two approaches in `utils/problemGenerator.ts`:
-- **Exhaustive search**: Generate random numbers/targets until valid solution exists
-- **Reverse generation**: Build expression tree backwards from target value
-- Problems validated for solvability, reasonable difficulty, and numerical variety
+Three problem types in `utils/problemGenerator.ts`:
+- **Addition Problems**: Sum-based targets
+- **Multiplication Problems**: Product-based targets  
+- **Mixed Problems**: Combination of operations
+- Configurable difficulty and target ranges per mode
+- Validates all problems have solutions
 
-### Game State Structure
-```typescript
-// Current puzzle state
-nodes: NodeData[]           // All tree nodes with positioning
-currentProblem: ProblemData // 5 numbers + target + solutions
-selectedNodeId: string     // Currently selected node for connection
+### Game Mode Configuration
+Mode-specific settings in `config/gameMode.ts`:
+- **Challenge Mode**: 60s initial + 10s bonus, 2 skips, score tracking
+- **Infinite Mode**: 5 minute total, unlimited skips, statistics focus
+- Each mode has distinct color themes and UI treatments
 
-// Mode-specific state  
-challengeState: ChallengeState  // Timer, problem count, resets
-infiniteStats: InfiniteStats    // Accuracy, streaks, timing
-```
+### Design System
+Modern dark theme with atomic design pattern:
+- Glass morphism effects and gradients
+- Mode-specific color palettes (orange/purple)
+- Consistent spacing and typography scales
+- Accessibility-focused contrast ratios
 
 ## Current Development Status
 
 ### Completed Foundation
-- Complete game logic and state management
-- Problem generation with difficulty balancing
-- Screen navigation and mode switching
-- Timer system for challenge mode
-- Statistics tracking for infinite mode
-- TypeScript types and mathematical models
+- Complete game logic and mathematical models
+- State management with Zustand
+- Navigation and screen structure
+- Timer and scoring systems
+- Sound effects integration
+- AdMob ad service setup
+- TypeScript types throughout
 
-### Missing Core UI (Primary Development Need)
-- **Interactive tree building interface** - Currently shows placeholder text
-- Drag-and-drop node connection system using react-native-gesture-handler
-- Visual representation of expression tree growth
-- Node selection and operator choice interface
-- Animation system for tree construction using react-native-reanimated
+### Critical Missing UI Components
+The game logic is complete but needs interactive UI:
+- **GameBoard visual tree builder** - Currently shows placeholder
+- **Drag-and-drop node connections** using gesture handlers
+- **Visual expression tree representation** with node hierarchy
+- **Operator selection interface** for choosing +, -, ×, ÷
+- **Tree growth animations** using react-native-reanimated
+- **Node selection states** and visual feedback
 
-### Architecture Notes for UI Development
-- `NodeData` interface includes `position: {x, y}` for UI placement
-- Tree depth calculation determines visual hierarchy
-- `isUsed` flag controls node interaction availability
-- Color schemes defined per mode in `constants/index.ts`
-- Japanese UI text throughout - maintain consistency
+### Implementation Notes for UI Development
+- `NodeData` includes `position: {x, y}` ready for visual placement
+- Tree depth calculation available for hierarchy layout
+- `isUsed` flag controls interaction availability
+- Mode-specific themes in `design/themes.ts`
+- All text in Japanese - maintain localization
 
-## Special Considerations
+## Sound System
+Audio feedback managed by `services/soundService.ts`:
+- Six sound effects: button, connect, countdown, start, success, tap
+- User-configurable via settings
+- Preloaded for performance
 
-### Japanese Localization
+## AdMob Integration
+- Full SDK integration with banner and interstitial ad support
+- Service abstraction in `services/adService.ts`
+- Privacy configuration in iOS Info.plist
+
+## Testing Approach
+- Jest with React Native preset
+- Problem generator unit tests
+- Mock SVG components for testing
+- Japanese comments in test files
+
+## Japanese Localization
 All UI text is in Japanese. Key terms:
 - チャレンジモード (Challenge Mode)
-- 無限に遊ぶモード (Infinite Mode) 
+- 無限に遊ぶ (Infinite Play)
 - 目標 (Target)
-- 問題数 (Problem Count)
-- リセット (Reset)
+- スキップ (Skip)
+- やり直す (Undo)
 
-### Game Balance Configuration
-Timer and difficulty settings in `constants/index.ts`:
-- Challenge mode: 60s initial + 30s per correct answer
-- Numbers: Always exactly 5, ranging 1-6
-- Targets: Range 10-60 with guaranteed solutions
-- Reset limit: 2 per challenge game
-
-### Tree Building UX Requirements
-Based on design document, the core mechanic should feel like "growing a tree":
-- Visual tree growth animations
-- Intuitive node connection (drag-and-drop or tap-select)
-- Clear parent-child relationships in visual layout
-- Smooth layout adjustments as tree expands upward
+## Development Priorities
+1. Implement interactive GameBoard component
+2. Add visual tree representation
+3. Create node connection animations
+4. Build operator selection UI
+5. Test complete gameplay flow

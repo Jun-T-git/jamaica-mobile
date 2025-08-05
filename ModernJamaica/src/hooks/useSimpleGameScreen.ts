@@ -5,6 +5,7 @@ import { useSuccessAnimation } from './useSuccessAnimation';
 import { useGameDialogs } from './useGameDialogs';
 import { GameMode, GameStatus } from '../types';
 import { getGameModeConfig, getDialogConfig, getTimeWarningColor } from '../config';
+import { getDifficultyConfig } from '../config/difficulty';
 import { formatTime } from '../utils/gameUtils';
 import { COLORS } from '../constants';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -80,6 +81,9 @@ export const useSimpleGameScreen = (
     };
   }, [navigation, setNavigationCallback]);
 
+  // 難易度設定を取得
+  const difficultyConfig = getDifficultyConfig(gameState.difficulty);
+  
   // ヘッダー統計情報
   const headerStats = [
     {
@@ -105,6 +109,13 @@ export const useSimpleGameScreen = (
             COLORS.DANGER
           ),
     },
+    {
+      label: '難易度',
+      value: difficultyConfig.label.ja,
+      variant: 'compact' as const,
+      labelColor: COLORS.TEXT.SECONDARY,
+      valueColor: difficultyConfig.theme.primary,
+    },
   ];
 
   // ゲーム情報
@@ -123,7 +134,7 @@ export const useSimpleGameScreen = (
     headerStats,
     gameInfo,
     successAnim,
-    highScore: highScores[mode],
+    highScore: highScores[mode][gameState.difficulty],
     
     // ダイアログ
     dialogs: {

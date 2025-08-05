@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ユーザースコアコレクション
+    match /userScores/{userId} {
+      
+      // 読み取り: 誰でも可能（ランキング表示用）
+      allow read: if true;
+      
+      // 作成: 認証済みユーザーが自分のドキュメントを作成する場合のみ
+      allow create: if request.auth != null 
+        && request.auth.uid == userId
+        && isBasicValidDocument(request.data);
+      
+      // 更新: 認証済みユーザーが自分のドキュメントを更新する場合のみ
+      allow update: if request.auth != null 
+        && request.auth.uid == userId
+        && isBasicValidUpdate(request.data, resource.data);
+      
+      // 削除: 認証済みユーザーが自分のドキュメントを削除する場合のみ（デバッグ用）
+      allow delete: if request.auth != null 
+        && request.auth.uid == userId;
+    }
+  }
+  
+  // 基本的なドキュメント構造検証（緩い設定）
+  function isBasicValidDocument(data) {
+    return data.userId is string
+      && data.displayName is string
+      && data.displayName.size() <= 50  // 緩い制限
+      && data.createdAt is number
+      && data.lastUpdated is number;
+  }
+  
+  // 基本的な更新検証（緩い設定）
+  function isBasicValidUpdate(newData, currentData) {
+    return 
+      // 基本フィールドの保護（変更不可）
+      newData.userId == currentData.userId
+      && newData.createdAt == currentData.createdAt
+      &&
+      // 表示名の基本チェック
+      (newData.displayName is string && newData.displayName.size() <= 50)
+      &&
+      // lastUpdatedの基本チェック
+      (newData.lastUpdated is number)
+      &&
+      // challengeScoresの基本チェック（存在する場合）
+      (!('challengeScores' in newData) || isBasicValidScores(newData.challengeScores));
+  }
+  
+  // 基本的なスコア検証（緩い設定）
+  function isBasicValidScores(challengeScores) {
+    return challengeScores is map
+      && (!('easy' in challengeScores) || isBasicValidScore(challengeScores.easy))
+      && (!('normal' in challengeScores) || isBasicValidScore(challengeScores.normal))
+      && (!('hard' in challengeScores) || isBasicValidScore(challengeScores.hard));
+  }
+  
+  // 個別スコアの基本検証（緩い設定）
+  function isBasicValidScore(score) {
+    return score is map
+      && score.score is number
+      && score.score >= 0
+      && score.score <= 999999  // 非常に緩い上限
+      && score.timestamp is number
+      && score.problemCount is number
+      && score.problemCount >= 0;
+  }
+}
