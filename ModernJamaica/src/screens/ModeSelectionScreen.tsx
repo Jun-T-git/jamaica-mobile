@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import {
+  Dimensions,
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   TouchableOpacity,
@@ -88,112 +90,117 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
       </View>
 
       {/* Game Mode Selection */}
-      <View style={styles.modesContainer}>
-        {/* Challenge Mode Button */}
-        <TouchableOpacity
-          onPress={() => handleModeSelect(GameMode.CHALLENGE)}
-          style={styles.modeButton}
-          activeOpacity={0.8}
-        >
-          <View style={styles.modeContent}>
-            <View style={styles.modeIconContainer}>
-              <MaterialIcons
-                name="timer"
-                size={28}
-                color={ModernDesign.colors.accent.neon}
-              />
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.modesContainer}>
+          {/* Challenge Mode Button */}
+          <TouchableOpacity
+            onPress={() => handleModeSelect(GameMode.CHALLENGE)}
+            style={styles.modeButton}
+            activeOpacity={0.8}
+          >
+            <View style={styles.modeContent}>
+              <View style={styles.modeIconContainer}>
+                <MaterialIcons
+                  name="timer"
+                  size={28}
+                  color={ModernDesign.colors.accent.neon}
+                />
+              </View>
+              <View style={styles.modeTextContainer}>
+                <Typography variant="h4" style={styles.modeTitle}>
+                  チャレンジモード
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="secondary"
+                  style={styles.modeDescription}
+                >
+                  時間内に何問解けるか挑戦
+                </Typography>
+              </View>
+              <View style={styles.modeArrow}>
+                <MaterialIcons
+                  name="arrow-forward-ios"
+                  size={20}
+                  color={ModernDesign.colors.text.tertiary}
+                />
+              </View>
             </View>
-            <View style={styles.modeTextContainer}>
-              <Typography variant="h4" style={styles.modeTitle}>
-                チャレンジモード
-              </Typography>
-              <Typography
-                variant="body2"
-                color="secondary"
-                style={styles.modeDescription}
-              >
-                時間制限内に何問解けるか挑戦
-              </Typography>
-            </View>
-            <View style={styles.modeArrow}>
-              <MaterialIcons
-                name="arrow-forward-ios"
-                size={20}
-                color={ModernDesign.colors.text.tertiary}
-              />
-            </View>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
 
-        {/* Infinite Mode Button */}
-        <TouchableOpacity
-          onPress={() => handleModeSelect(GameMode.INFINITE)}
-          style={styles.modeButton}
-          activeOpacity={0.8}
-        >
-          <View style={styles.modeContent}>
-            <View style={styles.modeIconContainer}>
-              <MaterialIcons
-                name="all-inclusive"
-                size={28}
-                color={ModernDesign.colors.accent.neon}
-              />
+          {/* Infinite Mode Button */}
+          <TouchableOpacity
+            onPress={() => handleModeSelect(GameMode.INFINITE)}
+            style={styles.modeButton}
+            activeOpacity={0.8}
+          >
+            <View style={styles.modeContent}>
+              <View style={styles.modeIconContainer}>
+                <MaterialIcons
+                  name="all-inclusive"
+                  size={28}
+                  color={ModernDesign.colors.accent.neon}
+                />
+              </View>
+              <View style={styles.modeTextContainer}>
+                <Typography variant="h4" style={styles.modeTitle}>
+                  練習モード
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="secondary"
+                  style={styles.modeDescription}
+                >
+                  自分のペースでじっくり練習
+                </Typography>
+              </View>
+              <View style={styles.modeArrow}>
+                <MaterialIcons
+                  name="arrow-forward-ios"
+                  size={20}
+                  color={ModernDesign.colors.text.tertiary}
+                />
+              </View>
             </View>
-            <View style={styles.modeTextContainer}>
-              <Typography variant="h4" style={styles.modeTitle}>
-                練習モード
-              </Typography>
-              <Typography
-                variant="body2"
-                color="secondary"
-                style={styles.modeDescription}
-              >
-                自分のペースでじっくり練習
-              </Typography>
-            </View>
-            <View style={styles.modeArrow}>
-              <MaterialIcons
-                name="arrow-forward-ios"
-                size={20}
-                color={ModernDesign.colors.text.tertiary}
-              />
-            </View>
-          </View>
-        </TouchableOpacity>
-      </View>
+          </TouchableOpacity>
+        </View>
 
-      {/* セカンダリナビゲーション */}
-      <View style={styles.secondaryNavigation}>
-        <TouchableOpacity
-          onPress={handleRankingPress}
-          style={styles.navButton}
-          activeOpacity={0.8}
-        >
-          <MaterialIcons
-            name="leaderboard"
-            size={20}
-            color={ModernDesign.colors.text.tertiary}
-          />
-          <Typography variant="body2" style={styles.navButtonText}>
-            スコア
-          </Typography>
-        </TouchableOpacity>
+        {/* セカンダリナビゲーション */}
+        <View style={styles.secondaryNavigation}>
+          <TouchableOpacity
+            onPress={handleRankingPress}
+            style={styles.navButton}
+            activeOpacity={0.8}
+          >
+            <MaterialIcons
+              name="leaderboard"
+              size={20}
+              color={ModernDesign.colors.text.tertiary}
+            />
+            <Typography variant="body2" style={styles.navButtonText}>
+              スコア
+            </Typography>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={handleSettingsPress}
-          style={styles.navButton}
-          activeOpacity={0.8}
-        >
-          <MaterialIcons
-            name="settings"
-            size={20}
-            color={ModernDesign.colors.text.tertiary}
-          />
-          <Typography variant="body2" style={styles.navButtonText}>
-            設定
-          </Typography>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            onPress={handleSettingsPress}
+            style={styles.navButton}
+            activeOpacity={0.8}
+          >
+            <MaterialIcons
+              name="settings"
+              size={20}
+              color={ModernDesign.colors.text.tertiary}
+            />
+            <Typography variant="body2" style={styles.navButtonText}>
+              設定
+            </Typography>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
 
       {/* バナー広告 */}
       <BannerAdView style={styles.bannerAd} />
@@ -201,16 +208,30 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   );
 };
 
+const { width: screenWidth } = Dimensions.get('window');
+const isSmallScreen = screenWidth < 375;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ModernDesign.colors.background.primary,
   },
   header: {
-    paddingTop: ModernDesign.spacing[16],
+    paddingTop: isSmallScreen
+      ? ModernDesign.spacing[8]
+      : ModernDesign.spacing[16],
     paddingBottom: ModernDesign.spacing[4],
-    paddingHorizontal: ModernDesign.spacing[6],
+    paddingHorizontal: isSmallScreen
+      ? ModernDesign.spacing[4]
+      : ModernDesign.spacing[6],
     alignItems: 'center',
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: ModernDesign.spacing[4],
   },
   logo: {
     marginBottom: ModernDesign.spacing[4],
@@ -225,19 +246,22 @@ const styles = StyleSheet.create({
     fontSize: ModernDesign.typography.fontSize.lg,
   },
   modesContainer: {
-    flex: 1,
-    paddingHorizontal: ModernDesign.spacing[6],
+    paddingHorizontal: isSmallScreen
+      ? ModernDesign.spacing[4]
+      : ModernDesign.spacing[6],
     paddingTop: ModernDesign.spacing[8],
-    paddingBottom: ModernDesign.spacing[8],
+    paddingBottom: ModernDesign.spacing[4],
     gap: ModernDesign.spacing[4],
   },
   secondaryNavigation: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: ModernDesign.spacing[6],
+    paddingHorizontal: isSmallScreen
+      ? ModernDesign.spacing[4]
+      : ModernDesign.spacing[6],
     paddingTop: ModernDesign.spacing[6],
-    paddingBottom: ModernDesign.spacing[20], // 広告スペースを確保
-    backgroundColor: ModernDesign.colors.background.primary,
+    paddingBottom: ModernDesign.spacing[6],
+    gap: ModernDesign.spacing[3],
   },
   navButton: {
     alignItems: 'center',
@@ -248,7 +272,8 @@ const styles = StyleSheet.create({
     paddingVertical: ModernDesign.spacing[4], // タップしやすくするため縦幅を拡大
     borderWidth: 1,
     borderColor: ModernDesign.colors.border.subtle,
-    width: '47%', // 画面の半分弱でボタンサイズを統一
+    flex: 1, // 柔軟な幅調整
+    maxWidth: 150, // 最大幅を制限
     flexDirection: 'row',
     gap: ModernDesign.spacing[2],
     minHeight: 48, // 最小タップ領域を確保
@@ -263,7 +288,7 @@ const styles = StyleSheet.create({
   modeButton: {
     backgroundColor: ModernDesign.colors.background.tertiary,
     borderRadius: ModernDesign.borderRadius['2xl'],
-    padding: ModernDesign.spacing[6],
+    padding: isSmallScreen ? ModernDesign.spacing[4] : ModernDesign.spacing[6],
     borderWidth: 1,
     borderColor: ModernDesign.colors.border.subtle,
     ...ModernDesign.shadows.base,
@@ -287,19 +312,19 @@ const styles = StyleSheet.create({
   modeTitle: {
     marginBottom: ModernDesign.spacing[1],
     fontWeight: ModernDesign.typography.fontWeight.semibold,
-    fontSize: ModernDesign.typography.fontSize['2xl'],
+    fontSize: isSmallScreen
+      ? ModernDesign.typography.fontSize.xl
+      : ModernDesign.typography.fontSize['2xl'],
   },
   modeDescription: {
     fontSize: ModernDesign.typography.fontSize.sm,
-    lineHeight: ModernDesign.typography.fontSize.sm * 1.3,
+    lineHeight: ModernDesign.typography.fontSize.sm * 1.4,
+    flexWrap: 'wrap',
   },
   modeArrow: {
     marginLeft: ModernDesign.spacing[2],
   },
   bannerAd: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    // 通常のレイアウトフローに配置
   },
 });
