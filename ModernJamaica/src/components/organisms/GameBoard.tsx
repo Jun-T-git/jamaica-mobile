@@ -525,25 +525,26 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           </View>
         </View>
 
-        {/* Current State Indicator - Visual only */}
-        <View style={styles.stateIndicator}>
-          {firstNode && (
-            <Animated.View
-              style={[
-                styles.selectionDisplay,
-                {
-                  opacity: animatedValue,
-                  transform: [{ scale: animatedValue }],
-                },
-              ]}
-            >
+        {/* Current State Indicator - Floating overlay */}
+        {firstNode && (
+          <Animated.View
+            style={[
+              styles.floatingIndicator,
+              {
+                opacity: animatedValue,
+                transform: [{ scale: animatedValue }],
+              },
+            ]}
+            pointerEvents="none"
+          >
+            <View style={styles.selectionDisplay}>
               <Text style={styles.selectedNumber}>{firstNode.value}</Text>
               {selectedOperator && (
                 <Text style={styles.pendingOperation}>{selectedOperator}</Text>
               )}
-            </Animated.View>
-          )}
-        </View>
+            </View>
+          </Animated.View>
+        )}
 
         {/* Operations - Bottom dock style */}
         <View style={styles.operationDock}>
@@ -759,22 +760,27 @@ const styles = StyleSheet.create({
   selectedCellText: {
     color: ModernDesign.colors.background.primary,
   },
-  // State indicator - minimal
-  stateIndicator: {
-    alignItems: 'center',
-    minHeight: ModernDesign.spacing[10],
-    justifyContent: 'center',
-    marginBottom: ModernDesign.spacing[5],
+  // Floating state indicator - positioned at top
+  floatingIndicator: {
+    position: 'absolute',
+    top: 10,
+    alignSelf: 'center',
+    zIndex: 1000,
   },
   selectionDisplay: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: ModernDesign.colors.glass.background,
+    backgroundColor: 'rgba(26, 27, 35, 0.9)', // 半透明背景
     paddingHorizontal: ModernDesign.spacing[4],
     paddingVertical: ModernDesign.spacing[2],
     borderRadius: ModernDesign.borderRadius.full,
     borderWidth: 1,
     borderColor: ModernDesign.colors.glass.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   selectedNumber: {
     fontSize: ModernDesign.typography.fontSize['2xl'],

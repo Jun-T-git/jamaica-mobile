@@ -14,14 +14,15 @@ export const useGameDialogs = (
   const [showRestartDialog, setShowRestartDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
 
-  const { initGame, endGame } = useGameStore();
+  const { initGame, endGame, gameState } = useGameStore();
 
   const handleRestart = async () => {
     setShowRestartDialog(false);
     
     try {
       // タイマーはStore内で管理されるため、ここでの処理は不要
-      await initGame(gameMode);
+      // 現在の難易度を維持してゲームを再開始
+      await initGame(gameMode, gameState.difficulty);
     } catch (error) {
       console.error('Failed to restart game:', error);
       setShowRestartDialog(false);
