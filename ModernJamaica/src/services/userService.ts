@@ -40,7 +40,7 @@ export class UserService {
       
       return newUserId;
     } catch (error) {
-      console.error('Failed to get user ID:', error);
+      console.error('Failed to get user ID:', String(error));
       // エラー時は一時的なIDを返す
       const tempId = this.generateUserId();
       this.userId = tempId;
@@ -66,7 +66,7 @@ export class UserService {
       const stored = await AsyncStorage.getItem(USER_ID_KEY);
       return stored === null;
     } catch (error) {
-      console.error('Failed to check first time user:', error);
+      console.error('Failed to check first time user:', String(error));
       return true; // エラー時は初回ユーザーとして扱う
     }
   }
@@ -79,7 +79,7 @@ export class UserService {
       await AsyncStorage.removeItem(USER_ID_KEY);
       this.userId = null;
     } catch (error) {
-      console.error('Failed to reset user ID:', error);
+      console.error('Failed to reset user ID:', String(error));
     }
   }
 

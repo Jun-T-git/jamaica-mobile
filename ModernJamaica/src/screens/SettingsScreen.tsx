@@ -69,7 +69,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
       if (success) {
         setEditingName(false);
-        soundManager.play(SoundType.SUCCESS);
+        soundManager.play(SoundType.CORRECT);
       } else {
         Alert.alert('エラー', 'ニックネームの更新に失敗しました');
       }
@@ -129,11 +129,11 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
               />
               <Typography
                 variant="body1"
-                style={[
-                  styles.settingTitle,
-                  type === 'editable' && styles.editableTitle,
-                  type === 'readonly' && styles.readonlyTitle,
-                ]}
+                style={{
+                  ...styles.settingTitle,
+                  ...(type === 'editable' ? styles.editableTitle : {}),
+                  ...(type === 'readonly' ? styles.readonlyTitle : {}),
+                }}
               >
                 {title}
               </Typography>
@@ -307,7 +307,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         <View style={styles.bottomSpacer} />
       </ScrollView>
 
-      <BannerAdView style={styles.bannerAd} />
+      <BannerAdView />
     </SafeAreaView>
   );
 };
@@ -552,12 +552,6 @@ const styles = StyleSheet.create({
 
   // その他
   bottomSpacer: {
-    height: ModernDesign.spacing[20], // 広告分のスペース
-  },
-  bannerAd: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    height: 100, // Adaptiveバナー対応余白
   },
 });

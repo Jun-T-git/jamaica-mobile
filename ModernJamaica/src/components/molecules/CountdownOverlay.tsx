@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Text,
   StyleSheet,
@@ -39,9 +39,12 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
   
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const cleanup = () => {
+  const cleanup = useCallback(() => {
+    if (__DEV__) console.log('🧹 CountdownOverlay cleanup called');
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      if (__DEV__) console.log('⏱️ Countdown interval cleared');
     }
     fadeAnim.setValue(0);
     scaleAnim.setValue(0);
@@ -53,10 +56,15 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
       anim.opacity.setValue(0);
       anim.rotate.setValue(0);
     });
-  };
+  }, [fadeAnim, scaleAnim, pulseAnim, glowAnim, circleScaleAnim, particleAnims]);
 
   useEffect(() => {
+    if (__DEV__) console.log('🎬 CountdownOverlay useEffect - visible:', visible, 'startCount:', startCount);
+    
     if (visible) {
+      // 既存のタイマーを必ずクリーンアップ
+      cleanup();
+      
       setCurrentCount(startCount);
       setPhase('enter');
       
@@ -74,35 +82,14 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
       cleanup();
     }
 
-    return cleanup;
-  }, [visible, startCount]); // eslint-disable-line react-hooks/exhaustive-deps
+    // クリーンアップは必ずコンポーネントのアンマウント時のみ実行
+    return () => {
+      if (__DEV__) console.log('🧹 CountdownOverlay unmounting - cleanup');
+      cleanup();
+    };
+  }, [visible, startCount, fadeAnim, cleanup, startCountdownSequence]); // 必要な依存関係を追加
 
-  const startCountdownSequence = () => {
-    // Show initial number immediately
-    showNumberAnimation();
-    
-    intervalRef.current = setInterval(() => {
-      setCurrentCount(prev => {
-        const nextCount = prev - 1;
-        if (nextCount <= 0) {
-          // Show "START!" with special animation
-          if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-          }
-          
-          setPhase('start');
-          showStartAnimation();
-          return 0;
-        } else {
-          // Show next number with elegant animation
-          showNumberAnimation();
-          return nextCount;
-        }
-      });
-    }, 1000);
-  };
-
-  const showNumberAnimation = () => {
+  const showNumberAnimation = useCallback(() => {
     // カウントダウン数字効果音
     soundManager.play(SoundType.COUNTDOWN);
     
@@ -164,9 +151,9 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
         useNativeDriver: true,
       }),
     ]).start();
-  };
+  }, [scaleAnim, pulseAnim, glowAnim, circleScaleAnim]);
 
-  const showStartAnimation = () => {
+  const showStartAnimation = useCallback(() => {
     // START効果音
     soundManager.play(SoundType.START);
     
@@ -241,7 +228,48 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
         onComplete();
       });
     }, 800);
-  };
+  }, [scaleAnim, pulseAnim, glowAnim, circleScaleAnim, fadeAnim, onComplete]);
+
+  const startCountdownSequence = useCallback(() => {
+    if (__DEV__) console.log('🎯 Starting countdown sequence');
+    
+    // 既存のintervalをクリーンアップ（安全のため）
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      if (__DEV__) console.log('⚠️ Previous interval cleared before starting new one');
+    }
+    
+    // Show initial number immediately
+    showNumberAnimation();
+    
+    intervalRef.current = setInterval(() => {
+      setCurrentCount(prev => {
+        const nextCount = prev - 1;
+        if (__DEV__) console.log('⏱️ Countdown tick:', prev, '->', nextCount);
+        
+        if (nextCount <= 0) {
+          // Show "START!" with special animation
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+            if (__DEV__) console.log('⏱️ Countdown completed - interval cleared');
+          }
+          
+          setPhase('start');
+          showStartAnimation();
+          return 0;
+        } else {
+          // Show next number with elegant animation
+          showNumberAnimation();
+          return nextCount;
+        }
+      });
+    }, 1000);
+    
+    if (__DEV__) console.log('⏱️ New countdown interval started');
+  }, [showNumberAnimation, showStartAnimation]);
+
 
   if (!visible) return null;
 
