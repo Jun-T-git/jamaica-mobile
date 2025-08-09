@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import {
+  Platform,
   StyleSheet,
   TouchableOpacity,
-  View,
-  Platform,
   useWindowDimensions,
+  View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Logo } from '../components/atoms/Logo';
@@ -66,18 +66,18 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   };
 
   return (
-    <AppScreen 
+    <AppScreen
       testID="mode-selection-screen"
       contentContainerStyle={styles.screenContainer}
     >
       {/* Header section with Flexbox layout */}
       <View style={styles.headerSection}>
-        <Logo 
-          size={Math.max(80, Math.min(120, Math.floor(screenHeight * 0.14)))} 
+        <Logo
+          size={Math.max(80, Math.min(120, Math.floor(screenHeight * 0.14)))}
         />
-        <Typography 
-          variant="h3" 
-          textAlign="center" 
+        <Typography
+          variant="h3"
+          textAlign="center"
           style={styles.title}
           numberOfLines={1}
           adjustsFontSizeToFit={Platform.OS === 'ios'}
@@ -115,8 +115,8 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               />
             </View>
             <View style={styles.modeTextBox}>
-              <Typography 
-                variant="h4" 
+              <Typography
+                variant="h4"
                 style={styles.modeTitle}
                 numberOfLines={1}
                 adjustsFontSizeToFit={Platform.OS === 'ios'}
@@ -157,8 +157,8 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               />
             </View>
             <View style={styles.modeTextBox}>
-              <Typography 
-                variant="h4" 
+              <Typography
+                variant="h4"
                 style={styles.modeTitle}
                 numberOfLines={1}
                 adjustsFontSizeToFit={Platform.OS === 'ios'}
@@ -217,60 +217,61 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
           </Typography>
         </TouchableOpacity>
       </View>
-
     </AppScreen>
   );
 };
 
 const styles = StyleSheet.create({
-  // Main container - Optimized spacing
+  // Main container - Grid-based layout
   screenContainer: {
     flex: 1,
-    justifyContent: 'space-between',
+    display: 'flex',
+    flexDirection: 'column',
   },
-  
-  // Header section - Clean spacing
+
+  // Header section - Takes 4.5 grid rows (45% of screen)
   headerSection: {
+    flex: 4.5,
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: ModernDesign.spacing[5],
-    paddingTop: ModernDesign.spacing[6],
-    paddingBottom: ModernDesign.spacing[4],
     gap: ModernDesign.spacing[3],
   },
-  
-  // Mode selection - Better visual balance
+
+  // Mode selection - Takes 4.5 grid rows (45% of screen)
   modeSection: {
-    flex: 1,
+    flex: 4.5,
     justifyContent: 'center',
     paddingHorizontal: ModernDesign.spacing[5],
     gap: ModernDesign.spacing[4],
-    maxWidth: 400,
     width: '100%',
     alignSelf: 'center',
   },
-  
-  // Footer - Refined spacing
+
+  // Footer - Takes 1 grid row (10% of screen)
   footerSection: {
+    flex: 1,
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: ModernDesign.spacing[5],
     paddingVertical: ModernDesign.spacing[5],
-    paddingBottom: ModernDesign.spacing[6],
     gap: ModernDesign.spacing[3],
   },
-  
+
   // Typography
   title: {
     color: ModernDesign.colors.text.primary,
     fontWeight: ModernDesign.typography.fontWeight.black,
     fontSize: ModernDesign.typography.fontSize['3xl'],
   },
-  
+
   subtitle: {
     color: ModernDesign.colors.text.tertiary,
     fontSize: ModernDesign.typography.fontSize.base,
     fontWeight: ModernDesign.typography.fontWeight.medium,
   },
-  
+
   // Mode button styling
   modeButton: {
     backgroundColor: ModernDesign.colors.background.tertiary,
@@ -282,14 +283,14 @@ const styles = StyleSheet.create({
     borderColor: ModernDesign.colors.border.subtle,
     ...ModernDesign.shadows.base,
   },
-  
+
   // Mode button content
   modeButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: ModernDesign.spacing[4],
   },
-  
+
   // Icon box styling
   modeIconBox: {
     width: 56,
@@ -300,20 +301,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexShrink: 0,
   },
-  
+
   // Text container
   modeTextBox: {
     flex: 1,
     gap: ModernDesign.spacing[1],
   },
-  
+
   // Mode title - More prominent
   modeTitle: {
     fontWeight: ModernDesign.typography.fontWeight.bold,
     fontSize: ModernDesign.typography.fontSize['2xl'],
     color: ModernDesign.colors.text.primary,
   },
-  
+
   // Navigation buttons - Improved visual
   navButton: {
     flex: 1,
@@ -322,16 +323,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: ModernDesign.spacing[2],
     backgroundColor: ModernDesign.colors.background.secondary,
-    borderRadius: ModernDesign.borderRadius['2xl'],
-    paddingHorizontal: ModernDesign.spacing[5],
+    borderRadius: ModernDesign.borderRadius.xl,
     paddingVertical: ModernDesign.spacing[3],
     borderWidth: 1,
     borderColor: ModernDesign.colors.border.subtle,
-    minHeight: 52,
-    maxWidth: 160,
+    minHeight: 56,
+    width: '100%',
     ...ModernDesign.shadows.sm,
   },
-  
+
   navButtonText: {
     color: ModernDesign.colors.text.secondary,
     fontWeight: ModernDesign.typography.fontWeight.semibold,

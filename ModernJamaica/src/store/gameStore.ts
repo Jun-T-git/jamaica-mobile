@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { GameState, GameMode, GameStatus, UnifiedGameState, NodeData, DifficultyLevel } from '../types';
 import { generateProblem } from '../utils/problemGenerator';
 import { getGameModeConfig } from '../config';
-import { getDifficultyConfig, DEFAULT_DIFFICULTY } from '../config/difficulty';
+import { getDifficultyConfig, DEFAULT_DIFFICULTY, calculateBonusTime } from '../config/difficulty';
 import { saveHighScoreWithDifficulty, loadAllHighScoresWithDifficulty } from '../utils/storage';
 import { adService } from '../services/adService';
 import { ComboTracker, calculateProblemScore, calculateFinalBonus } from '../utils/scoreCalculator';
@@ -300,7 +300,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         
         // スコア更新
         const { gameState: game } = state;
-        const difficultyConfig = getDifficultyConfig(game.difficulty);
         const solveTime = (Date.now() - state.problemStartTime) / 1000;
         
         if (game.mode === GameMode.CHALLENGE) {
@@ -316,8 +315,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const currentCombo = state.comboTracker.onCorrectAnswer(Date.now());
           const problemScore = calculateProblemScore(problemResult, currentCombo);
           
-          // 難易度に応じたボーナス時間を使用
-          const bonusTime = difficultyConfig.time.bonus;
+          // 問題数に応じた逓減ボーナス時間を計算（次の問題用なので+1）
+          const bonusTime = calculateBonusTime(game.difficulty, game.problemCount + 1);
           
           set({
             gameState: {
