@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Animated,
   Dimensions,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -69,10 +70,14 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     return () => subscription?.remove();
   }, []);
 
-  const { width: screenWidth } = dimensions;
+  const { width: screenWidth, height: screenHeight } = dimensions;
   const containerPadding = screenWidth * 0.05;
   const availableWidth = screenWidth - containerPadding * 2;
-  const cellSize = Math.floor(availableWidth * 0.095);
+  
+  // Adjust cell size based on both width and height to prevent overflow
+  const maxCellSizeFromWidth = Math.floor(availableWidth * 0.095);
+  const maxCellSizeFromHeight = Math.floor(screenHeight * 0.06);
+  const cellSize = Math.min(maxCellSizeFromWidth, maxCellSizeFromHeight, 45);
   const actualNodeSize = cellSize * 1.6;
 
   // Animate selection feedback
@@ -409,8 +414,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     (totalCellWidth - cellGap * (GRID_COLS - 1)) / GRID_COLS;
   const actualCellSize = Math.min(cellTotalSize, cellSize);
 
-  // Calculate vertical spacing - consistent spacing between all rows
-  const rowGap = actualCellSize * 1.0;
+  // Calculate vertical spacing - reduced for smaller screens
+  const rowGap = Math.min(actualCellSize * 0.8, screenHeight * 0.04);
 
   // Grid container dimensions
   const gridContainerWidth =
@@ -435,23 +440,25 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   };
 
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.gameArea}>
-        {/* Target - Prominent but minimal */}
-        <View style={styles.targetContainer}>
-          <Text style={styles.targetLabel}>つくる数</Text>
-          <Text style={styles.targetNumber}>{gameInfo.target}</Text>
-        </View>
+  // Check if we need scrolling for very small screens
+  const needsScroll = screenHeight < 600;
 
-        {/* Main Game Grid */}
-        <View style={styles.gridWrapper}>
-          <View
-            style={[
-              styles.gridInner,
-              { width: gridContainerWidth, height: gridContainerHeight },
-            ]}
-          >
+  const content = (
+    <>
+      {/* Target - Prominent but minimal */}
+      <View style={styles.targetContainer}>
+        <Text style={styles.targetLabel}>つくる数</Text>
+        <Text style={styles.targetNumber}>{gameInfo.target}</Text>
+      </View>
+
+      {/* Main Game Grid - Flex 1 to take available space */}
+      <View style={[styles.gridWrapper, needsScroll && styles.gridWrapperScrollable]}>
+        <View
+          style={[
+            styles.gridInner,
+            { width: gridContainerWidth, height: gridContainerHeight },
+          ]}
+        >
             {/* SVG overlay for edges */}
             <Svg
               style={StyleSheet.absoluteFillObject}
@@ -525,28 +532,29 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           </View>
         </View>
 
-        {/* Current State Indicator - Visual only */}
-        <View style={styles.stateIndicator}>
-          {firstNode && (
-            <Animated.View
-              style={[
-                styles.selectionDisplay,
-                {
-                  opacity: animatedValue,
-                  transform: [{ scale: animatedValue }],
-                },
-              ]}
-            >
-              <Text style={styles.selectedNumber}>{firstNode.value}</Text>
-              {selectedOperator && (
-                <Text style={styles.pendingOperation}>{selectedOperator}</Text>
-              )}
-            </Animated.View>
-          )}
-        </View>
+      {/* Current State Indicator - Floating overlay */}
+      {firstNode && (
+        <Animated.View
+          style={[
+            styles.floatingIndicator,
+            {
+              opacity: animatedValue,
+              transform: [{ scale: animatedValue }],
+            },
+          ]}
+          pointerEvents="none"
+        >
+          <View style={styles.selectionDisplay}>
+            <Text style={styles.selectedNumber}>{firstNode.value}</Text>
+            {selectedOperator && (
+              <Text style={styles.pendingOperation}>{selectedOperator}</Text>
+            )}
+          </View>
+        </Animated.View>
+      )}
 
-        {/* Operations - Bottom dock style */}
-        <View style={styles.operationDock}>
+      {/* Operations - Bottom dock style */}
+      <View style={styles.operationDock}>
           <View style={styles.operatorRow}>
             {operators.map(op => (
               <TouchableOpacity
@@ -641,7 +649,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             </TouchableOpacity>
           </View>
         </View>
-      </View>
 
       {/* Skip Confirmation Dialog */}
       <Dialog
@@ -668,6 +675,22 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         ]}
         onClose={() => setShowSkipDialog(false)}
       />
+    </>
+  );
+
+  return (
+    <View style={styles.container}>
+      {needsScroll ? (
+        <ScrollView
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {content}
+        </ScrollView>
+      ) : (
+        content
+      )}
     </View>
   );
 };
@@ -676,20 +699,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ModernDesign.colors.background.primary,
+    paddingHorizontal: ModernDesign.spacing[3],
+    paddingVertical: ModernDesign.spacing[2],
   },
-  gameArea: {
-    flex: 1,
-    paddingHorizontal: ModernDesign.spacing[4],
-    paddingVertical: ModernDesign.spacing[3],
-  },
-  // Target - Clean and minimal
+  // Target - Clean and minimal with flexible sizing
   targetContainer: {
     alignItems: 'center',
-    paddingVertical: ModernDesign.spacing[6],
+    paddingVertical: ModernDesign.spacing[4],
     backgroundColor: ModernDesign.colors.background.tertiary,
     marginHorizontal: ModernDesign.spacing[2],
     borderRadius: ModernDesign.borderRadius.xl,
-    marginBottom: ModernDesign.spacing[4],
+    marginBottom: ModernDesign.spacing[3],
   },
   targetLabel: {
     fontSize: ModernDesign.typography.fontSize.sm,
@@ -699,18 +719,30 @@ const styles = StyleSheet.create({
     letterSpacing: ModernDesign.typography.letterSpacing.wide,
   },
   targetNumber: {
-    fontSize: ModernDesign.typography.fontSize['5xl'],
+    fontSize: ModernDesign.typography.fontSize['4xl'],
     fontWeight: ModernDesign.typography.fontWeight.bold,
     color: ModernDesign.colors.accent.neon,
   },
-  // Grid
+  // Grid - Flex 1 to take available space
   gridWrapper: {
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
+    minHeight: 200, // Ensure minimum height for grid
+  },
+  gridWrapperScrollable: {
+    flex: 0, // Remove flex when scrollable
+    marginVertical: ModernDesign.spacing[3],
   },
   gridInner: {
     position: 'relative',
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: ModernDesign.spacing[4],
   },
   absoluteCell: {
     position: 'absolute',
@@ -759,39 +791,51 @@ const styles = StyleSheet.create({
   selectedCellText: {
     color: ModernDesign.colors.background.primary,
   },
-  // State indicator - minimal
-  stateIndicator: {
-    alignItems: 'center',
-    minHeight: ModernDesign.spacing[10],
-    justifyContent: 'center',
-    marginBottom: ModernDesign.spacing[5],
+  // Floating state indicator - ターゲット表示エリアの下に配置
+  floatingIndicator: {
+    position: 'absolute',
+    top: 120, // ターゲットコンテナの下に配置（調整済み）
+    alignSelf: 'center',
+    zIndex: 1000,
+    // 左右の余白を確保してノードと重ならないように
+    left: '20%',
+    right: '20%',
   },
   selectionDisplay: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: ModernDesign.colors.glass.background,
-    paddingHorizontal: ModernDesign.spacing[4],
-    paddingVertical: ModernDesign.spacing[2],
-    borderRadius: ModernDesign.borderRadius.full,
-    borderWidth: 1,
-    borderColor: ModernDesign.colors.glass.border,
+    justifyContent: 'center',
+    backgroundColor: ModernDesign.colors.background.tertiary, // 不透明背景で視認性向上
+    paddingHorizontal: ModernDesign.spacing[5],
+    paddingVertical: ModernDesign.spacing[3],
+    borderRadius: ModernDesign.borderRadius['2xl'],
+    borderWidth: 2,
+    borderColor: ModernDesign.colors.accent.neon,
+    shadowColor: ModernDesign.colors.accent.neon,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
+    minWidth: 120, // 最小幅を確保
   },
   selectedNumber: {
-    fontSize: ModernDesign.typography.fontSize['2xl'],
+    fontSize: ModernDesign.typography.fontSize['3xl'],
     fontWeight: ModernDesign.typography.fontWeight.bold,
     color: ModernDesign.colors.accent.neon,
   },
   pendingOperation: {
-    fontSize: ModernDesign.typography.fontSize.xl,
-    color: ModernDesign.colors.text.secondary,
-    marginLeft: ModernDesign.spacing[2],
+    fontSize: ModernDesign.typography.fontSize['2xl'],
+    fontWeight: ModernDesign.typography.fontWeight.semibold,
+    color: ModernDesign.colors.accent.neon,
+    marginLeft: ModernDesign.spacing[3],
   },
-  // Operation dock
+  // Operation dock - Fixed at bottom with proper spacing
   operationDock: {
     backgroundColor: ModernDesign.colors.background.tertiary,
     borderRadius: ModernDesign.borderRadius['2xl'],
-    paddingVertical: ModernDesign.spacing[4],
+    paddingVertical: ModernDesign.spacing[3],
     paddingHorizontal: ModernDesign.spacing[3],
+    marginTop: ModernDesign.spacing[3],
     borderWidth: 1,
     borderColor: ModernDesign.colors.border.subtle,
     ...ModernDesign.shadows.lg,
@@ -799,11 +843,12 @@ const styles = StyleSheet.create({
   operatorRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    marginBottom: ModernDesign.spacing[4],
+    marginBottom: ModernDesign.spacing[3],
+    gap: ModernDesign.spacing[2],
   },
   operatorButton: {
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     borderRadius: ModernDesign.borderRadius.lg,
     justifyContent: 'center',
     alignItems: 'center',

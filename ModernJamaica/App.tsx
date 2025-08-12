@@ -44,7 +44,7 @@ function App() {
         console.log('AdMob SDK initialized');
       })
       .catch((error) => {
-        console.error('AdMob SDK initialization error:', error);
+        console.error('AdMob SDK initialization error:', String(error));
       });
 
     // 音声設定の読み込み

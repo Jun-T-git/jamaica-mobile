@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import {
-  SafeAreaView,
-  StatusBar,
+  Platform,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Logo } from '../components/atoms/Logo';
 import { Typography } from '../components/atoms/Typography';
-import { BannerAdView } from '../components/molecules/BannerAdView';
+import { AppScreen } from '../components/layouts/AppScreen';
 import { ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';
@@ -23,8 +23,9 @@ interface ModeSelectionScreenProps {
 export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   navigation,
 }) => {
-  const { loadStoredData, highScores } = useGameStore();
+  const { loadStoredData } = useGameStore();
   const { loadDisplayName, loadSoundSetting, displayName } = useSettingsStore();
+  const { height: screenHeight } = useWindowDimensions();
 
   useEffect(() => {
     // ゲームデータを読み込み
@@ -65,16 +66,23 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={ModernDesign.colors.background.primary}
-      />
-
-      {/* Header with logo and typography */}
-      <View style={styles.header}>
-        <Logo size={100} style={styles.logo} />
-        <Typography variant="h4" textAlign="center" style={styles.title}>
+    <AppScreen
+      testID="mode-selection-screen"
+      contentContainerStyle={styles.screenContainer}
+    >
+      {/* Header section with Flexbox layout */}
+      <View style={styles.headerSection}>
+        <Logo
+          size={Math.max(80, Math.min(120, Math.floor(screenHeight * 0.14)))}
+        />
+        <Typography
+          variant="h3"
+          textAlign="center"
+          style={styles.title}
+          numberOfLines={1}
+          adjustsFontSizeToFit={Platform.OS === 'ios'}
+          minimumFontScale={0.7}
+        >
           ジャマイカの木
         </Typography>
         <Typography
@@ -82,88 +90,103 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
           color="secondary"
           textAlign="center"
           style={styles.subtitle}
+          numberOfLines={1}
+          adjustsFontSizeToFit={Platform.OS === 'ios'}
+          minimumFontScale={0.8}
         >
-          数字をつなげる計算パズル
+          数字をつなける計算パズル
         </Typography>
       </View>
 
-      {/* Game Mode Selection */}
-      <View style={styles.modesContainer}>
+      {/* Mode buttons section with Flexbox */}
+      <View style={styles.modeSection}>
         {/* Challenge Mode Button */}
         <TouchableOpacity
           onPress={() => handleModeSelect(GameMode.CHALLENGE)}
           style={styles.modeButton}
           activeOpacity={0.8}
         >
-          <View style={styles.modeContent}>
-            <View style={styles.modeIconContainer}>
+          <View style={styles.modeButtonContent}>
+            <View style={styles.modeIconBox}>
               <MaterialIcons
                 name="timer"
                 size={28}
                 color={ModernDesign.colors.accent.neon}
               />
             </View>
-            <View style={styles.modeTextContainer}>
-              <Typography variant="h4" style={styles.modeTitle}>
+            <View style={styles.modeTextBox}>
+              <Typography
+                variant="h4"
+                style={styles.modeTitle}
+                numberOfLines={1}
+                adjustsFontSizeToFit={Platform.OS === 'ios'}
+                minimumFontScale={0.7}
+              >
                 チャレンジモード
               </Typography>
               <Typography
                 variant="body2"
                 color="secondary"
-                style={styles.modeDescription}
+                numberOfLines={1}
+                adjustsFontSizeToFit={Platform.OS === 'ios'}
+                minimumFontScale={0.8}
               >
-                時間制限内に何問解けるか挑戦
+                時間内に何問解けるか挑戦
               </Typography>
             </View>
-            <View style={styles.modeArrow}>
-              <MaterialIcons
-                name="arrow-forward-ios"
-                size={20}
-                color={ModernDesign.colors.text.tertiary}
-              />
-            </View>
+            <MaterialIcons
+              name="arrow-forward-ios"
+              size={20}
+              color={ModernDesign.colors.text.tertiary}
+            />
           </View>
         </TouchableOpacity>
 
-        {/* Infinite Mode Button */}
+        {/* Practice Mode Button */}
         <TouchableOpacity
           onPress={() => handleModeSelect(GameMode.INFINITE)}
           style={styles.modeButton}
           activeOpacity={0.8}
         >
-          <View style={styles.modeContent}>
-            <View style={styles.modeIconContainer}>
+          <View style={styles.modeButtonContent}>
+            <View style={styles.modeIconBox}>
               <MaterialIcons
                 name="all-inclusive"
                 size={28}
                 color={ModernDesign.colors.accent.neon}
               />
             </View>
-            <View style={styles.modeTextContainer}>
-              <Typography variant="h4" style={styles.modeTitle}>
+            <View style={styles.modeTextBox}>
+              <Typography
+                variant="h4"
+                style={styles.modeTitle}
+                numberOfLines={1}
+                adjustsFontSizeToFit={Platform.OS === 'ios'}
+                minimumFontScale={0.7}
+              >
                 練習モード
               </Typography>
               <Typography
                 variant="body2"
                 color="secondary"
-                style={styles.modeDescription}
+                numberOfLines={1}
+                adjustsFontSizeToFit={Platform.OS === 'ios'}
+                minimumFontScale={0.8}
               >
                 自分のペースでじっくり練習
               </Typography>
             </View>
-            <View style={styles.modeArrow}>
-              <MaterialIcons
-                name="arrow-forward-ios"
-                size={20}
-                color={ModernDesign.colors.text.tertiary}
-              />
-            </View>
+            <MaterialIcons
+              name="arrow-forward-ios"
+              size={20}
+              color={ModernDesign.colors.text.tertiary}
+            />
           </View>
         </TouchableOpacity>
       </View>
 
-      {/* セカンダリナビゲーション */}
-      <View style={styles.secondaryNavigation}>
+      {/* Footer navigation section with Flexbox */}
+      <View style={styles.footerSection}>
         <TouchableOpacity
           onPress={handleRankingPress}
           style={styles.navButton}
@@ -194,112 +217,125 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
           </Typography>
         </TouchableOpacity>
       </View>
-
-      {/* バナー広告 */}
-      <BannerAdView style={styles.bannerAd} />
-    </SafeAreaView>
+    </AppScreen>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  // Main container - Grid-based layout
+  screenContainer: {
     flex: 1,
-    backgroundColor: ModernDesign.colors.background.primary,
+    display: 'flex',
+    flexDirection: 'column',
   },
-  header: {
-    paddingTop: ModernDesign.spacing[16],
-    paddingBottom: ModernDesign.spacing[4],
-    paddingHorizontal: ModernDesign.spacing[6],
-    alignItems: 'center',
-  },
-  logo: {
-    marginBottom: ModernDesign.spacing[4],
-  },
-  title: {
-    marginBottom: ModernDesign.spacing[2], // マージンを少し縮小
-    color: ModernDesign.colors.text.primary,
-    fontWeight: ModernDesign.typography.fontWeight.black,
-  },
-  subtitle: {
-    opacity: 0.6,
-    fontSize: ModernDesign.typography.fontSize.lg,
-  },
-  modesContainer: {
-    flex: 1,
-    paddingHorizontal: ModernDesign.spacing[6],
-    paddingTop: ModernDesign.spacing[8],
-    paddingBottom: ModernDesign.spacing[8],
-    gap: ModernDesign.spacing[4],
-  },
-  secondaryNavigation: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: ModernDesign.spacing[6],
-    paddingTop: ModernDesign.spacing[6],
-    paddingBottom: ModernDesign.spacing[20], // 広告スペースを確保
-    backgroundColor: ModernDesign.colors.background.primary,
-  },
-  navButton: {
+
+  // Header section - Takes 4.5 grid rows (45% of screen)
+  headerSection: {
+    flex: 4.5,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: ModernDesign.colors.background.secondary,
-    borderRadius: ModernDesign.borderRadius.xl,
     paddingHorizontal: ModernDesign.spacing[5],
-    paddingVertical: ModernDesign.spacing[4], // タップしやすくするため縦幅を拡大
-    borderWidth: 1,
-    borderColor: ModernDesign.colors.border.subtle,
-    width: '47%', // 画面の半分弱でボタンサイズを統一
+    gap: ModernDesign.spacing[3],
+  },
+
+  // Mode selection - Takes 4.5 grid rows (45% of screen)
+  modeSection: {
+    flex: 4.5,
+    justifyContent: 'center',
+    paddingHorizontal: ModernDesign.spacing[5],
+    gap: ModernDesign.spacing[4],
+    width: '100%',
+    alignSelf: 'center',
+  },
+
+  // Footer - Takes 1 grid row (10% of screen)
+  footerSection: {
+    flex: 1,
     flexDirection: 'row',
-    gap: ModernDesign.spacing[2],
-    minHeight: 48, // 最小タップ領域を確保
-    ...ModernDesign.shadows.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: ModernDesign.spacing[5],
+    paddingVertical: ModernDesign.spacing[5],
+    gap: ModernDesign.spacing[3],
   },
-  navButtonText: {
-    color: ModernDesign.colors.text.secondary,
+
+  // Typography
+  title: {
+    color: ModernDesign.colors.text.primary,
+    fontWeight: ModernDesign.typography.fontWeight.black,
+    fontSize: ModernDesign.typography.fontSize['3xl'],
+  },
+
+  subtitle: {
+    color: ModernDesign.colors.text.tertiary,
+    fontSize: ModernDesign.typography.fontSize.base,
     fontWeight: ModernDesign.typography.fontWeight.medium,
-    fontSize: ModernDesign.typography.fontSize.sm,
-    letterSpacing: ModernDesign.typography.letterSpacing.wide,
   },
+
+  // Mode button styling
   modeButton: {
     backgroundColor: ModernDesign.colors.background.tertiary,
-    borderRadius: ModernDesign.borderRadius['2xl'],
-    padding: ModernDesign.spacing[6],
+    borderRadius: ModernDesign.borderRadius['3xl'],
+    paddingVertical: ModernDesign.spacing[5],
+    paddingHorizontal: ModernDesign.spacing[5],
+    minHeight: 90,
     borderWidth: 1,
     borderColor: ModernDesign.colors.border.subtle,
     ...ModernDesign.shadows.base,
   },
-  modeContent: {
+
+  // Mode button content
+  modeButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: ModernDesign.spacing[4],
   },
-  modeIconContainer: {
+
+  // Icon box styling
+  modeIconBox: {
     width: 56,
     height: 56,
     backgroundColor: ModernDesign.colors.background.secondary,
-    borderRadius: ModernDesign.borderRadius.lg,
+    borderRadius: ModernDesign.borderRadius.xl,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: ModernDesign.spacing[4],
+    flexShrink: 0,
   },
-  modeTextContainer: {
+
+  // Text container
+  modeTextBox: {
     flex: 1,
+    gap: ModernDesign.spacing[1],
   },
+
+  // Mode title - More prominent
   modeTitle: {
-    marginBottom: ModernDesign.spacing[1],
-    fontWeight: ModernDesign.typography.fontWeight.semibold,
+    fontWeight: ModernDesign.typography.fontWeight.bold,
     fontSize: ModernDesign.typography.fontSize['2xl'],
+    color: ModernDesign.colors.text.primary,
   },
-  modeDescription: {
-    fontSize: ModernDesign.typography.fontSize.sm,
-    lineHeight: ModernDesign.typography.fontSize.sm * 1.3,
+
+  // Navigation buttons - Improved visual
+  navButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: ModernDesign.spacing[2],
+    backgroundColor: ModernDesign.colors.background.secondary,
+    borderRadius: ModernDesign.borderRadius.xl,
+    paddingVertical: ModernDesign.spacing[3],
+    borderWidth: 1,
+    borderColor: ModernDesign.colors.border.subtle,
+    minHeight: 56,
+    width: '100%',
+    ...ModernDesign.shadows.sm,
   },
-  modeArrow: {
-    marginLeft: ModernDesign.spacing[2],
-  },
-  bannerAd: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+
+  navButtonText: {
+    color: ModernDesign.colors.text.secondary,
+    fontWeight: ModernDesign.typography.fontWeight.semibold,
+    fontSize: ModernDesign.typography.fontSize.base,
+    letterSpacing: ModernDesign.typography.letterSpacing.normal,
   },
 });

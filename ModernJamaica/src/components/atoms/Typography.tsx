@@ -14,6 +14,9 @@ interface TypographyProps {
   textAlign?: 'left' | 'center' | 'right';
   dynamicType?: boolean; // Dynamic Type対応を有効にするかどうか（オプトイン）
   accessibilityScale?: number; // ユーザーのアクセシビリティ設定倍率
+  adjustsFontSizeToFit?: boolean; // iOSでテキストを自動縮小
+  minimumFontScale?: number; // 最小縮小率
+  ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip'; // テキストの省略方法
 }
 
 export const Typography: React.FC<TypographyProps> = ({
@@ -25,6 +28,9 @@ export const Typography: React.FC<TypographyProps> = ({
   textAlign = 'left',
   dynamicType = false,
   accessibilityScale = 1.0,
+  adjustsFontSizeToFit,
+  minimumFontScale,
+  ellipsizeMode,
 }) => {
   const getTextStyle = (): TextStyle => {
     const variantStyle = styles[variant];
@@ -56,6 +62,9 @@ export const Typography: React.FC<TypographyProps> = ({
     <Text
       style={[getTextStyle(), style]}
       numberOfLines={numberOfLines}
+      adjustsFontSizeToFit={adjustsFontSizeToFit === true}
+      minimumFontScale={minimumFontScale || 1.0}
+      ellipsizeMode={ellipsizeMode}
     >
       {children}
     </Text>

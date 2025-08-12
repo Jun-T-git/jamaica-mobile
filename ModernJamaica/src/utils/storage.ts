@@ -39,7 +39,7 @@ export const saveHighScoreWithDifficulty = async (
       await AsyncStorage.setItem(key, score.toString());
     }
   } catch (error) {
-    console.error(`Failed to save ${mode} ${difficulty} high score:`, error);
+    console.error('Failed to save', String(mode), String(difficulty), 'high score:', String(error));
   }
 };
 
@@ -62,7 +62,7 @@ export const loadHighScoreWithDifficulty = async (
     const value = await AsyncStorage.getItem(key);
     return value != null ? parseInt(value, 10) : null;
   } catch (error) {
-    console.error(`Failed to load ${mode} ${difficulty} high score:`, error);
+    console.error('Failed to load', String(mode), String(difficulty), 'high score:', String(error));
     return null;
   }
 };
@@ -86,7 +86,7 @@ export const loadHighScore = async (mode: GameMode): Promise<number | null> => {
       return score;
     }
   } catch (error) {
-    console.error(`Failed to migrate ${mode} high score:`, error);
+    console.error('Failed to migrate', String(mode), 'high score:', String(error));
   }
   
   return null;
@@ -106,7 +106,7 @@ export const saveSettings = async (settings: StoredData['settings']): Promise<vo
   try {
     await AsyncStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
   } catch (error) {
-    console.error('Failed to save settings:', error);
+    console.error('Failed to save settings:', String(error));
   }
 };
 
@@ -116,7 +116,7 @@ export const loadSettings = async (): Promise<StoredData['settings'] | null> => 
     const jsonValue = await AsyncStorage.getItem(STORAGE_KEYS.SETTINGS);
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch (error) {
-    console.error('Failed to load settings:', error);
+    console.error('Failed to load settings:', String(error));
     return null;
   }
 };
@@ -174,6 +174,6 @@ export const clearAllStoredData = async (): Promise<void> => {
     ];
     await AsyncStorage.multiRemove(keysToRemove);
   } catch (error) {
-    console.error('Failed to clear stored data:', error);
+    console.error('Failed to clear stored data:', String(error));
   }
 };

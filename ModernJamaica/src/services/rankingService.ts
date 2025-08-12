@@ -83,7 +83,7 @@ export class RankingService {
       console.log('🎯 Transaction result:', result);
       return result;
     } catch (error) {
-      console.error('❌ Failed to submit score:', error);
+      console.error('❌ Failed to submit score:', String(error));
       return false;
     }
   }
@@ -133,7 +133,7 @@ export class RankingService {
       console.log('🏆 Final rankings:', JSON.stringify(rankings, null, 2));
       return rankings;
     } catch (error) {
-      console.error('❌ Failed to get ranking:', error);
+      console.error('❌ Failed to get ranking:', String(error));
       return [];
     }
   }
@@ -182,7 +182,7 @@ export class RankingService {
         percentile,
       };
     } catch (error) {
-      console.error('Failed to get user rank:', error);
+      console.error('Failed to get user rank:', String(error));
       return { rank: null, totalUsers: 0 };
     }
   }
@@ -200,7 +200,7 @@ export class RankingService {
 
       return doc.exists() ? (doc.data() as UserScoreDocument) : null;
     } catch (error) {
-      console.error('Failed to get user score document:', error);
+      console.error('Failed to get user score document:', String(error));
       return null;
     }
   }
@@ -221,7 +221,7 @@ export class RankingService {
 
       return null;
     } catch (error) {
-      console.error('Failed to get user best score:', error);
+      console.error('Failed to get user best score:', String(error));
       return null;
     }
   }
@@ -256,7 +256,7 @@ export class RankingService {
         return true;
       }
     } catch (error) {
-      console.error('❌ Failed to update display name:', error);
+      console.error('❌ Failed to update display name:', String(error));
       return false;
     }
   }

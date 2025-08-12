@@ -198,7 +198,7 @@ export const RankingScreen: React.FC<RankingScreenProps> = ({ navigation }) => {
       </ScrollView>
 
       {/* バナー広告 */}
-      <BannerAdView style={styles.bannerAd} />
+      <BannerAdView />
     </SafeAreaView>
   );
 };
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: ModernDesign.spacing[20], // 広告分のスペースを確保
+    paddingBottom: 100, // Adaptiveバナー対応余白
   },
   tabsContainer: {
     marginTop: ModernDesign.spacing[2],
@@ -306,11 +306,5 @@ const styles = StyleSheet.create({
     color: ModernDesign.colors.text.secondary,
     textAlign: 'center',
     fontStyle: 'italic',
-  },
-  bannerAd: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
 });

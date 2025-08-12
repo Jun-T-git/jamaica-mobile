@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { GameState, GameMode, GameStatus, UnifiedGameState, NodeData, DifficultyLevel } from '../types';
 import { generateProblem } from '../utils/problemGenerator';
 import { getGameModeConfig } from '../config';
-import { getDifficultyConfig, DEFAULT_DIFFICULTY } from '../config/difficulty';
+import { getDifficultyConfig, DEFAULT_DIFFICULTY, calculateBonusTime } from '../config/difficulty';
 import { saveHighScoreWithDifficulty, loadAllHighScoresWithDifficulty } from '../utils/storage';
 import { adService } from '../services/adService';
 import { ComboTracker, calculateProblemScore, calculateFinalBonus } from '../utils/scoreCalculator';
@@ -300,7 +300,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         
         // スコア更新
         const { gameState: game } = state;
-        const difficultyConfig = getDifficultyConfig(game.difficulty);
         const solveTime = (Date.now() - state.problemStartTime) / 1000;
         
         if (game.mode === GameMode.CHALLENGE) {
@@ -316,8 +315,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const currentCombo = state.comboTracker.onCorrectAnswer(Date.now());
           const problemScore = calculateProblemScore(problemResult, currentCombo);
           
-          // 難易度に応じたボーナス時間を使用
-          const bonusTime = difficultyConfig.time.bonus;
+          // 問題数に応じた逓減ボーナス時間を計算（次の問題用なので+1）
+          const bonusTime = calculateBonusTime(game.difficulty, game.problemCount + 1);
           
           set({
             gameState: {
@@ -434,7 +433,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       
       return success;
     } catch (error) {
-      console.error('Failed to submit score to ranking:', error);
+      console.error('Failed to submit score to ranking:', String(error));
       set({ 
         isSubmittingScore: false, 
         rankingSubmissionResult: false 
@@ -492,25 +491,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ランキングに自動提出（新記録達成時のみ）
     if (isNewHighScore && game.mode === GameMode.CHALLENGE) {
       console.log('🏆 New high score detected in challenge mode, attempting to submit to ranking...');
-      console.log('📊 Final score:', finalScore, 'Previous high score:', previousHighScore);
+      console.log('📊 Final score:', String(finalScore), 'Previous high score:', String(previousHighScore));
       
       // 提供されたdisplayNameがあればそれを使用、なければsettingsStoreから取得
       let nameToUse = displayName;
       if (!nameToUse || nameToUse.trim().length === 0) {
         const settingsState = useSettingsStore.getState();
         nameToUse = settingsState.displayName;
-        console.log('📝 Using display name from settings:', nameToUse);
+        console.log('📝 Using display name from settings:', String(nameToUse));
       }
       
       if (nameToUse && nameToUse.trim().length > 0) {
-        console.log('🚀 Submitting new high score with name:', nameToUse);
+        console.log('🚀 Submitting new high score with name:', String(nameToUse));
         const submissionResult = await get().submitScoreToRanking(nameToUse);
-        console.log('✅ Ranking submission result:', submissionResult);
+        console.log('✅ Ranking submission result:', String(submissionResult));
       } else {
         console.log('⚠️ No valid display name found, skipping ranking submission');
       }
     } else if (game.mode === GameMode.CHALLENGE) {
-      console.log('📝 Challenge mode ended but no new high score (Final:', finalScore, 'vs Previous:', previousHighScore, ')');
+      console.log('📝 Challenge mode ended but no new high score (Final:', String(finalScore), 'vs Previous:', String(previousHighScore), ')');
     }
     
     // 広告表示（手動終了以外）

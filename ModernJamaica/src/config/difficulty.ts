@@ -8,6 +8,8 @@ export interface DifficultyConfig {
   time: {
     initial: number;  // 初期時間（秒）
     bonus: number;    // 正解ボーナス（秒）
+    bonusDecrement: number; // ボーナス時間減少量（秒）
+    minimumBonus: number;   // 最小ボーナス時間（秒）
   };
   label: {
     ja: string;       // 日本語表示名
@@ -31,8 +33,10 @@ export const DIFFICULTY_CONFIG: Record<DifficultyLevel, DifficultyConfig> = {
       max: 4 
     },
     time: { 
-      initial: 120,  // 2分
-      bonus: 20      // +20秒
+      initial: 120,    // 2分
+      bonus: 20,       // +20秒（1問目）
+      bonusDecrement: 2, // 2秒ずつ減少
+      minimumBonus: 4    // 最小4秒
     },
     label: {
       ja: 'かんたん',
@@ -51,8 +55,10 @@ export const DIFFICULTY_CONFIG: Record<DifficultyLevel, DifficultyConfig> = {
       max: 6 
     },
     time: { 
-      initial: 60,   // 1分
-      bonus: 10      // +10秒
+      initial: 60,     // 1分
+      bonus: 10,       // +10秒（1問目）
+      bonusDecrement: 1, // 1秒ずつ減少
+      minimumBonus: 4    // 最小4秒
     },
     label: {
       ja: 'ふつう',
@@ -71,8 +77,10 @@ export const DIFFICULTY_CONFIG: Record<DifficultyLevel, DifficultyConfig> = {
       max: 10 
     },
     time: { 
-      initial: 60,   // 1分
-      bonus: 10      // +10秒
+      initial: 60,     // 1分
+      bonus: 10,       // +10秒（1問目）
+      bonusDecrement: 1, // 1秒ずつ減少
+      minimumBonus: 4    // 最小4秒
     },
     label: {
       ja: 'むずかしい',
@@ -91,6 +99,20 @@ export const DIFFICULTY_CONFIG: Record<DifficultyLevel, DifficultyConfig> = {
  */
 export const getDifficultyConfig = (difficulty: DifficultyLevel): DifficultyConfig => {
   return DIFFICULTY_CONFIG[difficulty];
+};
+
+/**
+ * 問題数に応じた逓減ボーナス時間を計算
+ */
+export const calculateBonusTime = (difficulty: DifficultyLevel, problemCount: number): number => {
+  const config = DIFFICULTY_CONFIG[difficulty];
+  const { bonus, bonusDecrement, minimumBonus } = config.time;
+  
+  // 1問目は最大ボーナス、その後は問題数に応じて減少
+  const decreasedBonus = bonus - ((problemCount - 1) * bonusDecrement);
+  
+  // 最小ボーナス時間を下回らないようにする
+  return Math.max(decreasedBonus, minimumBonus);
 };
 
 /**

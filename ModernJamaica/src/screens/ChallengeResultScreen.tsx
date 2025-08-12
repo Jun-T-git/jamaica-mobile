@@ -5,6 +5,7 @@ import {
   Animated,
   Dimensions,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -68,6 +69,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
 
   // Animated score counter
   const [displayedScore, setDisplayedScore] = useState(0);
+  const [bannerHeight, setBannerHeight] = useState(50); // Banner ad height
 
   useEffect(() => {
     // Initial entrance animation
@@ -175,19 +177,28 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Background Gradient Effect */}
-      <View style={styles.backgroundGradient} />
-
-      {/* Result Card */}
-      <Animated.View
-        style={[
-          styles.resultCard,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
-          },
+      {/* Main content area with flex 1 */}
+      <ScrollView 
+        style={styles.scrollContainer}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: bannerHeight + 20 } // Dynamic padding based on banner height
         ]}
+        showsVerticalScrollIndicator={false}
       >
+        {/* Background Gradient Effect */}
+        <View style={styles.backgroundGradient} />
+
+        {/* Result Card */}
+        <Animated.View
+          style={[
+            styles.resultCard,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+            },
+          ]}
+        >
         {/* Header Icon */}
         <Animated.View
           style={[
@@ -206,7 +217,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
         >
           <MaterialIcons
             name={isNewHighScore ? 'star' : 'timer-off'}
-            size={40}
+            size={32}
             color={
               isNewHighScore
                 ? ModernDesign.colors.accent.gold
@@ -345,8 +356,8 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
         </View>
       </Animated.View>
 
-      {/* New High Score Confetti Effect */}
-      {isNewHighScore && (
+        {/* New High Score Confetti Effect */}
+        {isNewHighScore && (
         <Animated.View
           style={[
             styles.confettiContainer,
@@ -388,10 +399,11 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
             />
           ))}
         </Animated.View>
-      )}
+        )}
+      </ScrollView>
 
-      {/* バナー広告 */}
-      <BannerAdView style={styles.bannerAd} />
+      {/* バナー広告 - Fixed at bottom */}
+      <BannerAdView onHeightChange={setBannerHeight} />
     </SafeAreaView>
   );
 };
@@ -400,10 +412,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 120, // 広告スペースを縮小
-    paddingHorizontal: ModernDesign.spacing[4], // 左右のマージンを追加
+    paddingHorizontal: ModernDesign.spacing[4],
+    paddingTop: ModernDesign.spacing[4],
+    minHeight: '100%',
   },
   backgroundGradient: {
     position: 'absolute',
@@ -416,67 +435,67 @@ const styles = StyleSheet.create({
   },
   resultCard: {
     width: '100%',
-    maxWidth: 340, // 最大幅をさらに縮小
+    maxWidth: 340,
     backgroundColor: ModernDesign.colors.background.tertiary,
     borderRadius: ModernDesign.borderRadius['3xl'],
     borderWidth: 2,
     borderColor: ModernDesign.colors.accent.neon,
-    padding: ModernDesign.spacing[5], // パディングをさらに縮小
+    padding: ModernDesign.spacing[4], // Further reduced padding
     alignItems: 'center',
     ...ModernDesign.shadows.xl,
   },
   headerIconContainer: {
-    width: 56, // サイズをさらに縮小
-    height: 56, // サイズをさらに縮小
+    width: 48,
+    height: 48,
     borderRadius: ModernDesign.borderRadius.full,
     backgroundColor: ModernDesign.colors.glass.background,
     borderWidth: 1,
     borderColor: ModernDesign.colors.glass.border,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: ModernDesign.spacing[3], // マージンを縮小
+    marginBottom: ModernDesign.spacing[2],
     ...ModernDesign.shadows.base,
   },
   title: {
-    fontSize: ModernDesign.typography.fontSize['3xl'],
+    fontSize: ModernDesign.typography.fontSize['2xl'],
     fontWeight: ModernDesign.typography.fontWeight.bold,
     color: ModernDesign.colors.text.primary,
     textAlign: 'center',
-    marginBottom: ModernDesign.spacing[2],
+    marginBottom: ModernDesign.spacing[1],
     letterSpacing: ModernDesign.typography.letterSpacing.wide,
   },
   subtitle: {
-    fontSize: ModernDesign.typography.fontSize.lg,
+    fontSize: ModernDesign.typography.fontSize.base,
     color: ModernDesign.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: ModernDesign.spacing[4], // マージンをさらに縮小
+    marginBottom: ModernDesign.spacing[3],
   },
   scoreSection: {
     alignItems: 'center',
-    marginBottom: ModernDesign.spacing[4], // マージンをさらに縮小
+    marginBottom: ModernDesign.spacing[3],
   },
   scoreLabel: {
-    fontSize: ModernDesign.typography.fontSize.base,
+    fontSize: ModernDesign.typography.fontSize.sm,
     color: ModernDesign.colors.text.secondary,
-    marginBottom: ModernDesign.spacing[2],
+    marginBottom: ModernDesign.spacing[1],
     letterSpacing: ModernDesign.typography.letterSpacing.wide,
   },
   scoreContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: ModernDesign.spacing[4],
+    marginBottom: ModernDesign.spacing[3],
   },
   scoreValue: {
-    fontSize: ModernDesign.typography.fontSize['6xl'],
+    fontSize: ModernDesign.typography.fontSize['5xl'],
     fontWeight: ModernDesign.typography.fontWeight.black,
     color: ModernDesign.colors.accent.neon,
-    lineHeight: ModernDesign.typography.fontSize['6xl'] * 1.1,
+    lineHeight: ModernDesign.typography.fontSize['5xl'] * 1.1,
   },
   scoreUnit: {
-    fontSize: ModernDesign.typography.fontSize['2xl'],
+    fontSize: ModernDesign.typography.fontSize.xl,
     fontWeight: ModernDesign.typography.fontWeight.bold,
     color: ModernDesign.colors.text.primary,
-    marginLeft: ModernDesign.spacing[2],
+    marginLeft: ModernDesign.spacing[1],
   },
   newRecordBadge: {
     flexDirection: 'row',
@@ -510,8 +529,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginBottom: ModernDesign.spacing[6], // マージンを縮小
-    paddingHorizontal: ModernDesign.spacing[4],
+    marginBottom: ModernDesign.spacing[4],
+    paddingHorizontal: ModernDesign.spacing[2],
   },
   statItem: {
     alignItems: 'center',
@@ -530,7 +549,7 @@ const styles = StyleSheet.create({
   },
   buttonSection: {
     width: '100%',
-    gap: ModernDesign.spacing[4],
+    gap: ModernDesign.spacing[3],
   },
   difficultyBadge: {
     flexDirection: 'row',
@@ -560,11 +579,5 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-  },
-  bannerAd: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
 });

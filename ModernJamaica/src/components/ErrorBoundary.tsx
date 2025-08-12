@@ -31,7 +31,16 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // エラーオブジェクトを安全に出力
+    try {
+      console.error('ErrorBoundary caught an error:');
+      console.error('- Error name:', String(error?.name || 'Unknown'));
+      console.error('- Error message:', String(error?.message || 'No message'));
+      console.error('- Component stack:', String(errorInfo?.componentStack || 'No stack'));
+    } catch (loggingError) {
+      // ログ出力自体でエラーが発生した場合
+      console.error('ErrorBoundary logging failed');
+    }
   }
 
   handleReset = () => {
