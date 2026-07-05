@@ -1,0 +1,35 @@
+{
+  "$comment": "これは非アクティブな推奨設定です。有効化するには内容を .claude/settings.json にコピーしてください（下記「有効化」参照）。permissions.allow は自律開発時の許可プロンプト削減、hooks.Stop は作業終了時に doc-drift を非ブロッキングで通知する nudge です。",
+  "$activation": "cp .claude/settings.recommended.json .claude/settings.json でチーム共有設定として有効化。個人のみなら .claude/settings.local.json に置く（gitignore 済み）。または /update-config スキルで対話的に反映。",
+  "permissions": {
+    "allow": [
+      "Bash(npm test)",
+      "Bash(npm test:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint:*)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npx tsc:*)",
+      "Bash(node .claude/scripts/check-doc-drift.mjs)",
+      "Bash(node .claude/scripts/check-doc-drift.mjs:*)",
+      "Bash(git status)",
+      "Bash(git status:*)",
+      "Bash(git diff)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git show:*)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/scripts/check-doc-drift.mjs --nudge"
+          }
+        ]
+      }
+    ]
+  }
+}
