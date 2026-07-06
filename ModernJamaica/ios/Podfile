@@ -29,5 +29,36 @@ target 'ModernJamaica' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # fmt 11.0.2（RN 0.80.2 が RCT-Folly 経由で固定）は現行の Xcode/clang(26 系)で
+    # consteval のフォーマット文字列チェックがコンパイルできない
+    # （"call to consteval function ... is not a constant expression"）。
+    # base.h は FMT_USE_CONSTEVAL をコンパイラ検出で無条件に再定義するため
+    # -D では上書きできない。ヘッダに 0 固定の上書きを差し込み、全環境
+    # （ローカル / Xcode Cloud / GitHub Actions）で一貫して回避する。
+    # pod install の度に再適用されるため gitignore な Pods/ を直接触る必要がない。
+    patch_fmt_consteval(installer)
   end
+end
+
+def patch_fmt_consteval(installer)
+  marker = "// patched: force FMT_USE_CONSTEVAL off (Xcode 26 / clang consteval 非互換)"
+  base_h = File.join(installer.sandbox.root, "fmt/include/fmt/base.h")
+  unless File.exist?(base_h)
+    Pod::UI.warn "[post_install] fmt/base.h が見つからず consteval パッチをスキップ"
+    return
+  end
+  src = File.read(base_h)
+  return if src.include?(marker) # 冪等
+
+  anchor = "#if FMT_USE_CONSTEVAL\n#  define FMT_CONSTEVAL consteval"
+  unless src.include?(anchor)
+    Pod::UI.warn "[post_install] fmt/base.h の想定箇所が見つからず consteval パッチをスキップ"
+    return
+  end
+  patched = "#undef FMT_USE_CONSTEVAL\n#define FMT_USE_CONSTEVAL 0 #{marker}\n#{anchor}"
+  # CocoaPods がコピーする pod ヘッダは read-only(0444) のことがあるため writable にしてから書く。
+  File.chmod(0644, base_h)
+  File.write(base_h, src.sub(anchor, patched))
+  Pod::UI.puts "[post_install] fmt/base.h の consteval を無効化（Xcode 26 互換）"
 end

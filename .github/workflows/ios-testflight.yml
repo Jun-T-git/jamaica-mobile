@@ -28,7 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ローカルのベータ Xcode(26.x)と異なり、安定版 Xcode を使うため fmt 問題は起きない。
+      # fmt(consteval)の Xcode 26 非互換は Podfile の post_install で全環境共通に修正済み。
+      # ランナーの既定 Xcode を使う（macos-15 は安定版 Xcode 16/26 系）。
       - name: Select stable Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
