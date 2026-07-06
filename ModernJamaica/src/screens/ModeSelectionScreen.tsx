@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: ModernDesign.spacing[6],
     paddingTop: ModernDesign.spacing[6],
-    paddingBottom: ModernDesign.spacing[20], // 広告スペースを確保
+    paddingBottom: ModernDesign.spacing[24], // 広告＋下部セーフエリアぶんを確保
     backgroundColor: ModernDesign.colors.background.primary,
   },
   navButton: {

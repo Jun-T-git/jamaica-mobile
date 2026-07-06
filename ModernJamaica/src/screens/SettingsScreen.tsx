@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
 
   // その他
   bottomSpacer: {
-    height: ModernDesign.spacing[20], // 広告分のスペース
+    height: ModernDesign.spacing[24], // 広告＋下部セーフエリアぶんを確保
   },
   bannerAd: {
     position: 'absolute',
