@@ -1,0 +1,85 @@
+require "shellwords"
+
+# iOS のみをリリース対象とする方針（Android は配信しない）。
+default_platform(:ios)
+
+XCODEPROJ  = "ios/ModernJamaica.xcodeproj"
+WORKSPACE  = "ios/ModernJamaica.xcworkspace"
+SCHEME     = "ModernJamaica"
+APP_ID     = "com.junt.modernjamaica"
+TEAM_ID    = "JD7L34U2WS"
+
+platform :ios do
+  desc "Release ビルドを作成し TestFlight へアップロードする"
+  desc "使い方: bundle exec fastlane ios beta version:1.1.4 changelog:\"広告設定の修正\""
+  desc ""
+  desc "必要な環境変数（CI では GitHub Secrets から注入）:"
+  desc "  ASC_KEY_ID    … App Store Connect API キーの Key ID"
+  desc "  ASC_ISSUER_ID … 同 Issuer ID（チーム共通）"
+  desc "  ASC_KEY_PATH  … ダウンロードした AuthKey_*.p8 のパス"
+  lane :beta do |options|
+    key_id    = ENV.fetch("ASC_KEY_ID")
+    issuer_id = ENV.fetch("ASC_ISSUER_ID")
+    key_path  = File.expand_path(ENV.fetch("ASC_KEY_PATH"))
+
+    # クラウド管理の配布証明書を自動生成するには Admin ロールのキーが必要。
+    api_key = app_store_connect_api_key(
+      key_id: key_id,
+      issuer_id: issuer_id,
+      key_filepath: key_path,
+      duration: 1200,
+    )
+
+    version = (options[:version] ||
+      get_info_plist_value(path: "ios/ModernJamaica/Info.plist", key: "CFBundleShortVersionString")).to_s.strip
+    UI.user_error!("marketing version が空です。version:X.Y.Z を渡してください") if version.empty?
+
+    # 同じバージョン列(train)の最新ビルド番号 + 1。新規 train なら 1 から。
+    # 公開済みバージョンより低いと弾かれるため、常に単調増加させる。
+    latest = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: APP_ID,
+      version: version,
+      initial_build_number: 0,
+    )
+    build_number = latest.to_i + 1
+    UI.important("Releasing #{version} (build #{build_number}) to TestFlight")
+
+    # apple-generic versioning のため、ビルド設定と Info.plist の両方を確実に揃える。
+    increment_version_number(version_number: version, xcodeproj: XCODEPROJ)
+    increment_build_number(build_number: build_number, xcodeproj: XCODEPROJ)
+
+    build_app(
+      workspace: WORKSPACE,
+      scheme: SCHEME,
+      configuration: "Release",
+      export_method: "app-store",
+      # API キーでクラウド配布署名を自動プロビジョニング（証明書をリポジトリに置かない）。
+      xcargs: [
+        "-allowProvisioningUpdates",
+        "-authenticationKeyPath #{key_path.shellescape}",
+        "-authenticationKeyID #{key_id}",
+        "-authenticationKeyIssuerID #{issuer_id}",
+      ].join(" "),
+      export_options: {
+        signingStyle: "automatic",
+        teamID: TEAM_ID,
+        uploadSymbols: true,
+      },
+      output_directory: "build",
+      output_name: "ModernJamaica.ipa",
+      clean: true,
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      app_identifier: APP_ID,
+      # 内部テスターのみ（Beta App Review 不要）。外部配信は別途 true にする。
+      distribute_external: false,
+      skip_waiting_for_build_processing: true,
+      changelog: (options[:changelog].to_s.empty? ? nil : options[:changelog]),
+    )
+
+    UI.success("Uploaded #{version} (#{build_number}). App Store Connect で処理完了後、内部テスターに配信されます。")
+  end
+end
