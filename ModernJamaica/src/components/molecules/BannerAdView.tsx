@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, Platform } from 'react-native';
-import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
+import { View, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BannerAd } from 'react-native-google-mobile-ads';
 import { adService } from '../../services/adService';
 import { ModernDesign } from '../../constants';
-
-const { width: screenWidth } = Dimensions.get('window');
 
 interface BannerAdViewProps {
   style?: any;
@@ -13,50 +12,21 @@ interface BannerAdViewProps {
 export const BannerAdView: React.FC<BannerAdViewProps> = ({ style }) => {
   const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [adHeight, setAdHeight] = useState(0);
-  
+  // 画面下部のホームインジケータ／角丸ぶんのセーフエリア。バナーは各画面で
+  // position:absolute; bottom:0 で貼られ、これは端末の物理的な最下部に吸着する
+  // （親のセーフエリアを無視する）。この inset ぶんを下パディングとして確保し、
+  // 広告本体をインジケータ帯の上へ押し上げて隠れないようにする。
+  const insets = useSafeAreaInsets();
+
   const adUnitId = adService.getBannerAdUnitId();
-  
+
   if (!adUnitId) {
     return null;
   }
 
-  // モバイルゲームに最適化されたバナーサイズを選択
-  const getBannerSize = (): BannerAdSize => {
-    // 小さな画面（iPhone SE等）
-    if (screenWidth <= 375) {
-      return BannerAdSize.BANNER; // 320x50 - コンパクト
-    }
-    
-    // 標準的な画面サイズ
-    if (screenWidth <= 414) {
-      return BannerAdSize.LARGE_BANNER; // 320x100 - より見やすい
-    }
-    
-    // 大きな画面（iPad等）
-    if (screenWidth >= 768) {
-      return BannerAdSize.LEADERBOARD; // 728x90 - タブレット最適化
-    }
-    
-    // デフォルトはアンカー付きアダプティブバナー（次世代の動的サイズバナー）
-    return BannerAdSize.ANCHORED_ADAPTIVE_BANNER;
-  };
-
-  // 広告サイズに基づく推定高さ
-  const getEstimatedHeight = (): number => {
-    const bannerSize = getBannerSize();
-    
-    if (bannerSize === BannerAdSize.BANNER) return 50;
-    if (bannerSize === BannerAdSize.LARGE_BANNER) return 100;
-    if (bannerSize === BannerAdSize.LEADERBOARD) return 90;
-    
-    // アンカー付きアダプティブバナーのデフォルト高さ
-    return Platform.OS === 'ios' ? 50 : 50;
-  };
-
   const handleAdLoaded = (dimensions: { width: number; height: number }) => {
     console.log('✅ Banner ad loaded successfully!');
     console.log(`📏 Dimensions: ${dimensions.width}x${dimensions.height}`);
-    console.log(`📱 Screen width: ${screenWidth}px`);
     console.log(`🎯 Ad Unit ID: ${adUnitId}`);
     console.log(`🔧 Is Dev Mode: ${__DEV__}`);
     setIsAdLoaded(true);
@@ -65,7 +35,6 @@ export const BannerAdView: React.FC<BannerAdViewProps> = ({ style }) => {
 
   const handleAdFailedToLoad = (error: any) => {
     console.error('❌ Banner ad failed to load!');
-    console.error('📱 Screen width:', screenWidth);
     console.error('🎯 Ad Unit ID:', adUnitId);
     console.error('🔧 Is Dev Mode:', __DEV__);
     console.error('📋 Error details:', error);
@@ -73,20 +42,25 @@ export const BannerAdView: React.FC<BannerAdViewProps> = ({ style }) => {
     setAdHeight(0);
   };
 
+  // 広告が実際に読み込まれるまではコンテナを完全に折りたたむ。
+  // 高さや枠線を先取りで確保すると、読み込み失敗時に「枠線付きの空箱」が
+  // 残ったり、実サイズとの差で表示がガタつく（表示崩れ）原因になる。
   return (
-    <View 
+    <View
       style={[
-        styles.container, 
+        styles.container,
+        isAdLoaded && styles.containerLoaded,
         style,
-        { 
-          height: isAdLoaded ? adHeight : getEstimatedHeight(),
-          minHeight: isAdLoaded ? adHeight : getEstimatedHeight()
-        }
+        {
+          height: isAdLoaded ? adHeight + insets.bottom : 0,
+          paddingBottom: isAdLoaded ? insets.bottom : 0,
+        },
       ]}
     >
       <BannerAd
         unitId={adUnitId}
-        size={getBannerSize()}
+        // アンカー付きアダプティブバナー: 画面幅いっぱいに広がり高さは自動最適化。
+        size={adService.getBannerAdSize()}
         onAdLoaded={handleAdLoaded}
         onAdFailedToLoad={handleAdFailedToLoad}
       />
@@ -96,12 +70,14 @@ export const BannerAdView: React.FC<BannerAdViewProps> = ({ style }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: ModernDesign.colors.background.primary,
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    // Safe Areaを考慮した下部マージン
-    paddingBottom: Platform.OS === 'ios' ? 0 : 0,
+    overflow: 'hidden',
+  },
+  // 背景色・上部ボーダーは広告が表示されているときだけ適用する。
+  containerLoaded: {
+    backgroundColor: ModernDesign.colors.background.primary,
     borderTopWidth: 1,
     borderTopColor: ModernDesign.colors.border.subtle,
   },

@@ -77,7 +77,7 @@ canonical 文書は**薄く保つ**。関数シグネチャや具体数値を散
 
 これらは今回のスコープ外だが、実装に存在する事実として記録する。触れる際に是正を検討。
 
-1. **Android AdMob が本番未設定**: `services/adService.ts` の Android 広告 ID が `ca-app-pub-XXXXX/XXXXX` プレースホルダのまま。本番リリース前に要設定。
+1. **Android AdMob 本番 ID 未取得**: `services/adService.ts` の Android 広告 ID（バナー/インタースティシャル）は本番 ID が未取得のため `undefined`（無効なプレースホルダ ID を渡すと広告枠が壊れるため）。この間 Android 本番では広告を出さない（`getBannerAdUnitId()` が `undefined` を返し BannerAdView は null、interstitial は未初期化）。iOS は設定済み。**本アプリは iOS のみをリリース対象とする方針のため、この負債は実質的に問題にならない**（Android を配信する場合のみ本番 ID の取得と `Platform.select` の `android` への設定が必要）。
 2. **Firestore ルールと実装の乖離**: `firestore.rules` は `request.auth != null && request.auth.uid == userId`（Firebase Auth 前提）だが、`@react-native-firebase/auth` は**未導入**で `userService` は AsyncStorage の匿名 ID を使う。実際の書き込み経路とルールが整合していない可能性。詳細は [decisions/0003-firestore-ranking.md](./decisions/0003-firestore-ranking.md)。
 3. **設定の重複**: `config/gameMode.ts` と `constants/index.ts` の `GAME_CONFIG` に同種の値（チャレンジ 60s / スキップ 2 等）が二重定義。`GAME_CONFIG` は主にテスト参照で、`TARGET.MIN/MAX` は現行生成器で未使用。config/ 系に一本化するのが望ましい。
 4. **テストカバレッジが低い**: `scoreCalculator` / `gameStore`（connectNodes・判定・タイマー）/ services / stores / 画面が未テスト。
