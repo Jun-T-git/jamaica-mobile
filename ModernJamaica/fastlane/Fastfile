@@ -128,4 +128,54 @@ platform :ios do
 
     UI.success("Metadata & screenshots uploaded for #{version}. App Store Connect で確認し、手動で審査提出してください。")
   end
+
+  desc "本番リリース: メタデータ/スクショ/What's New を反映し、最新ビルドを紐付けて審査提出する"
+  desc "使い方: bundle exec fastlane ios release version:1.1.4"
+  desc ""
+  desc "- タイトル・説明・キーワード等の既存メタデータは維持（release_notes とスクショのみ反映）"
+  desc "- 輸出コンプライアンス: 非該当（暗号化なし。Info.plist の ITSAppUsesNonExemptEncryption=false と整合）"
+  desc "- 広告識別子(IDFA): 使用しない（ATT 未実装。AdMob は SKAdNetwork で配信・計測）"
+  desc "- 審査承認後は自動で公開（automatic_release）"
+  desc "必要な環境変数は beta レーンと同じ（ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_PATH）。"
+  lane :release do |options|
+    key_id    = ENV.fetch("ASC_KEY_ID")
+    issuer_id = ENV.fetch("ASC_ISSUER_ID")
+    key_path  = File.expand_path(ENV.fetch("ASC_KEY_PATH"))
+
+    api_key = app_store_connect_api_key(
+      key_id: key_id,
+      issuer_id: issuer_id,
+      key_filepath: key_path,
+      duration: 1200,
+    )
+
+    version = (options[:version] ||
+      get_info_plist_value(path: "ios/ModernJamaica/Info.plist", key: "CFBundleShortVersionString")).to_s.strip
+    UI.user_error!("marketing version が空です。version:X.Y.Z を渡してください") if version.empty?
+    UI.important("Submitting #{version} for App Store review (auto-release)")
+
+    upload_to_app_store(
+      api_key: api_key,
+      app_identifier: APP_ID,
+      app_version: version,
+      # バイナリは TestFlight/CI で既にアップロード済み。該当バージョンの最新ビルドを紐付ける。
+      skip_binary_upload: true,
+      overwrite_screenshots: true,
+      force: true,
+      run_precheck_before_submit: false,
+      precheck_include_in_app_purchases: false,
+      metadata_path: "./fastlane/metadata",
+      screenshots_path: "./fastlane/screenshots",
+      languages: ["ja"],
+      # 審査提出＋承認後の自動公開。
+      submit_for_review: true,
+      automatic_release: true,
+      submission_information: {
+        export_compliance_uses_encryption: false,
+        add_id_info_uses_idfa: false,
+      },
+    )
+
+    UI.success("Submitted #{version} for review. 承認後に自動公開されます。")
+  end
 end
