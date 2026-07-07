@@ -28,10 +28,9 @@ jobs:
       - name: Setup Ruby (bundler cache)
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.3"
-          # Gemfile.lock の BUNDLED WITH(1.17.2) は Ruby 3.3 で落ちるため、
-          # Ruby 3.3 対応の新しい Bundler を使う（ios-testflight.yml と同じ理由）。
-          bundler: latest
+          # lock が Ruby<3.2 前提(CFPropertyList 3.0.9)のため 3.1 に合わせる
+          # （ios-testflight.yml と同じ理由）。
+          ruby-version: "3.1"
           bundler-cache: true
           working-directory: ModernJamaica
 
