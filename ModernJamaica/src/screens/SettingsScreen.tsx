@@ -69,7 +69,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
       if (success) {
         setEditingName(false);
-        soundManager.play(SoundType.SUCCESS);
+        soundManager.play(SoundType.CORRECT);
       } else {
         Alert.alert('エラー', 'ニックネームの更新に失敗しました');
       }

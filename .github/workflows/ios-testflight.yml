@@ -48,7 +48,11 @@ jobs:
       - name: Setup Ruby (bundler cache)
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.3"
+          # この Gemfile.lock は CFPropertyList 3.0.9(Ruby<3.2 要求)で解決されている
+          # （xcodeproj < 1.26.0 のピンが CFPropertyList < 4.0 を強制するため）。
+          # Ruby 3.2+ では bundle install が落ちるので、lock が対応する Ruby 3.1 に合わせる。
+          # 恒久対応は依存ピンを緩めて lock を Ruby 3.3 で再生成すること（別タスク）。
+          ruby-version: "3.1"
           bundler-cache: true
           working-directory: ModernJamaica
 

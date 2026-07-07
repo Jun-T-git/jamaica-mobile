@@ -9,7 +9,7 @@ interface RankingEntryProps {
   mode: 'challenge' | 'infinite'; // チャレンジモードのみ対応だが互換性のため残す
 }
 
-export const RankingEntry: React.FC<RankingEntryProps> = ({ entry, mode }) => {
+export const RankingEntry: React.FC<RankingEntryProps> = ({ entry }) => {
   const getRankColor = (rank: number): string => {
     switch (rank) {
       case 1:
@@ -20,19 +20,6 @@ export const RankingEntry: React.FC<RankingEntryProps> = ({ entry, mode }) => {
         return '#CD7F32';
       default:
         return ModernDesign.colors.text.primary;
-    }
-  };
-
-  const getRankIcon = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return 'looks-one';
-      case 2:
-        return 'looks-two';
-      case 3:
-        return 'looks-3';
-      default:
-        return null;
     }
   };
 

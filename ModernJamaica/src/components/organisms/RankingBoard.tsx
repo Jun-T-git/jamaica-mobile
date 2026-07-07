@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  View, 
-  ScrollView, 
-  RefreshControl, 
-  StyleSheet, 
+import {
+  View,
+  StyleSheet,
   ActivityIndicator,
   TouchableOpacity
 } from 'react-native';
@@ -17,17 +15,14 @@ import { ModernDesign } from '../../design/modernDesignSystem';
 interface RankingBoardProps {
   mode: GameMode;
   selectedDifficulty?: DifficultyLevel;
-  onDifficultyChange?: (difficulty: DifficultyLevel) => void;
 }
 
-export const RankingBoard: React.FC<RankingBoardProps> = ({ 
-  mode, 
-  selectedDifficulty = DifficultyLevel.NORMAL, 
-  onDifficultyChange 
+export const RankingBoard: React.FC<RankingBoardProps> = ({
+  mode,
+  selectedDifficulty = DifficultyLevel.NORMAL,
 }) => {
   const [rankings, setRankings] = useState<RankingEntryType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadRankingData = async (showLoading = true) => {
@@ -49,15 +44,8 @@ export const RankingBoard: React.FC<RankingBoardProps> = ({
       setError('ランキングの読み込みに失敗しました');
     } finally {
       setIsLoading(false);
-      setIsRefreshing(false);
     }
   };
-
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    loadRankingData(false);
-  };
-
 
   useEffect(() => {
     loadRankingData();

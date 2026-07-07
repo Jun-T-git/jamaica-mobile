@@ -23,7 +23,7 @@ interface ModeSelectionScreenProps {
 export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   navigation,
 }) => {
-  const { loadStoredData, highScores } = useGameStore();
+  const { loadStoredData } = useGameStore();
   const { loadDisplayName, loadSoundSetting, displayName } = useSettingsStore();
 
   useEffect(() => {

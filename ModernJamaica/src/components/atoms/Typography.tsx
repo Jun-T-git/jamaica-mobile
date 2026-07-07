@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet, TextStyle } from 'react-native';
+import { Text, StyleSheet, TextStyle, StyleProp } from 'react-native';
 import { ModernDesign, getDynamicLineHeight } from '../../design/modernDesignSystem';
 
 type TypographyVariant = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'body1' | 'body2' | 'caption' | 'overline';
@@ -9,8 +9,9 @@ interface TypographyProps {
   variant?: TypographyVariant;
   color?: TypographyColor;
   children: React.ReactNode;
-  style?: TextStyle;
+  style?: StyleProp<TextStyle>;
   numberOfLines?: number;
+  ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip';
   textAlign?: 'left' | 'center' | 'right';
   dynamicType?: boolean; // Dynamic Type対応を有効にするかどうか（オプトイン）
   accessibilityScale?: number; // ユーザーのアクセシビリティ設定倍率
@@ -22,6 +23,7 @@ export const Typography: React.FC<TypographyProps> = ({
   children,
   style,
   numberOfLines,
+  ellipsizeMode,
   textAlign = 'left',
   dynamicType = false,
   accessibilityScale = 1.0,
@@ -56,6 +58,7 @@ export const Typography: React.FC<TypographyProps> = ({
     <Text
       style={[getTextStyle(), style]}
       numberOfLines={numberOfLines}
+      ellipsizeMode={ellipsizeMode}
     >
       {children}
     </Text>
