@@ -83,11 +83,12 @@ platform :ios do
     UI.success("Uploaded #{version} (#{build_number}). App Store Connect で処理完了後、内部テスターに配信されます。")
   end
 
-  desc "App Store のメタデータ(日本語)とスクリーンショットをアップロードする（バイナリは送らない）"
+  desc "App Store の What's New(リリースノート)とスクリーンショットを反映する（バイナリは送らない）"
   desc "使い方: bundle exec fastlane ios metadata version:1.1.4"
   desc ""
-  desc "fastlane/metadata/ja/*.txt と fastlane/screenshots/ja/*.png を App Store Connect の"
-  desc "該当バージョンへ反映する。審査提出はしない（submit_for_review: false）。"
+  desc "反映するのは fastlane/metadata/ja/release_notes.txt と fastlane/screenshots/ja/*.png のみ。"
+  desc "タイトル・サブタイトル・説明・キーワード・宣伝文など既存メタデータは意図的に置いていない"
+  desc "ため上書きされない（App Store Connect の現行値を維持）。審査提出もしない。"
   desc "必要な環境変数は beta レーンと同じ（ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_PATH）。"
   lane :metadata do |options|
     key_id    = ENV.fetch("ASC_KEY_ID")
