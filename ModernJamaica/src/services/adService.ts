@@ -1,4 +1,4 @@
-import { Platform, Dimensions } from 'react-native';
+import { Platform } from 'react-native';
 import {
   AdEventType,
   BannerAdSize,
@@ -6,19 +6,23 @@ import {
   TestIds,
 } from 'react-native-google-mobile-ads';
 
-// AdMob IDs - テスト用IDを使用（本番用IDは後で置き換える）
+// AdMob IDs
+// __DEV__ ではテスト用ID、本番では各プラットフォームの本番IDを使う。
+// Android の本番広告IDは未取得（技術的負債）。プレースホルダを渡すと
+// 無効IDへのリクエストで広告枠が壊れるため、取得できるまで undefined とし、
+// 呼び出し側で広告自体を出さない（BannerAdView は null、interstitial は未初期化）。
 const adUnitIds = {
   banner: __DEV__
     ? TestIds.BANNER
     : Platform.select({
-        ios: 'ca-app-pub-9884011718535966/5647036127', // 本番用iOS広告ID
-        android: 'ca-app-pub-XXXXX/XXXXX', // 本番用Android広告ID
+        ios: 'ca-app-pub-9884011718535966/5647036127', // 本番用iOSバナー広告ID
+        android: undefined, // TODO: 本番Androidバナー広告ID未設定
       }),
   interstitial: __DEV__
     ? TestIds.INTERSTITIAL
     : Platform.select({
-        ios: 'ca-app-pub-9884011718535966/7002465924', // 本番用iOS広告ID
-        android: 'ca-app-pub-XXXXX/XXXXX', // 本番用Android広告ID
+        ios: 'ca-app-pub-9884011718535966/7002465924', // 本番用iOSインタースティシャル広告ID
+        android: undefined, // TODO: 本番Androidインタースティシャル広告ID未設定
       }),
 };
 
@@ -97,33 +101,12 @@ class AdService {
     return adUnitIds.banner;
   }
 
-  // バナー広告のサイズを取得（モバイルゲーム最適化）
+  // バナー広告のサイズを取得（全デバイス共通）
   getBannerAdSize(): BannerAdSize {
-    // アダプティブバナーは各デバイスに最適化される
+    // アンカー付きアダプティブバナーは画面幅いっぱいに広がり、各デバイスに
+    // 最適な高さへ自動調整される（Google 推奨）。固定サイズをデバイス幅で
+    // 出し分けると横幅の隙間や高さの不揃いで表示崩れの原因になるため使わない。
     return BannerAdSize.ANCHORED_ADAPTIVE_BANNER;
-  }
-
-  // デバイス別の最適なバナーサイズを取得
-  getOptimalBannerSize(): BannerAdSize {
-    const { width } = Dimensions.get('window');
-
-    // iPhoneの場合
-    if (Platform.OS === 'ios') {
-      if (width <= 320) {
-        return BannerAdSize.BANNER; // 320x50
-      } else if (width <= 728) {
-        return BannerAdSize.LARGE_BANNER; // 320x100
-      } else {
-        return BannerAdSize.LEADERBOARD; // 728x90
-      }
-    }
-
-    // Androidの場合
-    if (width <= 320) {
-      return BannerAdSize.BANNER; // 320x50
-    } else {
-      return BannerAdSize.ANCHORED_ADAPTIVE_BANNER; // 自動調整
-    }
   }
 
   // インタースティシャル広告を表示すべきかチェック

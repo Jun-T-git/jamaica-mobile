@@ -1,0 +1,59 @@
+{
+  "$comment": "canonical ドキュメント → それが説明するソースの対応表。check-doc-drift.mjs と /sync-docs が使う唯一の情報源(linchpin)。パスはすべてリポジトリルート相対。covers を空にすると staleness(drift) 判定を行わず、パス参照の実在チェックのみ行う(意図が高レベルで揮発性ソースに紐づかない文書向け)。",
+  "docs": [
+    {
+      "path": "ModernJamaica/docs/GAME-CORE.md",
+      "covers": [
+        "ModernJamaica/src/store/gameStore.ts",
+        "ModernJamaica/src/utils/problemGenerator.ts",
+        "ModernJamaica/src/utils/scoreCalculator.ts",
+        "ModernJamaica/src/constants/scoreConfig.ts",
+        "ModernJamaica/src/config/difficulty.ts",
+        "ModernJamaica/src/config/gameMode.ts",
+        "ModernJamaica/src/types/index.ts",
+        "ModernJamaica/src/utils/SoundManager.ts"
+      ]
+    },
+    {
+      "path": "ModernJamaica/docs/DESIGN-SYSTEM.md",
+      "covers": [
+        "ModernJamaica/src/design/modernDesignSystem.ts",
+        "ModernJamaica/src/config/difficulty.ts"
+      ]
+    },
+    {
+      "path": "ModernJamaica/docs/ARCHITECTURE.md",
+      "covers": [
+        "ModernJamaica/App.tsx",
+        "ModernJamaica/package.json",
+        "ModernJamaica/src/services/*.ts"
+      ]
+    },
+    {
+      "path": "ModernJamaica/docs/CONVENTIONS.md",
+      "covers": [
+        "ModernJamaica/tsconfig.json",
+        "ModernJamaica/jest.config.js",
+        "ModernJamaica/.eslintrc.js",
+        "ModernJamaica/src/services/adService.ts",
+        "ModernJamaica/firestore.rules"
+      ]
+    },
+    {
+      "path": "ModernJamaica/docs/PHILOSOPHY.md",
+      "covers": []
+    },
+    {
+      "path": "ModernJamaica/docs/README.md",
+      "covers": []
+    },
+    {
+      "path": "ModernJamaica/CLAUDE.md",
+      "covers": []
+    },
+    {
+      "path": "CLAUDE.md",
+      "covers": []
+    }
+  ]
+}

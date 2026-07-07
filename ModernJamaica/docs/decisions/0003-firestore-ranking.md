@@ -1,4 +1,21 @@
-# Modern Jamaica ランキングシステム設計書
+<!-- STABILITY: frozen -->
+
+# ADR-0003: Firestore による匿名ランキング（設計書）
+
+- 記録日: 2026-07-05 に ADR として再配置（本文は当時の設計書のまま凍結）
+- 状態: Accepted（**実装との既知の乖離あり** — 下記「実装との差分」を参照）
+
+> **これは frozen（時点凍結）ドキュメント**。当時の設計意図の記録であり、現在の実装の正ではない。現状の振る舞いは canonical の [../ARCHITECTURE.md](../ARCHITECTURE.md) と [../GAME-CORE.md](../GAME-CORE.md) を見ること。以下の本文は設計書を原文のまま保存している。
+
+## 実装との既知の差分（2026-07-05 時点）
+
+この設計書と実際のコードには次の乖離がある。**コードが正**（[../README.md](../README.md)）:
+
+- **認証**: 設計書は「匿名・アカウント登録不要」。実装の `services/userService.ts` は AsyncStorage の匿名 ID（`user_<ts>_<rand>`）を使い、**`@react-native-firebase/auth` は未導入**。一方 `firestore.rules` は `request.auth != null && request.auth.uid == userId`（Firebase Auth 前提）を要求しており、書き込み経路とルールが整合していない可能性がある（[../CONVENTIONS.md](../CONVENTIONS.md) 技術的負債 #2）。
+- **対象モード**: ランキングは**チャレンジモード専用**。無限モードのスコアは送信されない（`services/rankingService.ts`）。
+- **表示名の長さ**: `firestore.rules` は 50 文字まで許容するが、クライアント検証（`userService.validateDisplayName`）は 20 文字上限。
+
+---
 
 ## 概要
 

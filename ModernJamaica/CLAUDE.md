@@ -1,166 +1,75 @@
-# CLAUDE.md
+# CLAUDE.md — Modern Jamaica（アプリ憲法）
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Claude Code がこのアプリのコードで作業するときの最上位ガイド。**このファイルは薄く保ち、詳細は `docs/` の canonical 文書に委ねる。**
 
-## Project Overview
+## 第一原則: コードが正（Source of Truth）
 
-**Modern Jamaica** (モダンジャマイカ/ジャマイカの木) is a React Native 0.80.2 mathematical puzzle game where players construct expression trees to reach target numbers using exactly 5 given numbers (1-6) and mathematical operations (+, -, ×, ÷).
+このアプリは**リリース済み**。**実装が真実**。ドキュメントと実装が矛盾したら、**コードを正としてドキュメントを直す**（逆はしない）。
+（過去の CLAUDE.md は実装と大きく乖離していた。同じ轍を踏まないための仕組みが `docs/` と `.claude/` にある。）
 
-## Development Commands
+## これは何のアプリか
+
+**Modern Jamaica（ジャマイカの木）** — 5 つの数字と四則演算（＋−×÷）で**式の木**を組み立て、**目標値**に到達させる数字パズルゲーム。全数字を使い切り、最後に残る単一ノード（木の根）が目標値と一致すれば正解。生成される問題は**必ず解ける**ことが保証される。
+
+哲学と**絶対に壊してはいけない不変条件**は必読 → **[docs/PHILOSOPHY.md](./docs/PHILOSOPHY.md)**
+
+## ドキュメントの歩き方
+
+作業前に、対象に応じて canonical 文書（`docs/`）を読む。**canonical 文書は実装と一致した常緑。ここ CLAUDE.md や docs に具体数値・シグネチャを二重化しない**（腐る原因）。
+
+| 目的 | 読む文書 |
+|---|---|
+| 何を作るべきか・壊してはいけないもの | [docs/PHILOSOPHY.md](./docs/PHILOSOPHY.md) |
+| 全体構造・どこに何があるか・データフロー | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) |
+| ゲームルール・ノードモデル・判定・問題生成・スコア | [docs/GAME-CORE.md](./docs/GAME-CORE.md) |
+| 色・余白・テーマ・アトミックデザイン | [docs/DESIGN-SYSTEM.md](./docs/DESIGN-SYSTEM.md) |
+| 規約・テスト・検証手順・**技術的負債** | [docs/CONVENTIONS.md](./docs/CONVENTIONS.md) |
+| 過去の設計判断（凍結） | [docs/decisions/](./docs/decisions/) |
+| 文書全体の考え方（安定性ティア） | [docs/README.md](./docs/README.md) |
+
+## 技術スタック（要点）
+
+React Native 0.80.2 + React 19 + TypeScript(strict) / Zustand / React Navigation 7 / react-native-svg（盤面エッジ）/ Firebase Firestore（ランキング）/ AsyncStorage / AdMob / react-native-sound。
+
+**盤面操作はタップ方式**（drag&drop ではない）。**`react-native-reanimated` は不使用**（アニメは RN コア `Animated`）。詳細は [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)。
+
+## 開発コマンド
 
 ```bash
-# Start development
-npm start                    # Start Metro bundler
-npm run android             # Build and run Android app
-npm run ios                 # Build and run iOS app (requires Xcode)
+npm start                 # Metro 起動
+npm run ios               # iOS 実行（要 Xcode）
+npm run android           # Android 実行
+npm run lint              # ESLint
+npm test                  # Jest
+npx tsc --noEmit          # 型チェック
 
-# Code Quality 
-npm run lint                # Run ESLint
-npm test                    # Run Jest tests
-npm test -- --coverage      # Run tests with coverage
-
-# iOS Setup (if needed)
-cd ios
-bundle install              # Install Ruby dependencies
-bundle exec pod install     # Install CocoaPods dependencies
-cd ..
+# iOS 初回のみ
+cd ios && bundle install && bundle exec pod install && cd ..
 ```
 
-## Architecture Overview
+**「検証済み」と言う前に**: `npx tsc --noEmit` + `npm run lint` + `npm test` を通し、UI/挙動変更はシミュレータ/実機で動かす（`/run`・`/verify` 可）。
 
-### Technology Stack
-- **React Native 0.80.2** with TypeScript
-- **Zustand** for state management (no Redux)
-- **React Navigation 7.x** for screen navigation
-- **react-native-gesture-handler** for touch interactions
-- **react-native-google-mobile-ads** for monetization
-- **react-native-sound** for audio feedback
+## 作業の進め方（自律開発ワークフロー）
 
-### Project Structure
-```
-src/
-├── components/          # Atomic design pattern
-│   ├── atoms/          # Basic UI elements
-│   ├── molecules/      # Combined components
-│   └── organisms/      # Complex features
-├── screens/            # Main game screens
-├── store/              # Zustand stores
-├── utils/              # Core game logic
-├── types/              # TypeScript definitions
-├── constants/          # Game configuration
-├── config/             # Mode configurations
-├── design/             # Design system themes
-├── hooks/              # Custom React hooks
-└── services/           # External services
-```
+1. **読む**: 対象領域の canonical 文書と該当コードを読む。コードが正。
+2. **不変条件を守る**: [docs/PHILOSOPHY.md](./docs/PHILOSOPHY.md) の不変条件を破らない。コア（`store/gameStore.ts`, `utils/problemGenerator.ts`, `utils/scoreCalculator.ts`）に触れる変更は `game-core-guardian` サブエージェントでレビューする。
+3. **実装**: 既存パターン・トークン・config を再利用。マジックナンバーは config/constants へ。
+4. **検証**: 上記コマンド。
+5. **文書を追随**: 下の更新規約に従い canonical 文書を更新し、**完了前に `/sync-docs` を実行**。
 
-### State Management Architecture
-- **gameStore.ts**: Central store managing all game state
-  - Supports both Challenge and Infinite modes in unified state
-  - Handles timer, scores, problem generation, node connections
-  - Undo/Redo with full history tracking
-  - Real-time validation and combo scoring
-- **settingsStore.ts**: User preferences and sound toggles
-- No prop drilling - use Zustand hooks directly in components
+## ドキュメント更新規約（コードを変えたら文書も直す）
 
-### Expression Tree System
-Core game mechanics in `utils/` and `store/gameStore.ts`:
-- **Node Data Structure**: Each node has position, value, depth, parent/child relationships
-- **Tree Building**: `connectNodes()` validates connections, calculates results, creates InternalNodes
-- **Problem Types**: Addition-only, Multiplication-only, Mixed operations
-- **Tree Validation**: Checks single root node equals target value
+| 変更したコード | 更新する canonical 文書 |
+|---|---|
+| `store/gameStore.ts`, `utils/problemGenerator.ts`, `utils/scoreCalculator.ts`, `constants/scoreConfig.ts`, `config/difficulty.ts`, `config/gameMode.ts`, `types/` | [docs/GAME-CORE.md](./docs/GAME-CORE.md) |
+| `design/modernDesignSystem.ts` | [docs/DESIGN-SYSTEM.md](./docs/DESIGN-SYSTEM.md) |
+| 構成・モジュール境界・新 service/screen・依存追加 | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) |
+| 規約・テスト方針・負債 | [docs/CONVENTIONS.md](./docs/CONVENTIONS.md) |
+| 本質・不変条件・デザイン/収益方針 | [docs/PHILOSOPHY.md](./docs/PHILOSOPHY.md) |
+| 設計判断（不変条件を破る等） | `docs/decisions/` に**新規 ADR 追加**（既存は書き換えない） |
 
-### Game Flow Architecture
-```
-Mode Selection → Problem Generation → Node Display → Tree Building → Validation → Next/Score
-```
+対応表とスクリプトの実体は `../.claude/`（`doc-manifest.json` / `check-doc-drift.mjs`）。
 
-## Key Technical Patterns
+## 既知の技術的負債（着手時に確認）
 
-### Node Connection Logic
-The `connectNodes()` function in gameStore:
-1. Validates two nodes can be combined (not already used)
-2. Calculates result based on selected operator
-3. Creates new InternalNode with calculated value
-4. Marks original nodes as "used" (become children)
-5. Updates tree structure and checks completion
-
-### Problem Generation Strategy
-Three problem types in `utils/problemGenerator.ts`:
-- **Addition Problems**: Sum-based targets
-- **Multiplication Problems**: Product-based targets  
-- **Mixed Problems**: Combination of operations
-- Configurable difficulty and target ranges per mode
-- Validates all problems have solutions
-
-### Game Mode Configuration
-Mode-specific settings in `config/gameMode.ts`:
-- **Challenge Mode**: 60s initial + 10s bonus, 2 skips, score tracking
-- **Infinite Mode**: 5 minute total, unlimited skips, statistics focus
-- Each mode has distinct color themes and UI treatments
-
-### Design System
-Modern dark theme with atomic design pattern:
-- Glass morphism effects and gradients
-- Mode-specific color palettes (orange/purple)
-- Consistent spacing and typography scales
-- Accessibility-focused contrast ratios
-
-## Current Development Status
-
-### Completed Foundation
-- Complete game logic and mathematical models
-- State management with Zustand
-- Navigation and screen structure
-- Timer and scoring systems
-- Sound effects integration
-- AdMob ad service setup
-- TypeScript types throughout
-
-### Critical Missing UI Components
-The game logic is complete but needs interactive UI:
-- **GameBoard visual tree builder** - Currently shows placeholder
-- **Drag-and-drop node connections** using gesture handlers
-- **Visual expression tree representation** with node hierarchy
-- **Operator selection interface** for choosing +, -, ×, ÷
-- **Tree growth animations** using react-native-reanimated
-- **Node selection states** and visual feedback
-
-### Implementation Notes for UI Development
-- `NodeData` includes `position: {x, y}` ready for visual placement
-- Tree depth calculation available for hierarchy layout
-- `isUsed` flag controls interaction availability
-- Mode-specific themes in `design/themes.ts`
-- All text in Japanese - maintain localization
-
-## Sound System
-Audio feedback managed by `services/soundService.ts`:
-- Six sound effects: button, connect, countdown, start, success, tap
-- User-configurable via settings
-- Preloaded for performance
-
-## AdMob Integration
-- Full SDK integration with banner and interstitial ad support
-- Service abstraction in `services/adService.ts`
-- Privacy configuration in iOS Info.plist
-
-## Testing Approach
-- Jest with React Native preset
-- Problem generator unit tests
-- Mock SVG components for testing
-- Japanese comments in test files
-
-## Japanese Localization
-All UI text is in Japanese. Key terms:
-- チャレンジモード (Challenge Mode)
-- 無限に遊ぶ (Infinite Play)
-- 目標 (Target)
-- スキップ (Skip)
-- やり直す (Undo)
-
-## Development Priorities
-1. Implement interactive GameBoard component
-2. Add visual tree representation
-3. Create node connection animations
-4. Build operator selection UI
-5. Test complete gameplay flow
+Android AdMob 本番 ID 未設定 / Firestore ルールと auth 実装の乖離 / `config` と `GAME_CONFIG` の二重定義 / テストカバレッジ低 / `ProblemData.solutions` 未使用。詳細と背景は [docs/CONVENTIONS.md](./docs/CONVENTIONS.md)。

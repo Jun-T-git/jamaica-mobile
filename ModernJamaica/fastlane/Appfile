@@ -1,0 +1,3 @@
+# App Store Connect API キー認証を使うため apple_id は不要。
+app_identifier("com.junt.modernjamaica")
+team_id("JD7L34U2WS")

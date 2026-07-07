@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: ModernDesign.spacing[20], // 広告分のスペースを確保
+    paddingBottom: ModernDesign.spacing[24], // 広告＋下部セーフエリアぶんを確保
   },
   tabsContainer: {
     marginTop: ModernDesign.spacing[2],
