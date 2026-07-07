@@ -1,0 +1,45 @@
+name: iOS App Store Metadata
+
+# 手動トリガー。App Store のメタデータ(日本語)とスクリーンショットを App Store Connect へ反映する。
+# バイナリ(ipa)は送らず、審査提出もしない（内容確認後に App Store Connect で手動提出）。
+#   gh workflow run ios-appstore-metadata.yml -f version=1.1.4
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "反映先の Marketing version, 例: 1.1.4"
+        required: true
+        type: string
+
+concurrency:
+  group: ios-appstore-metadata
+  cancel-in-progress: false
+
+jobs:
+  metadata:
+    # deliver(メタデータ/スクショのアップロード)は Xcode/ビルド不要なので Linux で十分。
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ModernJamaica
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby (bundler cache)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: ModernJamaica
+
+      - name: Write App Store Connect API key
+        run: |
+          echo "${{ secrets.APP_STORE_CONNECT_KEY_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/AuthKey.p8"
+
+      - name: Upload metadata & screenshots
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          ASC_KEY_PATH: ${{ runner.temp }}/AuthKey.p8
+        run: |
+          bundle exec fastlane ios metadata version:"${{ inputs.version }}"

@@ -50,8 +50,13 @@ yarn-error.log
 
 **/fastlane/report.xml
 **/fastlane/Preview.html
-**/fastlane/screenshots
 **/fastlane/test_output
+# App Store 掲載用スクショは手作りのマーケ画像なので追跡する（deliver の入力・CIのチェックアウトに必要）。
+# snapshot 自動生成物は使っていない。
+!**/fastlane/screenshots
+
+# App Store スクショ生成物（build.mjs が base64 埋め込みで再生成する巨大 HTML）は追跡しない。
+appstore/generator/out/
 
 # Bundle artifact
 *.jsbundle

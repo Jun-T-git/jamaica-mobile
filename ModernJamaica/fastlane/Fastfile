@@ -82,4 +82,49 @@ platform :ios do
 
     UI.success("Uploaded #{version} (#{build_number}). App Store Connect で処理完了後、内部テスターに配信されます。")
   end
+
+  desc "App Store のメタデータ(日本語)とスクリーンショットをアップロードする（バイナリは送らない）"
+  desc "使い方: bundle exec fastlane ios metadata version:1.1.4"
+  desc ""
+  desc "fastlane/metadata/ja/*.txt と fastlane/screenshots/ja/*.png を App Store Connect の"
+  desc "該当バージョンへ反映する。審査提出はしない（submit_for_review: false）。"
+  desc "必要な環境変数は beta レーンと同じ（ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_PATH）。"
+  lane :metadata do |options|
+    key_id    = ENV.fetch("ASC_KEY_ID")
+    issuer_id = ENV.fetch("ASC_ISSUER_ID")
+    key_path  = File.expand_path(ENV.fetch("ASC_KEY_PATH"))
+
+    api_key = app_store_connect_api_key(
+      key_id: key_id,
+      issuer_id: issuer_id,
+      key_filepath: key_path,
+      duration: 1200,
+    )
+
+    version = (options[:version] ||
+      get_info_plist_value(path: "ios/ModernJamaica/Info.plist", key: "CFBundleShortVersionString")).to_s.strip
+    UI.user_error!("marketing version が空です。version:X.Y.Z を渡してください") if version.empty?
+    UI.important("Uploading App Store metadata & screenshots for #{version}")
+
+    upload_to_app_store(
+      api_key: api_key,
+      app_identifier: APP_ID,
+      app_version: version,
+      # メタデータ本文とスクショのみ。ビルド(ipa)は beta レーン/CI で別途アップロード。
+      skip_binary_upload: true,
+      # 既存スクショを今回の6枚で置き換える。
+      overwrite_screenshots: true,
+      # CI で対話プレビュー(HTML)を出さない。
+      force: true,
+      run_precheck_before_submit: false,
+      precheck_include_in_app_purchases: false,
+      # 審査提出はしない。App Store Connect 上で内容を確認してから手動提出する。
+      submit_for_review: false,
+      languages: ["ja"],
+      metadata_path: "./fastlane/metadata",
+      screenshots_path: "./fastlane/screenshots",
+    )
+
+    UI.success("Metadata & screenshots uploaded for #{version}. App Store Connect で確認し、手動で審査提出してください。")
+  end
 end
