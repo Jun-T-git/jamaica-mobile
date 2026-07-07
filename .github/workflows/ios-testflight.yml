@@ -49,6 +49,10 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
+          # Gemfile.lock の BUNDLED WITH は 1.17.2 だが、それは Ruby 3.3 で
+          # 削除された String#untaint を呼び NoMethodError で落ちる。Ruby 3.3 対応の
+          # 新しい Bundler を使わせる（lock の resolved gem 群はそのまま）。
+          bundler: latest
           bundler-cache: true
           working-directory: ModernJamaica
 

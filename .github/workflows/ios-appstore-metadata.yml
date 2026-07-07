@@ -29,6 +29,9 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
+          # Gemfile.lock の BUNDLED WITH(1.17.2) は Ruby 3.3 で落ちるため、
+          # Ruby 3.3 対応の新しい Bundler を使う（ios-testflight.yml と同じ理由）。
+          bundler: latest
           bundler-cache: true
           working-directory: ModernJamaica
 
