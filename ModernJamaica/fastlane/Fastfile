@@ -129,10 +129,11 @@ platform :ios do
     UI.success("Metadata & screenshots uploaded for #{version}. App Store Connect で確認し、手動で審査提出してください。")
   end
 
-  desc "本番リリース: メタデータ/スクショ/What's New を反映し、最新ビルドを紐付けて審査提出する"
+  desc "本番リリース: 最新ビルドを紐付けて審査提出する（メタデータ/スクショは触らない）"
   desc "使い方: bundle exec fastlane ios release version:1.1.4"
   desc ""
-  desc "- タイトル・説明・キーワード等の既存メタデータは維持（release_notes とスクショのみ反映）"
+  desc "- What's New とスクショは事前に `metadata` レーンで反映しておくこと。ここでは再アップロードしない"
+  desc "  （deliver 再アップロードによるスクショ重複を避けるため、掃除と提出を分離）"
   desc "- 輸出コンプライアンス: 非該当（暗号化なし。Info.plist の ITSAppUsesNonExemptEncryption=false と整合）"
   desc "- 広告識別子(IDFA): 使用しない（ATT 未実装。AdMob は SKAdNetwork で配信・計測）"
   desc "- 審査承認後は自動で公開（automatic_release）"
@@ -160,13 +161,13 @@ platform :ios do
       app_version: version,
       # バイナリは TestFlight/CI で既にアップロード済み。該当バージョンの最新ビルドを紐付ける。
       skip_binary_upload: true,
-      overwrite_screenshots: true,
+      # メタデータ(What's New)とスクショは `metadata` レーンで反映済み。ここでは一切触らず提出のみ行う。
+      # deliver の再アップロード時の ASC 結果整合性の競合でスクショが重複するのを防ぐため。
+      skip_metadata: true,
+      skip_screenshots: true,
       force: true,
       run_precheck_before_submit: false,
       precheck_include_in_app_purchases: false,
-      metadata_path: "./fastlane/metadata",
-      screenshots_path: "./fastlane/screenshots",
-      languages: ["ja"],
       # 審査提出＋承認後の自動公開。
       submit_for_review: true,
       automatic_release: true,
