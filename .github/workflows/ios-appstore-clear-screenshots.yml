@@ -1,0 +1,45 @@
+name: iOS App Store Clear Screenshots
+
+# 手動トリガー。該当バージョンのスクリーンショットを全削除して 0 枚にする。
+# App Store Connect の画面で削除できない/重複した時の掃除用。掃除後にクリーンな6枚を入れ直す。
+#   gh workflow run ios-appstore-clear-screenshots.yml -f version=1.1.4
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "スクショを全削除する Marketing version, 例: 1.1.4"
+        required: true
+        type: string
+
+concurrency:
+  group: ios-appstore-screenshots
+  cancel-in-progress: false
+
+jobs:
+  clear:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ModernJamaica
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby (bundler cache)
+        uses: ruby/setup-ruby@v1
+        with:
+          # lock が Ruby<3.2 前提のため 3.1 に合わせる。
+          ruby-version: "3.1"
+          bundler-cache: true
+          working-directory: ModernJamaica
+
+      - name: Write App Store Connect API key
+        run: |
+          echo "${{ secrets.APP_STORE_CONNECT_KEY_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/AuthKey.p8"
+
+      - name: Clear all screenshots
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          ASC_KEY_PATH: ${{ runner.temp }}/AuthKey.p8
+        run: |
+          bundle exec fastlane ios clear_screenshots version:"${{ inputs.version }}"

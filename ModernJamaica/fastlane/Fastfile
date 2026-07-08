@@ -179,4 +179,44 @@ platform :ios do
 
     UI.success("Submitted #{version} for review. 承認後に自動公開されます。")
   end
+
+  desc "スクショを全削除して 0 枚にする（App Store Connect の画面で消せない時の掃除用）"
+  desc "使い方: bundle exec fastlane ios clear_screenshots version:1.1.4"
+  desc ""
+  desc "空のスクショフォルダで overwrite するため、既存スクショを全削除してアップロードは 0。"
+  desc "削除は結果整合性の競合を起こさないので確実。掃除後にクリーンな6枚を入れ直す。"
+  lane :clear_screenshots do |options|
+    key_id    = ENV.fetch("ASC_KEY_ID")
+    issuer_id = ENV.fetch("ASC_ISSUER_ID")
+    key_path  = File.expand_path(ENV.fetch("ASC_KEY_PATH"))
+
+    api_key = app_store_connect_api_key(
+      key_id: key_id,
+      issuer_id: issuer_id,
+      key_filepath: key_path,
+      duration: 1200,
+    )
+
+    version = (options[:version] ||
+      get_info_plist_value(path: "ios/ModernJamaica/Info.plist", key: "CFBundleShortVersionString")).to_s.strip
+    UI.user_error!("marketing version が空です。version:X.Y.Z を渡してください") if version.empty?
+    UI.important("Clearing ALL screenshots for #{version} (uploading 0)")
+
+    upload_to_app_store(
+      api_key: api_key,
+      app_identifier: APP_ID,
+      app_version: version,
+      skip_binary_upload: true,
+      skip_metadata: true,
+      # 空フォルダで上書き＝全削除・アップロード0。
+      overwrite_screenshots: true,
+      screenshots_path: "./fastlane/screenshots-empty",
+      languages: ["ja"],
+      force: true,
+      run_precheck_before_submit: false,
+      submit_for_review: false,
+    )
+
+    UI.success("Cleared all screenshots for #{version}. App Store Connect でクリーンな6枚を入れ直してください。")
+  end
 end
