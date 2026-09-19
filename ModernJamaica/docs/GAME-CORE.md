@@ -71,7 +71,7 @@ UI 操作は**タップで繋ぐ**（ノード → 演算子 → ノード）。
 - **基本スコア**: 使用した数字の合計 × `BASE_SCORE_MULTIPLIER`。
 - **時間ボーナス**: 速く解くほど倍率が上がる（`TIME_MULTIPLIER_MIN`〜`MAX`）。
 - **目標値ボーナス**: `DIFFICULTY_THRESHOLD` / `DIFFICULTY_MULTIPLIER` による加点。**`DIFFICULTY_BONUS_MAX` で頭打ち**（目標値の運でスコアが決まらないようにする）。
-- **コンボボーナス**: `ComboTracker` が `COMBO_TIME_LIMIT`（15s）以内の連続正解を追跡。`COMBO_MIN_COUNT`（3）以上で `COMBO_BONUS_RATE` 加算。
+- **コンボボーナス**: `ComboTracker` が `COMBO_TIME_LIMIT`（15s）以内の連続正解を追跡。`COMBO_MIN_COUNT`（3）以上で `COMBO_BONUS_RATE` 加算、**`COMBO_BONUS_MAX_RATE` で頭打ち**（長時間プレイでスコアが際限なく伸び、ランキングのスコア上限を超えるのを防ぐ）。
 - **最終ボーナス**（ゲーム終了時, `calculateFinalBonus`）: **正解数**（スキップを除く）の達成しきい値ボーナス + `EXCELLENCE_THRESHOLD` 超で優秀ボーナス。
 
 1 問ごとの内訳は `calculateScoreBreakdown` が返し、ストアが `scoreBreakdown` に累計する。プレイ中は獲得点とコンボ（`ComboIndicator`・正解オーバーレイ）、リザルト画面は内訳・最大コンボ・平均回答時間（`totalSolveTime / correctCount`）を表示する。

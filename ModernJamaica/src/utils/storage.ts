@@ -78,6 +78,9 @@ export const loadHighScore = async (mode: GameMode): Promise<number | null> => {
   const normalScore = await loadHighScoreWithDifficulty(mode, DEFAULT_DIFFICULTY);
   if (normalScore !== null) return normalScore;
   
+  // チャレンジの旧スコアは計算式が違うため移行しない（_v2 キーに混入させない）
+  if (mode === GameMode.CHALLENGE) return null;
+
   // 旧形式のキーからも読み込みを試みる
   try {
     const config = getGameModeConfig(mode);

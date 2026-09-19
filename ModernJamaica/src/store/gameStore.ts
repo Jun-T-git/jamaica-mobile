@@ -562,13 +562,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }, 100);
     }
     
-    // ランキングへの送信は通信を待たせないよう、画面遷移の後ろで行う
+    // ランキングへの送信は待たない（タイムアップ時のリザルト遷移も、手動終了時のメニュー遷移も
+    // 通信の完了を待たせない）。どちらも内部で例外を処理するため投げっぱなしでよい
     if (canSubmit) {
       if (isNewHighScore) {
-        await get().submitScoreToRanking(nameToUse);
+        get().submitScoreToRanking(nameToUse);
       } else {
         // 過去に通信エラーなどで送信できなかった自己ベストがあれば再送する
-        await rankingService.retryUnsentScore(game.difficulty, nameToUse.trim());
+        rankingService.retryUnsentScore(game.difficulty, nameToUse.trim());
       }
     }
   },

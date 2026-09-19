@@ -67,8 +67,11 @@ export const calculateScoreBreakdown = (result: ProblemResult, consecutiveCount:
   );
   
   // 4. 連続正解ボーナス
-  const combo = consecutiveCount >= SCORE_CONFIG.COMBO_MIN_COUNT ? 
-    Math.round(base * (consecutiveCount - SCORE_CONFIG.COMBO_MIN_COUNT + 1) * SCORE_CONFIG.COMBO_BONUS_RATE) : 0;
+  const comboRate = Math.min(
+    SCORE_CONFIG.COMBO_BONUS_MAX_RATE,
+    (consecutiveCount - SCORE_CONFIG.COMBO_MIN_COUNT + 1) * SCORE_CONFIG.COMBO_BONUS_RATE
+  );
+  const combo = consecutiveCount >= SCORE_CONFIG.COMBO_MIN_COUNT ? Math.round(base * comboRate) : 0;
   
   return { base, time, target, combo };
 };

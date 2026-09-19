@@ -11,6 +11,9 @@ import {
 } from '../types/ranking';
 import { userService } from './userService';
 
+// firestore.rules の isValidScore と同じ上限
+const MAX_RANKING_SCORE = 999999;
+
 export class RankingService {
   private static instance: RankingService;
   // V2: スコア計算式の見直しと匿名認証の導入に合わせてコレクションを分離
@@ -38,6 +41,9 @@ export class RankingService {
       return false;
     }
     
+    // Firestoreルールのスコア上限に合わせる（超過分は拒否され、再送を繰り返してしまうため）
+    submission = { ...submission, score: Math.min(submission.score, MAX_RANKING_SCORE) };
+
     // 送信が完了するまで端末に控えておく（オフライン時などに失敗しても次回再送できるように）
     await this.saveUnsentScore(submission);
     

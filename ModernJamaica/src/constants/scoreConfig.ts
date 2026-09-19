@@ -21,6 +21,7 @@ export const SCORE_CONFIG = {
   COMBO_TIME_LIMIT: 15000,         // コンボ継続制限時間（ミリ秒）
   COMBO_MIN_COUNT: 3,              // コンボボーナス開始回数
   COMBO_BONUS_RATE: 0.2,           // コンボボーナス倍率
+  COMBO_BONUS_MAX_RATE: 2.0,       // コンボボーナス倍率の上限（長時間プレイでスコアが際限なく伸びないようにする）
   
   // 最終ボーナス設定（リザルト画面）
   ACHIEVEMENT_BONUSES: {

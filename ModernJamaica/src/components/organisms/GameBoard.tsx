@@ -604,7 +604,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 },
               ]}
             >
-              <Text style={styles.selectedNumber}>{firstNode.value}</Text>
+              <Text style={styles.selectedNumber}>
+                {Math.round(firstNode.value * 100) / 100}
+              </Text>
               {selectedOperator && (
                 <Text style={styles.pendingOperation}>{selectedOperator}</Text>
               )}

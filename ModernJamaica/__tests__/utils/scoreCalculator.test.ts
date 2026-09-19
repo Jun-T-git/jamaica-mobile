@@ -44,6 +44,13 @@ describe('scoreCalculator', () => {
       expect(calculateScoreBreakdown(createResult(), 4).combo).toBe(600);
     });
 
+    it('コンボボーナスには上限がある', () => {
+      const capped = 1500 * SCORE_CONFIG.COMBO_BONUS_MAX_RATE;
+
+      expect(calculateScoreBreakdown(createResult(), 12).combo).toBe(capped);
+      expect(calculateScoreBreakdown(createResult(), 100).combo).toBe(capped);
+    });
+
     it('不正解は0点', () => {
       expect(calculateProblemScore(createResult({ isCorrect: false }), 5)).toBe(0);
     });

@@ -45,9 +45,11 @@ export const ComboIndicator: React.FC<ComboIndicatorProps> = ({
   if (isExpired) return null;
 
   const bonusPercent =
-    Math.max(0, combo - SCORE_CONFIG.COMBO_MIN_COUNT + 1) *
-    SCORE_CONFIG.COMBO_BONUS_RATE *
-    100;
+    Math.min(
+      SCORE_CONFIG.COMBO_BONUS_MAX_RATE,
+      Math.max(0, combo - SCORE_CONFIG.COMBO_MIN_COUNT + 1) *
+        SCORE_CONFIG.COMBO_BONUS_RATE,
+    ) * 100;
 
   return (
     <View style={styles.container} pointerEvents="none">
