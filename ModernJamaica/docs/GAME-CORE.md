@@ -13,47 +13,52 @@
 - `isUsed` … 既に結合の子として消費されたか。`true` のノードは再結合できない。
 - `parentId` / `depth` / `position` … 木構造とレイアウト用。
 
-問題は `ProblemData { numbers, target, difficulty, solutions? }`。**`solutions` は現状の生成器では設定されない（`undefined`）**。将来用の予約フィールド。
+問題は `ProblemData { numbers, target, difficulty, solutions?, solutionCount? }`。`solutionCount` は生成器が数えた「人が見つけやすい解の数」（難易度制御の根拠）。**`solutions` は現状の生成器では設定されない（`undefined`）**。将来用の予約フィールド。
 
 ## 2. 問題生成（`utils/problemGenerator.ts`）
 
-エントリポイント: `generateProblem(difficulty: DifficultyLevel): ProblemData`
+エントリポイント: `generateProblem(difficulty, rng?)`。`rng` を渡すと同じ乱数列から同じ問題を再現できる（既定は `Math.random`）。
 
-1. 難易度設定（`config/difficulty.ts`）の `numberRange` から**ランダムな整数を 5 つ**生成。
-2. `calculateTarget(numbers)` が 5 数字を**再帰的にランダムな演算で畳み込み**、最終的な単一値を `target` とする。
-3. `numbers` はシャッフルして返す。
+1. 難易度設定（`config/difficulty.ts`）の `numberRange` から**ランダムな整数を 5 つ**（手札）生成。
+2. `countSolutions(numbers)` が、5 数字を全部使って作れる値と**その解の数**を総当たりで数え上げる。
+3. 作れる値のうち、難易度の `targetRange` に収まり、かつ**「全部足すだけ」の値ではない**ものを目標値の候補とする。
+4. 候補を解の数で並べ、難易度の `solutionBand`（パーセンタイル帯と最小解数）に入るものからランダムに `target` を選ぶ。**解が多いほど易しい**。条件に合う候補がなければ手札を引き直す。
 
-**不変条件（解の保証）**: `calculateTarget` の畳み込み過程そのものが 1 つの有効な解になっているため、**生成される問題は必ず 5 数字全部で `target` に到達できる**。この性質を壊す変更は禁止（[PHILOSOPHY.md](./PHILOSOPHY.md) 不変条件 #1）。
+**不変条件（解の保証）**: `target` は必ず `countSolutions` が**実際に到達できた値**の中から選ぶため、**生成される問題は必ず 5 数字全部で `target` に到達できる**。引き直しの上限に達した場合の保険（最も解が多い候補／固定問題）も到達可能な問題だけを返す。この性質を壊す変更は禁止（[PHILOSOPHY.md](./PHILOSOPHY.md) 不変条件 #1）。独立ソルバによる検証が `__tests__/utils/problemGenerator.test.ts` にある。
 
-**演算子の制約**（`applyOperator`）:
-- `−` は `Math.abs(a-b)`（負を出さない）。
-- `÷` は割り切れる時のみ（`a % b === 0` か `b % a === 0`）。不可なら `+ − ×` から選び直して再試行。
+**数え上げの制約**（`countSolutions`）: 人が見つけやすい解だけを数えるため、途中結果は**正の整数**に限る。
+- `−` は大きい方から小さい方を引く（同値同士の 0 は数えない）。
+- `÷` は割り切れる時のみ。`÷1` は `×1` と同じ結果なので数えない。
 
-> **重要**: 「加算のみ／乗算のみ／混合」といった**問題タイプは存在しない**。生成器は難易度の数値レンジだけでパラメータ化された単一のロジック。（過去のドキュメントの誤り）
+これは**出題の基準**であり、プレイヤーの操作を縛るものではない（盤面では負の数や小数を経由する解も正解になる）。
 
-`generateProblemExhaustive()` は `@deprecated` な後方互換ラッパ（`generateProblem(NORMAL)` を呼ぶだけ）。
+> **重要**: 「加算のみ／乗算のみ／混合」といった**問題タイプは存在しない**。生成器は難易度設定（数字レンジ・目標値レンジ・解の数の帯）だけでパラメータ化された単一のロジック。（過去のドキュメントの誤り）
 
 ## 3. 難易度（`config/difficulty.ts`）
 
-| 難易度 | 数字レンジ | 初期時間 | 正解ボーナス | 色 |
+| 難易度 | 数字レンジ | 目標値レンジ | 出題する解の数の帯 | 色 |
 |---|---|---|---|---|
-| かんたん (EASY) | 1–4 | 120s | +20s | mint |
-| ふつう (NORMAL) | 1–6 | 60s | +10s | neon(青) |
-| むずかしい (HARD) | 1–10 | 60s | +10s | coral(橙) |
+| かんたん (EASY) | 1–4 | 小さめ | 解が多い側 | mint |
+| ふつう (NORMAL) | 1–6 | 本家ジャマイカと同じ | 中間 | neon(青) |
+| むずかしい (HARD) | 1–10 | 大きめ | 解が少ない側（下限あり） | coral(橙) |
 
-既定難易度は `DEFAULT_DIFFICULTY = NORMAL`。時間はチャレンジモードでこの難易度別値が使われる（`gameMode.ts` の 60s は無限モード等の基準）。
+具体値（`targetRange` / `solutionBand` / 初期時間 / 正解ボーナス）は `config/difficulty.ts` が正。ここに数値を二重化しない。
+
+既定難易度は `DEFAULT_DIFFICULTY = NORMAL`。時間はチャレンジモードでこの難易度別値が使われる（`gameMode.ts` のチャレンジの時間は使われない基準値）。
 
 ## 4. ノード結合と正解判定（`store/gameStore.ts connectNodes`）
 
 UI 操作は**タップで繋ぐ**（ノード → 演算子 → ノード）。`connectNodes(firstNodeId, secondNodeId, operator)` の契約:
 
 1. 2 ノードを取得。どちらかが `isUsed` なら結合しない（多重使用の防止）。
-2. 演算子で結果を計算（`+ − × ÷`）。**除算は 0 を回避し、小数第 2 位に丸める**。
+2. 演算子で結果を計算（`+ − × ÷`）。**除算は 0 を回避し、結果は丸めずに保持する**（`(1÷3)×3` を正解にするため。丸めるのは盤面の表示だけ）。
 3. `internal-<id>` の新ノードを生成し、`leftChildId` / `rightChildId` を設定。元の 2 ノードを `isUsed: true`・`parentId` 設定（＝子になる）。
 4. **完成チェック**: 未使用ノードが 1 つだけ（`activeNodes.length === 1`）になったら、その値 `finalValue` と `targetNumber` を比較。
 5. **正解条件**: `Math.abs(finalValue - targetNumber) < 0.001`。この閾値は浮動小数点誤差の吸収用（[PHILOSOPHY.md](./PHILOSOPHY.md) 不変条件 #3）。
-   - 正解: 効果音・スコア/コンボ更新（チャレンジ）または正解数加算（無限）、時間ボーナス付与、約 1.5 秒後に次問題へ。
-   - **不正解（値が合わない単一ノード）専用の分岐はない**。プレイヤーは Undo でやり直す。
+   - 正解: 効果音・振動・スコア/コンボ更新（チャレンジ）または正解数加算（無限）、時間ボーナス付与、約 1.5 秒後に次問題へ（待機中にリスタート等で状態が変わっていたら生成しない）。
+   - 不正解（値が合わない単一ノード）: 不正解音・振動を鳴らし、`wrongAnswerCount` を増やす。盤面（`GameBoard`）はこれを見て揺れ・メッセージを出す。状態は巻き戻さず、プレイヤーは Undo でやり直す。
+
+**正解数とスキップ**: `problemCount` は試行数（正解 + スキップ）、`correctCount` は正解数。**スキップは正解に数えない**（最終ボーナス・ランキングの問題数・リザルトの統計は `correctCount` を使う）。
 
 ## 5. Undo（履歴）
 
@@ -65,9 +70,11 @@ UI 操作は**タップで繋ぐ**（ノード → 演算子 → ノード）。
 
 - **基本スコア**: 使用した数字の合計 × `BASE_SCORE_MULTIPLIER`。
 - **時間ボーナス**: 速く解くほど倍率が上がる（`TIME_MULTIPLIER_MIN`〜`MAX`）。
-- **難易度ボーナス**: `DIFFICULTY_THRESHOLD` / `DIFFICULTY_MULTIPLIER` による加点。
+- **目標値ボーナス**: `DIFFICULTY_THRESHOLD` / `DIFFICULTY_MULTIPLIER` による加点。**`DIFFICULTY_BONUS_MAX` で頭打ち**（目標値の運でスコアが決まらないようにする）。
 - **コンボボーナス**: `ComboTracker` が `COMBO_TIME_LIMIT`（15s）以内の連続正解を追跡。`COMBO_MIN_COUNT`（3）以上で `COMBO_BONUS_RATE` 加算。
-- **最終ボーナス**（リザルト画面, `calculateFinalBonus`）: 正解数の達成しきい値（5/7/10）ボーナス + `EXCELLENCE_THRESHOLD`（20000）超で優秀ボーナス。
+- **最終ボーナス**（ゲーム終了時, `calculateFinalBonus`）: **正解数**（スキップを除く）の達成しきい値ボーナス + `EXCELLENCE_THRESHOLD` 超で優秀ボーナス。
+
+1 問ごとの内訳は `calculateScoreBreakdown` が返し、ストアが `scoreBreakdown` に累計する。プレイ中は獲得点とコンボ（`ComboIndicator`・正解オーバーレイ）、リザルト画面は内訳・最大コンボ・平均回答時間（`totalSolveTime / correctCount`）を表示する。
 
 無限モードのスコアは「正解数」。ランキング送信対象外。
 
@@ -79,17 +86,21 @@ UI 操作は**タップで繋ぐ**（ノード → 演算子 → ノード）。
 | スキップ | 2 回 | 無制限（`Infinity`） |
 | スコア表示 | 計算スコア | 「N問」（正解数） |
 | ランキング | 対象 | 非対象 |
-| ハイスコアキー | `@jamaica_challenge_high_score` | `@jamaica_infinite_high_score` |
+| ハイスコアキー（難易度別, `utils/storage.ts`） | `@jamaica_challenge_<難易度>_high_score_v2` | `@jamaica_infinite_<難易度>_high_score` |
 
-注: チャレンジの時間は難易度設定（§3）で上書きされる。`gameMode.ts` の 60s は基準値。
+注: チャレンジの時間は難易度設定（§3）で上書きされる。
+
+チャレンジのハイスコアキーが `_v2` なのは、スコア計算式の見直し（目標値ボーナスの上限など）で旧スコアと比較できなくなったため（[decisions/0004](./decisions/0004-ranking-v2-anonymous-auth.md)）。
 
 ## 8. ゲーム状態遷移（`GameStatus`）
 
 `MENU → COUNTDOWN → BUILDING → (CORRECT で次問題ループ) → TIMEUP / MANUALLY_ENDED`。定義は `types/index.ts` の `GameStatus` enum。
 
-## 9. サウンド（`utils/SoundManager.ts`）
+## 9. サウンドと触覚（`utils/SoundManager.ts` / `services/hapticService.ts`）
 
-`soundManager` シングルトンが 6 種（button, connect, countdown, start, success, tap）をプリロード。`SoundType` enum で参照。設定でミュート可能（`settingsStore`）。
+`soundManager` シングルトンが効果音（button, connect, countdown, start, success, tap, wrong）をプリロード。`SoundType` enum で参照。設定でミュート可能（`settingsStore`）。オーディオカテゴリは **`Ambient`**（マナーモードに従い、再生中の音楽を止めない）。
+
+触覚フィードバックは `services/hapticService.ts`（選択・結合・正解・不正解）。設定でオフにできる。
 
 ---
 このファイルが説明する主なコード:

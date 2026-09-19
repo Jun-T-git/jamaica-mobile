@@ -78,12 +78,14 @@ canonical 文書は**薄く保つ**。関数シグネチャや具体数値を散
 これらは今回のスコープ外だが、実装に存在する事実として記録する。触れる際に是正を検討。
 
 1. **Android AdMob 本番 ID 未取得**: `services/adService.ts` の Android 広告 ID（バナー/インタースティシャル）は本番 ID が未取得のため `undefined`（無効なプレースホルダ ID を渡すと広告枠が壊れるため）。この間 Android 本番では広告を出さない（`getBannerAdUnitId()` が `undefined` を返し BannerAdView は null、interstitial は未初期化）。iOS は設定済み。**本アプリは iOS のみをリリース対象とする方針のため、この負債は実質的に問題にならない**（Android を配信する場合のみ本番 ID の取得と `Platform.select` の `android` への設定が必要）。
-2. **Firestore ルールと実装の乖離**: `firestore.rules` は `request.auth != null && request.auth.uid == userId`（Firebase Auth 前提）だが、`@react-native-firebase/auth` は**未導入**で `userService` は AsyncStorage の匿名 ID を使う。実際の書き込み経路とルールが整合していない可能性。詳細は [decisions/0003-firestore-ranking.md](./decisions/0003-firestore-ranking.md)。
+2. ~~Firestore ルールと実装の乖離~~ **解消**: Firebase 匿名認証を導入し、ランキングは認証 UID をドキュメント ID とする `userScoresV2` に移行（[decisions/0004-ranking-v2-anonymous-auth.md](./decisions/0004-ranking-v2-anonymous-auth.md)）。**運用上の前提**: Firebase コンソールで Anonymous 認証が有効であること、`firestore.rules` がデプロイ済みであること（`firebase deploy --only firestore:rules`）。未対応だとスコア送信だけが失敗する（ゲーム進行には影響しない。失敗分は端末に控えて次回再送）。
 3. **設定の重複**: `config/gameMode.ts` と `constants/index.ts` の `GAME_CONFIG` に同種の値（チャレンジ 60s / スキップ 2 等）が二重定義。`GAME_CONFIG` は主にテスト参照で、`TARGET.MIN/MAX` は現行生成器で未使用。config/ 系に一本化するのが望ましい。
-4. **テストカバレッジが低い**: `scoreCalculator` / `gameStore`（connectNodes・判定・タイマー）/ services / stores / 画面が未テスト。
+4. **テストカバレッジが低い**: `gameStore`（connectNodes・判定・タイマー）/ services / stores / 画面が未テスト。（`problemGenerator` と `scoreCalculator` はテストあり）
 5. **`ProblemData.solutions` 未使用**: 型にあるが生成器は設定しない（将来用予約）。
-6. **既存の型エラー（`tsc --noEmit` が red）**: `screens/SettingsScreen.tsx` に 3 件。特に `SoundType.SUCCESS` を参照しているが `SoundType` に `SUCCESS` は存在しない（実在は `CONNECT` / `CORRECT` などで、success.mp3 は `CORRECT` に割当。`utils/SoundManager.ts`）。他に style 配列と Typography の `ellipsizeMode` prop の型不整合。
-7. **既存の lint エラー（`npm run lint` が red・8 件）**: 未使用変数/インポート（`components/molecules/RankingEntry.tsx`, `components/organisms/RankingBoard.tsx`, `screens/ModeSelectionScreen.tsx`）。`RankingBoard.tsx` は Pull-to-Refresh 関連（`ScrollView`/`RefreshControl`/`handleRefresh`/`isRefreshing`）が未使用のまま残っており、実装途中の可能性。
+6. ~~既存の型エラー~~ **解消**: `tsc --noEmit` は green。
+7. ~~既存の lint エラー~~ **解消**: `npm run lint` はエラー 0。
+8. **旧ランキングデータ**: Firestore の `userScores`（V1）は旧スコア計算式・非認証 ID のデータで、読み取り専用のまま残している。不要になったら削除する。
+9. **不正解音は合成音**: `ios/wrong.wav` はスクリプトで合成した仮の音。他の効果音と質感を揃えた音源への差し替えが望ましい。
 
 ---
 このファイルが説明する主なコード: `tsconfig.json` / `jest.config.js` / `.eslintrc.js` / `config/*` / `services/adService.ts` / `firestore.rules`

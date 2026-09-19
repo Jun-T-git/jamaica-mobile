@@ -23,8 +23,8 @@
 src/
 ├── components/          # UI（アトミックデザイン）— DESIGN-SYSTEM.md 参照
 │   ├── atoms/           # Button, Card, Typography, Icon, Logo, StatValue, SoundToggleButton
-│   ├── molecules/       # Dialog, GameStat, RankingEntry, DifficultyTabs, CountdownOverlay, SuccessOverlay, BannerAdView 等
-│   ├── organisms/       # GameBoard, GameHeader, PauseMenu, RankingBoard
+│   ├── molecules/       # Dialog, GameStat, RankingEntry, DifficultyTabs, CountdownOverlay, SuccessOverlay, ComboIndicator, BannerAdView 等
+│   ├── organisms/       # GameBoard, GameHeader, PauseMenu, RankingBoard, TutorialModal（初回起動時の遊び方）
 │   └── ErrorBoundary.tsx
 ├── screens/             # 画面（8 つ）
 ├── store/               # Zustand ストア（gameStore, settingsStore）
@@ -84,12 +84,15 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 
 | サービス | ファイル | 役割 | バックエンド |
 |---|---|---|---|
-| ランキング | `services/rankingService.ts` | スコア送信（新記録時のみ・**チャレンジ専用**）／取得／順位 | Firestore `userScores` コレクション |
-| ユーザー | `services/userService.ts` | 匿名 ID 生成・表示名管理・バリデーション | AsyncStorage |
-| 広告 | `services/adService.ts` | インタースティシャル（数ゲームに 1 回）／バナー | AdMob |
-| サウンド | `utils/SoundManager.ts` | 6 種の効果音のプリロード・再生 | react-native-sound |
+| ランキング | `services/rankingService.ts` | スコア送信（新記録時のみ・**チャレンジ専用**・失敗分は次回再送）／取得／順位（件数の集計クエリ） | Firestore `userScoresV2` コレクション |
+| ユーザー | `services/userService.ts` | 匿名認証（UID がランキングのドキュメント ID）・表示名管理・バリデーション | Firebase Auth（匿名）／AsyncStorage |
+| 広告 | `services/adService.ts` | インタースティシャル（数ゲームに 1 回・リザルト離脱時・回数は永続化）／バナー | AdMob |
+| 計測 | `services/analyticsService.ts` | 画面表示・ゲーム開始/終了・正解/スキップ・チュートリアルのイベント送信（失敗は握りつぶす） | Firebase Analytics（広告 ID 連携なし） |
+| 触覚 | `services/hapticService.ts` | 選択・結合・正解・不正解の振動 | react-native-haptic-feedback |
+| サウンド | `utils/SoundManager.ts` | 効果音のプリロード・再生（`Ambient` カテゴリ） | react-native-sound |
 
-- Firestore のセキュリティルールは `firestore.rules`（リポジトリ内）。**ルールと実装の既知の乖離**（auth 前提だが auth SDK 未導入）は [CONVENTIONS.md](./CONVENTIONS.md) の技術的負債と [decisions/0003-firestore-ranking.md](./decisions/0003-firestore-ranking.md) を参照。
+- Firestore のセキュリティルールは `firestore.rules`（リポジトリ内。ルートの `firebase.json` から参照され `firebase deploy --only firestore:rules` でデプロイ）。本人（匿名認証 UID）だけが自分のドキュメントを書き込める。経緯は [decisions/0004-ranking-v2-anonymous-auth.md](./decisions/0004-ranking-v2-anonymous-auth.md)。
+- 外部サービス（ランキング・認証・計測・広告）の失敗や遅延で**ゲーム進行を止めない**。スコア送信はリザルト画面への遷移の後ろで行う。
 
 ## 永続化キー
 
