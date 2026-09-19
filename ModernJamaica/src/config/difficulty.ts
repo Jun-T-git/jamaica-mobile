@@ -5,6 +5,20 @@ export interface DifficultyConfig {
     min: number;
     max: number;
   };
+  targetRange: {
+    min: number;      // 目標値の下限
+    max: number;      // 目標値の上限
+  };
+  /**
+   * 解の数による難易度制御
+   * その手札で作れる目標値を「解の数が少ない順」に並べ、
+   * minPercentile〜maxPercentile の帯から目標値を選ぶ（解が多いほど易しい）
+   */
+  solutionBand: {
+    minPercentile: number;
+    maxPercentile: number;
+    minCount: number; // これ未満の解しかない目標値は出題しない
+  };
   time: {
     initial: number;  // 初期時間（秒）
     bonus: number;    // 正解ボーナス（秒）
@@ -30,6 +44,8 @@ export const DIFFICULTY_CONFIG: Record<DifficultyLevel, DifficultyConfig> = {
       min: 1, 
       max: 4 
     },
+    targetRange: { min: 10, max: 30 },
+    solutionBand: { minPercentile: 0.5, maxPercentile: 1.0, minCount: 60 },
     time: { 
       initial: 120,  // 2分
       bonus: 20      // +20秒
@@ -50,9 +66,11 @@ export const DIFFICULTY_CONFIG: Record<DifficultyLevel, DifficultyConfig> = {
       min: 1, 
       max: 6 
     },
+    targetRange: { min: 11, max: 66 },  // 本家ジャマイカと同じ範囲
+    solutionBand: { minPercentile: 0.25, maxPercentile: 0.75, minCount: 20 },
     time: { 
-      initial: 60,   // 1分
-      bonus: 10      // +10秒
+      initial: 90,   // 1分30秒
+      bonus: 15      // +15秒
     },
     label: {
       ja: 'ふつう',
@@ -70,9 +88,11 @@ export const DIFFICULTY_CONFIG: Record<DifficultyLevel, DifficultyConfig> = {
       min: 1, 
       max: 10 
     },
+    targetRange: { min: 20, max: 99 },
+    solutionBand: { minPercentile: 0.1, maxPercentile: 0.5, minCount: 8 },
     time: { 
-      initial: 60,   // 1分
-      bonus: 10      // +10秒
+      initial: 90,   // 1分30秒
+      bonus: 20      // +20秒
     },
     label: {
       ja: 'むずかしい',

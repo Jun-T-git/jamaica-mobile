@@ -1,4 +1,5 @@
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GameMode, DifficultyLevel } from '../types';
 import {
   UserScoreDocument,
@@ -12,7 +13,9 @@ import { userService } from './userService';
 
 export class RankingService {
   private static instance: RankingService;
-  private readonly collectionName = 'userScores';
+  // V2: スコア計算式の見直しと匿名認証の導入に合わせてコレクションを分離
+  // （旧 userScores のスコアは新しい計算式と比較できず、ドキュメントIDも認証UIDではない）
+  private readonly collectionName = 'userScoresV2';
 
   private constructor() {}
 
@@ -35,8 +38,11 @@ export class RankingService {
       return false;
     }
     
+    // 送信が完了するまで端末に控えておく（オフライン時などに失敗しても次回再送できるように）
+    await this.saveUnsentScore(submission);
+    
     try {
-      const userId = await userService.getUserId();
+      const userId = await userService.getAuthUserId();
       console.log('👤 User ID:', userId);
       
       const docRef = firestore().collection(this.collectionName).doc(userId);
@@ -81,10 +87,49 @@ export class RankingService {
       });
 
       console.log('🎯 Transaction result:', result);
+      await this.clearUnsentScore(submission.difficulty);
       return result;
     } catch (error) {
       console.error('❌ Failed to submit score:', error);
       return false;
+    }
+  }
+
+  /**
+   * 送信に失敗して端末に残っているスコアがあれば再送する
+   */
+  async retryUnsentScore(difficulty: DifficultyLevel, displayName: string): Promise<void> {
+    try {
+      const stored = await AsyncStorage.getItem(this.getUnsentScoreKey(difficulty));
+      if (!stored) return;
+
+      const unsent = JSON.parse(stored) as ScoreSubmission;
+      await this.submitScore({ ...unsent, displayName });
+    } catch (error) {
+      console.warn('Failed to retry unsent score:', error);
+    }
+  }
+
+  private getUnsentScoreKey(difficulty: DifficultyLevel): string {
+    return `@jamaica_ranking_unsent_${difficulty}`;
+  }
+
+  private async saveUnsentScore(submission: ScoreSubmission): Promise<void> {
+    try {
+      await AsyncStorage.setItem(
+        this.getUnsentScoreKey(submission.difficulty),
+        JSON.stringify(submission),
+      );
+    } catch (error) {
+      console.warn('Failed to save unsent score:', error);
+    }
+  }
+
+  private async clearUnsentScore(difficulty: DifficultyLevel): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(this.getUnsentScoreKey(difficulty));
+    } catch (error) {
+      console.warn('Failed to clear unsent score:', error);
     }
   }
 
@@ -107,13 +152,14 @@ export class RankingService {
       
       const snapshot = await firestore()
         .collection(this.collectionName)
+        .where(fieldPath, '>', 0)
         .orderBy(fieldPath, 'desc')
         .limit(limit)
         .get();
 
       console.log('📋 Retrieved documents count:', snapshot.size);
 
-      const currentUserId = await userService.getUserId();
+      const currentUserId = await userService.getAuthUserId();
       
       const rankings = snapshot.docs.map((doc, index) => {
         const data = doc.data() as UserScoreDocument;
@@ -147,7 +193,7 @@ export class RankingService {
       return { rank: null, totalUsers: 0 };
     }
     try {
-      const userId = await userService.getUserId();
+      const userId = await userService.getAuthUserId();
       const userDoc = await firestore()
         .collection(this.collectionName)
         .doc(userId)
@@ -161,19 +207,26 @@ export class RankingService {
       const userScore = this.getScoreFromDocument(userData, mode, difficulty);
       const fieldPath = this.getScoreFieldPath(mode, difficulty);
 
-      // ユーザーより上位のユーザー数を取得
-      const higherScoresSnapshot = await firestore()
-        .collection(this.collectionName)
-        .where(fieldPath, '>', userScore.score)
-        .get();
+      if (userScore.score <= 0) {
+        return { rank: null, totalUsers: 0 };
+      }
 
-      // 総ユーザー数を取得
-      const totalUsersSnapshot = await firestore()
-        .collection(this.collectionName)
-        .get();
+      // 件数だけを集計クエリで取得（ドキュメントを全件読み込まない）
+      const [higherScoresSnapshot, totalUsersSnapshot] = await Promise.all([
+        firestore()
+          .collection(this.collectionName)
+          .where(fieldPath, '>', userScore.score)
+          .count()
+          .get(),
+        firestore()
+          .collection(this.collectionName)
+          .where(fieldPath, '>', 0)
+          .count()
+          .get(),
+      ]);
 
-      const rank = higherScoresSnapshot.size + 1;
-      const totalUsers = totalUsersSnapshot.size;
+      const rank = higherScoresSnapshot.data().count + 1;
+      const totalUsers = totalUsersSnapshot.data().count;
       const percentile = totalUsers > 0 ? Math.round((1 - (rank - 1) / totalUsers) * 100) : 0;
 
       return {
@@ -192,7 +245,7 @@ export class RankingService {
    */
   async getUserScoreDocument(): Promise<UserScoreDocument | null> {
     try {
-      const userId = await userService.getUserId();
+      const userId = await userService.getAuthUserId();
       const doc = await firestore()
         .collection(this.collectionName)
         .doc(userId)
@@ -233,7 +286,7 @@ export class RankingService {
     console.log('🔄 updateDisplayName called with:', newDisplayName);
     
     try {
-      const userId = await userService.getUserId();
+      const userId = await userService.getAuthUserId();
       console.log('👤 User ID:', userId);
       
       const docRef = firestore().collection(this.collectionName).doc(userId);

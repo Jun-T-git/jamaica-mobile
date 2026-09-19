@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   AdEventType,
   BannerAdSize,
@@ -26,14 +27,17 @@ const adUnitIds = {
       }),
 };
 
+// 前回の広告表示からのゲーム数（アプリを再起動しても引き継ぐ）
+const GAMES_SINCE_INTERSTITIAL_KEY = '@jamaica_games_since_interstitial';
+
 // インタースティシャル広告のインスタンス
 let interstitialAd: InterstitialAd | null = null;
 
 class AdService {
   private interstitialLoadAttempts = 0;
   private readonly maxInterstitialLoadAttempts = 3;
-  private interstitialShownCount = 0;
   private readonly interstitialFrequency = 3; // 3ゲームごとに表示
+  private onInterstitialClosed: (() => void) | null = null;
 
   constructor() {
     this.initializeInterstitialAd();
@@ -70,6 +74,8 @@ class AdService {
       AdEventType.CLOSED,
       () => {
         console.log('Interstitial ad closed');
+        this.onInterstitialClosed?.();
+        this.onInterstitialClosed = null;
         // 次の広告を事前読み込み
         this.loadInterstitialAd();
       },
@@ -109,36 +115,53 @@ class AdService {
     return BannerAdSize.ANCHORED_ADAPTIVE_BANNER;
   }
 
-  // インタースティシャル広告を表示すべきかチェック
-  shouldShowInterstitial(): boolean {
-    this.interstitialShownCount++;
-    return this.interstitialShownCount % this.interstitialFrequency === 0;
-  }
+  /**
+   * ゲーム終了を記録し、表示タイミングならインタースティシャル広告を表示する
+   * 広告が閉じられるまで待つので、呼び出し側は await してから画面遷移すること
+   *
+   * ゲーム数はAsyncStorageに保存する（1回の起動で1〜2ゲームしか遊ばない
+   * ユーザーにも、通算3ゲームごとに表示されるようにするため）
+   */
+  async showInterstitialAfterGame(): Promise<boolean> {
+    const gamesSinceLastAd = (await this.loadGamesSinceInterstitial()) + 1;
 
-  // インタースティシャル広告を表示
-  async showInterstitialAd(): Promise<boolean> {
-    if (!interstitialAd) {
-      console.log('Interstitial ad not initialized');
+    if (gamesSinceLastAd < this.interstitialFrequency || !interstitialAd?.loaded) {
+      // 広告の準備ができていない場合はカウントを持ち越し、次のゲーム後に表示する
+      await this.saveGamesSinceInterstitial(gamesSinceLastAd);
       return false;
     }
 
+    const ad = interstitialAd;
     try {
-      const isLoaded = await interstitialAd.loaded;
-
-      if (isLoaded && this.shouldShowInterstitial()) {
-        await interstitialAd.show();
-        return true;
-      }
+      await new Promise<void>((resolve, reject) => {
+        this.onInterstitialClosed = resolve;
+        ad.show().catch(reject);
+      });
+      await this.saveGamesSinceInterstitial(0);
+      return true;
     } catch (error) {
       console.error('Error showing interstitial ad:', error);
+      this.onInterstitialClosed = null;
+      await this.saveGamesSinceInterstitial(gamesSinceLastAd);
+      return false;
     }
-
-    return false;
   }
 
-  // カウンターをリセット（必要に応じて）
-  resetInterstitialCounter() {
-    this.interstitialShownCount = 0;
+  private async loadGamesSinceInterstitial(): Promise<number> {
+    try {
+      const stored = await AsyncStorage.getItem(GAMES_SINCE_INTERSTITIAL_KEY);
+      return stored ? parseInt(stored, 10) || 0 : 0;
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  private async saveGamesSinceInterstitial(count: number): Promise<void> {
+    try {
+      await AsyncStorage.setItem(GAMES_SINCE_INTERSTITIAL_KEY, count.toString());
+    } catch (error) {
+      console.warn('Failed to save interstitial counter:', error);
+    }
   }
 }
 

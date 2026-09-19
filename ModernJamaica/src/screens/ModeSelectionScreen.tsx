@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   StatusBar,
@@ -10,11 +11,14 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Logo } from '../components/atoms/Logo';
 import { Typography } from '../components/atoms/Typography';
 import { BannerAdView } from '../components/molecules/BannerAdView';
+import { TutorialModal } from '../components/organisms/TutorialModal';
 import { ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';
 import { GameMode } from '../types';
 import { soundManager, SoundType } from '../utils/SoundManager';
+
+const TUTORIAL_COMPLETED_KEY = '@jamaica_tutorial_completed';
 
 interface ModeSelectionScreenProps {
   navigation: any;
@@ -25,6 +29,26 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
 }) => {
   const { loadStoredData } = useGameStore();
   const { loadDisplayName, loadSoundSetting, displayName } = useSettingsStore();
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  // 初回起動時は遊び方を自動で表示
+  useEffect(() => {
+    AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY)
+      .then(completed => {
+        if (completed !== 'true') setShowTutorial(true);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleTutorialClose = () => {
+    setShowTutorial(false);
+    AsyncStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true').catch(() => {});
+  };
+
+  const handleTutorialPress = () => {
+    soundManager.play(SoundType.BUTTON);
+    setShowTutorial(true);
+  };
 
   useEffect(() => {
     // ゲームデータを読み込み
@@ -165,6 +189,21 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
       {/* セカンダリナビゲーション */}
       <View style={styles.secondaryNavigation}>
         <TouchableOpacity
+          onPress={handleTutorialPress}
+          style={styles.navButton}
+          activeOpacity={0.8}
+        >
+          <MaterialIcons
+            name="help-outline"
+            size={20}
+            color={ModernDesign.colors.text.tertiary}
+          />
+          <Typography variant="body2" style={styles.navButtonText}>
+            遊び方
+          </Typography>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           onPress={handleRankingPress}
           style={styles.navButton}
           activeOpacity={0.8}
@@ -197,6 +236,8 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
 
       {/* バナー広告 */}
       <BannerAdView style={styles.bannerAd} />
+
+      <TutorialModal visible={showTutorial} onClose={handleTutorialClose} />
     </SafeAreaView>
   );
 };
@@ -234,6 +275,7 @@ const styles = StyleSheet.create({
   secondaryNavigation: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: ModernDesign.spacing[2],
     paddingHorizontal: ModernDesign.spacing[6],
     paddingTop: ModernDesign.spacing[6],
     paddingBottom: ModernDesign.spacing[24], // 広告＋下部セーフエリアぶんを確保
@@ -244,13 +286,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: ModernDesign.colors.background.secondary,
     borderRadius: ModernDesign.borderRadius.xl,
-    paddingHorizontal: ModernDesign.spacing[5],
+    paddingHorizontal: ModernDesign.spacing[2],
     paddingVertical: ModernDesign.spacing[4], // タップしやすくするため縦幅を拡大
     borderWidth: 1,
     borderColor: ModernDesign.colors.border.subtle,
-    width: '47%', // 画面の半分弱でボタンサイズを統一
+    flex: 1, // 3つのボタンを等幅で並べる
     flexDirection: 'row',
-    gap: ModernDesign.spacing[2],
+    gap: ModernDesign.spacing[1],
     minHeight: 48, // 最小タップ領域を確保
     ...ModernDesign.shadows.sm,
   },

@@ -11,6 +11,8 @@ prepare_react_native_project!
 # Firebase推奨設定
 use_frameworks! :linkage => :static
 $RNFirebaseAsStaticFramework = true
+# 広告識別子(IDFA)を使わない方針のため、Analyticsは広告ID連携なしで組み込む
+$RNFirebaseAnalyticsWithoutAdIdSupport = true
 
 target 'ModernJamaica' do
   config = use_native_modules!

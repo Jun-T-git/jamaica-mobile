@@ -5,6 +5,7 @@ import {
   Animated,
   Dimensions,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -15,8 +16,11 @@ import { BannerAdView } from '../components/molecules/BannerAdView';
 import { getDifficultyConfig } from '../config/difficulty';
 import { getGameModeConfig } from '../config/gameMode';
 import { COLORS, ModernDesign } from '../constants';
+import { adService } from '../services/adService';
+import { rankingService } from '../services/rankingService';
 import { useGameStore } from '../store/gameStore';
 import { DifficultyLevel, GameMode } from '../types';
+import { UserRankInfo } from '../types/ranking';
 
 const { width } = Dimensions.get('window');
 
@@ -49,7 +53,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
     mode = 'challenge',
     difficulty,
   } = route.params;
-  const { initGame, gameState } = useGameStore();
+  const { initGame, gameState, isSubmittingScore } = useGameStore();
 
   // ゲームモード設定を取得
   const gameMode = mode === 'infinite' ? GameMode.INFINITE : GameMode.CHALLENGE;
@@ -68,6 +72,24 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
 
   // Animated score counter
   const [displayedScore, setDisplayedScore] = useState(0);
+
+  // ランキング順位（チャレンジモードのみ）
+  const [rankInfo, setRankInfo] = useState<UserRankInfo | null>(null);
+  const [isLeaving, setIsLeaving] = useState(false);
+
+  // スコア送信の完了を待ってから自分の順位を取得する
+  useEffect(() => {
+    if (gameMode !== GameMode.CHALLENGE || isSubmittingScore) return;
+
+    let isCancelled = false;
+    rankingService.getUserRank(gameMode, currentDifficulty).then(info => {
+      if (!isCancelled) setRankInfo(info);
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [gameMode, currentDifficulty, isSubmittingScore]);
 
   useEffect(() => {
     // Initial entrance animation
@@ -91,22 +113,17 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
     ]).start();
 
     // Score counting animation
-    setTimeout(() => {
+    const listenerId = scoreCountAnim.addListener(({ value }) => {
+      setDisplayedScore(Math.floor(value));
+    });
+
+    const startTimer = setTimeout(() => {
       Animated.timing(scoreCountAnim, {
         toValue: finalScore,
         duration: 1500,
         useNativeDriver: false,
-      }).start();
-
-      // Animate score counter
-      const scoreInterval = setInterval(() => {
-        scoreCountAnim.addListener(({ value }) => {
-          setDisplayedScore(Math.floor(value));
-        });
-      }, 16);
-
-      setTimeout(() => {
-        clearInterval(scoreInterval);
+      }).start(({ finished }) => {
+        if (!finished) return;
         setDisplayedScore(finalScore);
 
         // Celebration animation if new high score
@@ -129,8 +146,13 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
             }),
           ]).start();
         }
-      }, 1500);
+      });
     }, 800);
+
+    return () => {
+      clearTimeout(startTimer);
+      scoreCountAnim.removeListener(listenerId);
+    };
   }, [
     finalScore,
     isNewHighScore,
@@ -141,43 +163,77 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
     celebrationAnim,
   ]);
 
+  // インタースティシャル広告はリザルトを見終わって画面を離れるタイミングで表示する
+  // （タイムアップ直後のスコアを見たい瞬間を遮らない）
+  const showAdBeforeLeaving = async () => {
+    if (config.ad.enabled) {
+      await adService.showInterstitialAfterGame();
+    }
+  };
+
   const handleRetry = async () => {
-    console.log('Retry button pressed, mode:', mode);
+    if (isLeaving) return;
+    setIsLeaving(true);
 
     try {
-      // ゲーム状態をリセットしてから新しいゲームを開始
-      const targetGameMode =
-        mode === 'infinite' ? GameMode.INFINITE : GameMode.CHALLENGE;
-      console.log('Initializing game with mode:', targetGameMode);
-      await initGame(targetGameMode, currentDifficulty);
-
-      // 初期化完了を待つ
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await showAdBeforeLeaving();
+      await initGame(gameMode, currentDifficulty);
 
       // replaceを使用して戻るボタンでリザルト画面に戻らないようにする
-      const screenName = mode === 'infinite' ? 'InfiniteMode' : 'ChallengeMode';
-      console.log('Navigating to screen:', screenName);
-      if (screenName === 'ChallengeMode') {
+      if (gameMode === GameMode.CHALLENGE) {
         navigation.replace('ChallengeMode', { difficulty: currentDifficulty });
       } else {
         navigation.replace('InfiniteMode', { difficulty: currentDifficulty });
       }
-      console.log('Navigation completed');
     } catch (error) {
       console.error('Error in handleRetry:', error);
+      setIsLeaving(false);
     }
   };
 
-  const handleBackToMenu = () => {
+  const handleBackToMenu = async () => {
+    if (isLeaving) return;
+    setIsLeaving(true);
+
+    await showAdBeforeLeaving();
     // replaceを使用して戻るボタンでリザルト画面に戻らないようにする
     navigation.replace('ModeSelection');
   };
+
+  const correctCount = gameState?.correctCount || 0;
+  const averageSolveTime =
+    correctCount > 0 ? gameState.totalSolveTime / correctCount : null;
+
+  // スコア内訳（0点の項目は表示しない）
+  const breakdownRows =
+    gameMode === GameMode.CHALLENGE && gameState
+      ? [
+          { label: '基本スコア', value: gameState.scoreBreakdown.base },
+          { label: 'スピードボーナス', value: gameState.scoreBreakdown.time },
+          { label: '目標値ボーナス', value: gameState.scoreBreakdown.target },
+          { label: 'コンボボーナス', value: gameState.scoreBreakdown.combo },
+          { label: '達成ボーナス', value: gameState.finalBonus },
+        ].filter(row => row.value > 0)
+      : [];
+
+  // 上位◯%（1位でも0%にならないよう切り上げ）
+  // 参加者が少ないうちは「1人中 上位100%」のようになるため表示しない
+  const MIN_USERS_FOR_PERCENT = 10;
+  const topPercent =
+    rankInfo?.rank && rankInfo.totalUsers >= MIN_USERS_FOR_PERCENT
+      ? Math.max(1, Math.ceil((rankInfo.rank / rankInfo.totalUsers) * 100))
+      : null;
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Background Gradient Effect */}
       <View style={styles.backgroundGradient} />
 
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
       {/* Result Card */}
       <Animated.View
         style={[
@@ -220,10 +276,6 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
           {isNewHighScore ? '新記録達成！' : 'タイムアップ！'}
         </Text>
 
-        <Text style={styles.subtitle}>
-          {isNewHighScore ? '素晴らしい結果です！' : 'お疲れ様でした！'}
-        </Text>
-
         {/* Score Display */}
         <View style={styles.scoreSection}>
           <Text style={styles.scoreLabel}>{config.display.headerLabel}</Text>
@@ -238,6 +290,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
             </Text>
           </Animated.View>
 
+          <View style={styles.badgeRow}>
           {/* Difficulty Badge */}
           <View
             style={[
@@ -293,10 +346,53 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
               </Text>
             </View>
           ) : null}
+          </View>
         </View>
+
+        {/* Ranking */}
+        {rankInfo?.rank && (
+          <View style={styles.rankSection}>
+            <MaterialIcons
+              name="leaderboard"
+              size={20}
+              color={ModernDesign.colors.accent.gold}
+            />
+            <Text style={styles.rankText}>
+              全国 {rankInfo.rank.toLocaleString()}位
+              <Text style={styles.rankSubText}>
+                {' '}/ {rankInfo.totalUsers.toLocaleString()}人
+                {topPercent !== null && `（上位${topPercent}%）`}
+              </Text>
+            </Text>
+          </View>
+        )}
+
+        {/* Score Breakdown */}
+        {breakdownRows.length > 0 && (
+          <View style={styles.breakdownSection}>
+            {breakdownRows.map(row => (
+              <View key={row.label} style={styles.breakdownRow}>
+                <Text style={styles.breakdownLabel}>{row.label}</Text>
+                <Text style={styles.breakdownValue}>
+                  +{row.value.toLocaleString()}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
 
         {/* Performance Stats */}
         <View style={styles.statsSection}>
+          <View style={styles.statItem}>
+            <MaterialIcons
+              name="done"
+              size={24}
+              color={ModernDesign.colors.accent.gold}
+            />
+            <Text style={styles.statLabel}>正解数</Text>
+            <Text style={styles.statValue}>{correctCount}問</Text>
+          </View>
+
           <View style={styles.statItem}>
             <MaterialIcons
               name="timer"
@@ -305,23 +401,23 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
             />
             <Text style={styles.statLabel}>平均回答時間</Text>
             <Text style={styles.statValue}>
-              {gameState?.problemCount && gameState.problemCount > 0
-                ? `${(60 / gameState.problemCount).toFixed(1)}秒`
+              {averageSolveTime !== null
+                ? `${averageSolveTime.toFixed(1)}秒`
                 : '---'}
             </Text>
           </View>
 
-          <View style={styles.statItem}>
-            <MaterialIcons
-              name="done"
-              size={24}
-              color={ModernDesign.colors.accent.gold}
-            />
-            <Text style={styles.statLabel}>正解した問題数</Text>
-            <Text style={styles.statValue}>
-              {gameState?.problemCount || 0}問
-            </Text>
-          </View>
+          {gameMode === GameMode.CHALLENGE && (
+            <View style={styles.statItem}>
+              <MaterialIcons
+                name="local-fire-department"
+                size={24}
+                color={ModernDesign.colors.accent.coral}
+              />
+              <Text style={styles.statLabel}>最大コンボ</Text>
+              <Text style={styles.statValue}>{gameState?.maxCombo || 0}</Text>
+            </View>
+          )}
         </View>
 
         {/* Action Buttons */}
@@ -329,10 +425,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
           <Button
             icon="replay"
             title="もう一度"
-            onPress={() => {
-              console.log('Button onPress triggered');
-              handleRetry();
-            }}
+            onPress={handleRetry}
             variant="primary"
           />
 
@@ -344,6 +437,7 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
           />
         </View>
       </Animated.View>
+      </ScrollView>
 
       {/* New High Score Confetti Effect */}
       {isNewHighScore && (
@@ -400,10 +494,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
+  },
+  scrollView: {
+    flex: 1,
+    width: '100%',
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 120, // 広告スペースを縮小
-    paddingHorizontal: ModernDesign.spacing[4], // 左右のマージンを追加
+    paddingTop: ModernDesign.spacing[4],
+    paddingBottom: 84, // 広告スペース（アダプティブバナーの高さ + 余白）
+    paddingHorizontal: ModernDesign.spacing[4],
   },
   backgroundGradient: {
     position: 'absolute',
@@ -445,12 +547,6 @@ const styles = StyleSheet.create({
     marginBottom: ModernDesign.spacing[2],
     letterSpacing: ModernDesign.typography.letterSpacing.wide,
   },
-  subtitle: {
-    fontSize: ModernDesign.typography.fontSize.lg,
-    color: ModernDesign.colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: ModernDesign.spacing[4], // マージンをさらに縮小
-  },
   scoreSection: {
     alignItems: 'center',
     marginBottom: ModernDesign.spacing[4], // マージンをさらに縮小
@@ -464,7 +560,7 @@ const styles = StyleSheet.create({
   scoreContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: ModernDesign.spacing[4],
+    marginBottom: ModernDesign.spacing[2],
   },
   scoreValue: {
     fontSize: ModernDesign.typography.fontSize['6xl'],
@@ -506,6 +602,44 @@ const styles = StyleSheet.create({
     fontWeight: ModernDesign.typography.fontWeight.semibold,
     color: ModernDesign.colors.text.secondary,
   },
+  rankSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: ModernDesign.spacing[2],
+    marginBottom: ModernDesign.spacing[4],
+  },
+  rankText: {
+    fontSize: ModernDesign.typography.fontSize.lg,
+    fontWeight: ModernDesign.typography.fontWeight.bold,
+    color: ModernDesign.colors.accent.gold,
+  },
+  rankSubText: {
+    fontSize: ModernDesign.typography.fontSize.sm,
+    fontWeight: ModernDesign.typography.fontWeight.medium,
+    color: ModernDesign.colors.text.secondary,
+  },
+  breakdownSection: {
+    width: '100%',
+    paddingVertical: ModernDesign.spacing[2],
+    paddingHorizontal: ModernDesign.spacing[4],
+    marginBottom: ModernDesign.spacing[4],
+    borderRadius: ModernDesign.borderRadius.lg,
+    backgroundColor: ModernDesign.colors.background.secondary,
+  },
+  breakdownRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 2,
+  },
+  breakdownLabel: {
+    fontSize: ModernDesign.typography.fontSize.sm,
+    color: ModernDesign.colors.text.secondary,
+  },
+  breakdownValue: {
+    fontSize: ModernDesign.typography.fontSize.sm,
+    fontWeight: ModernDesign.typography.fontWeight.semibold,
+    color: ModernDesign.colors.text.primary,
+  },
   statsSection: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -538,9 +672,14 @@ const styles = StyleSheet.create({
     borderRadius: ModernDesign.borderRadius.full,
     paddingHorizontal: ModernDesign.spacing[3],
     paddingVertical: ModernDesign.spacing[1],
-    marginTop: ModernDesign.spacing[2],
-    marginBottom: ModernDesign.spacing[3], // 新記録バッジとの間隔を広げる
     borderWidth: 1,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: ModernDesign.spacing[3],
   },
   difficultyText: {
     fontSize: ModernDesign.typography.fontSize.sm,

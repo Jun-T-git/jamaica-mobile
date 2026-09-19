@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -13,7 +13,9 @@ import { ModernDesign } from '../../constants';
 import { useGameStore } from '../../store/gameStore';
 import { GameMode, Operator } from '../../types';
 import { Dialog } from '../molecules/Dialog';
+import { ComboIndicator } from '../molecules/ComboIndicator';
 import { soundManager, SoundType } from '../../utils/SoundManager';
+import { hapticService } from '../../services/hapticService';
 
 interface GameBoardProps {
   gameInfo: {
@@ -42,6 +44,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     canUndo,
     skipProblem,
     gameState,
+    wrongAnswerCount,
   } = useGameStore();
 
   const [grid, setGrid] = useState<(GridNode | null)[][]>([]);
@@ -56,6 +59,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const [animatedValue] = useState(new Animated.Value(0));
   const [showSkipDialog, setShowSkipDialog] = useState(false);
   const [skipMessage, setSkipMessage] = useState('');
+  const [shakeAnim] = useState(new Animated.Value(0));
+  const [showWrongAnswer, setShowWrongAnswer] = useState(false);
+  const lastWrongAnswerCount = useRef(wrongAnswerCount);
 
   // Update dimensions on screen resize
   useEffect(() => {
@@ -88,6 +94,31 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       animatedValue.setValue(0);
     }
   }, [firstNode, animatedValue]);
+
+  // 不正解: 盤面を揺らしてメッセージを表示
+  useEffect(() => {
+    if (wrongAnswerCount === lastWrongAnswerCount.current) return;
+    lastWrongAnswerCount.current = wrongAnswerCount;
+
+    setShowWrongAnswer(true);
+    shakeAnim.setValue(0);
+    Animated.sequence(
+      [1, -1, 0.6, -0.6, 0].map(toValue =>
+        Animated.timing(shakeAnim, {
+          toValue,
+          duration: 60,
+          useNativeDriver: true,
+        }),
+      ),
+    ).start();
+  }, [wrongAnswerCount, shakeAnim]);
+
+  // 戻す・スキップ・次の問題で盤面が変わったら不正解表示を消す
+  useEffect(() => {
+    if (nodes.filter(n => !n.isUsed).length !== 1) {
+      setShowWrongAnswer(false);
+    }
+  }, [nodes]);
 
   // Find valid position for calculated node
   const findValidPosition = (
@@ -256,6 +287,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
     // ノードタップ時は特別な効果音（TAP）を使用
     soundManager.play(SoundType.TAP);
+    hapticService.selection();
 
     if (!firstNode) {
       setFirstNode(node);
@@ -275,6 +307,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
     // 演算子ボタンタップ時は特別な効果音（TAP）を使用
     soundManager.play(SoundType.TAP);
+    hapticService.selection();
 
     if (selectedOperator === operator) {
       setSelectedOperator(null);
@@ -295,6 +328,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
     if (!node.isActive) {
       style.push(styles.inactiveCell);
+    } else if (showWrongAnswer) {
+      style.push(styles.wrongCell);
     } else if (firstNode?.nodeId === node.nodeId) {
       style.push(styles.selectedCell);
     } else if (firstNode && selectedOperator) {
@@ -442,14 +477,30 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         <View style={styles.targetContainer}>
           <Text style={styles.targetLabel}>つくる数</Text>
           <Text style={styles.targetNumber}>{gameInfo.target}</Text>
+          {gameState?.mode === GameMode.CHALLENGE && (
+            <ComboIndicator
+              combo={gameState.currentCombo}
+              expiresAt={gameState.comboExpiresAt}
+            />
+          )}
         </View>
 
         {/* Main Game Grid */}
         <View style={styles.gridWrapper}>
-          <View
+          <Animated.View
             style={[
               styles.gridInner,
               { width: gridContainerWidth, height: gridContainerHeight },
+              {
+                transform: [
+                  {
+                    translateX: shakeAnim.interpolate({
+                      inputRange: [-1, 1],
+                      outputRange: [-10, 10],
+                    }),
+                  },
+                ],
+              },
             ]}
           >
             {/* SVG overlay for edges */}
@@ -508,8 +559,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                     disabled={!node.isActive || disabled}
                   >
                     <Text
+                      adjustsFontSizeToFit
+                      numberOfLines={1}
+                      minimumFontScale={0.5}
                       style={[
                         styles.cellText,
+                        { width: actualNodeSize - 12 },
                         !node.isActive && styles.inactiveCellText,
                         disabled && styles.disabledCellText,
                         firstNode?.nodeId === node.nodeId &&
@@ -522,12 +577,24 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 );
               }),
             )}
-          </View>
+          </Animated.View>
         </View>
 
         {/* Current State Indicator - Visual only */}
         <View style={styles.stateIndicator}>
-          {firstNode && (
+          {showWrongAnswer && (
+            <View style={styles.wrongAnswerDisplay}>
+              <MaterialIcons
+                name="undo"
+                size={18}
+                color={ModernDesign.colors.error}
+              />
+              <Text style={styles.wrongAnswerText}>
+                つくる数とちがいます。戻してやり直そう
+              </Text>
+            </View>
+          )}
+          {firstNode && !showWrongAnswer && (
             <Animated.View
               style={[
                 styles.selectionDisplay,
@@ -581,6 +648,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               style={[
                 styles.iconButton,
                 (!canUndo() || disabled) && styles.disabledIconButton,
+                showWrongAnswer && styles.highlightedIconButton,
               ]}
               onPress={() => {
                 // Undoボタンタップ時は特別な効果音（TAP）を使用
@@ -744,7 +812,12 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderStyle: 'dashed' as 'dashed',
   },
+  wrongCell: {
+    backgroundColor: ModernDesign.colors.background.tertiary,
+    borderColor: ModernDesign.colors.error,
+  },
   cellText: {
+    textAlign: 'center',
     fontSize: ModernDesign.typography.fontSize.xl,
     fontWeight: ModernDesign.typography.fontWeight.bold,
     color: ModernDesign.colors.text.primary,
@@ -846,6 +919,26 @@ const styles = StyleSheet.create({
   },
   disabledIconButton: {
     opacity: 0.3,
+  },
+  highlightedIconButton: {
+    borderWidth: 2,
+    borderColor: ModernDesign.colors.error,
+  },
+  wrongAnswerDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: ModernDesign.spacing[2],
+    paddingHorizontal: ModernDesign.spacing[4],
+    paddingVertical: ModernDesign.spacing[2],
+    borderRadius: ModernDesign.borderRadius.full,
+    borderWidth: 1,
+    borderColor: ModernDesign.colors.error,
+    backgroundColor: ModernDesign.colors.glass.background,
+  },
+  wrongAnswerText: {
+    fontSize: ModernDesign.typography.fontSize.sm,
+    fontWeight: ModernDesign.typography.fontWeight.semibold,
+    color: ModernDesign.colors.error,
   },
   skipButton: {
     position: 'relative',

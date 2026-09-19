@@ -1,15 +1,19 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { soundManager } from '../utils/SoundManager';
+import { hapticService } from '../services/hapticService';
 import { userService } from '../services/userService';
 import { rankingService } from '../services/rankingService';
 
 interface SettingsStore {
   soundEnabled: boolean;
+  hapticsEnabled: boolean;
   displayName: string;
   isDisplayNameSet: boolean;
   toggleSound: () => Promise<void>;
   loadSoundSetting: () => Promise<void>;
+  toggleHaptics: () => Promise<void>;
+  loadHapticsSetting: () => Promise<void>;
   setDisplayName: (name: string) => Promise<boolean>;
   updateDisplayNameWithFirebase: (name: string) => Promise<boolean>;
   loadDisplayName: () => Promise<void>;
@@ -18,6 +22,7 @@ interface SettingsStore {
 
 export const useSettingsStore = create<SettingsStore>((set, _get) => ({
   soundEnabled: true,
+  hapticsEnabled: true,
   displayName: '',
   isDisplayNameSet: false,
   
@@ -43,6 +48,31 @@ export const useSettingsStore = create<SettingsStore>((set, _get) => ({
       }
     } catch (error) {
       console.warn('Failed to load sound setting:', error);
+    }
+  },
+
+  toggleHaptics: async () => {
+    const newState = !hapticService.getEnabled();
+    hapticService.setEnabled(newState);
+    set({ hapticsEnabled: newState });
+
+    try {
+      await AsyncStorage.setItem('@haptics_enabled', JSON.stringify(newState));
+    } catch (error) {
+      console.warn('Failed to save haptics setting:', error);
+    }
+  },
+
+  loadHapticsSetting: async () => {
+    try {
+      const saved = await AsyncStorage.getItem('@haptics_enabled');
+      if (saved !== null) {
+        const enabled = JSON.parse(saved);
+        hapticService.setEnabled(enabled);
+        set({ hapticsEnabled: enabled });
+      }
+    } catch (error) {
+      console.warn('Failed to load haptics setting:', error);
     }
   },
 
@@ -80,14 +110,16 @@ export const useSettingsStore = create<SettingsStore>((set, _get) => ({
         AsyncStorage.getItem('@display_name_set'),
       ]);
 
-      if (savedName && isSet === 'true') {
+      if (savedName) {
         set({
           displayName: savedName,
-          isDisplayNameSet: true,
+          isDisplayNameSet: isSet === 'true',
         });
       } else {
         // 初回ユーザーの場合はデフォルト名を生成
+        // 読み込みのたびに名前が変わらないよう保存しておく（ランキングの表示名に使われる）
         const defaultName = userService.generateDefaultDisplayName();
+        await AsyncStorage.setItem('@display_name', defaultName);
         set({
           displayName: defaultName,
           isDisplayNameSet: false,

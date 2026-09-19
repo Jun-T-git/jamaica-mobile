@@ -20,6 +20,7 @@
 		DE4461672E3CFB79004C598A /* countdown.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DE4461652E3CFB79004C598A /* countdown.mp3 */; };
 		DE4461682E3CFB79004C598A /* start.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DE4461662E3CFB79004C598A /* start.mp3 */; };
 		DE4461692E3CFB79004C598A /* button.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DE4461642E3CFB79004C598A /* button.mp3 */; };
+		DE44616B2E3CFB79004C598A /* wrong.wav in Resources */ = {isa = PBXBuildFile; fileRef = DE44616A2E3CFB79004C598A /* wrong.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		DE4461642E3CFB79004C598A /* button.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = button.mp3; sourceTree = "<group>"; };
 		DE4461652E3CFB79004C598A /* countdown.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = countdown.mp3; sourceTree = "<group>"; };
 		DE4461662E3CFB79004C598A /* start.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start.mp3; sourceTree = "<group>"; };
+		DE44616A2E3CFB79004C598A /* wrong.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = wrong.wav; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -96,6 +98,7 @@
 				DE4461662E3CFB79004C598A /* start.mp3 */,
 				DE44615F2E3CCF59004C598A /* success.mp3 */,
 				DE4461602E3CCF59004C598A /* tap.mp3 */,
+				DE44616A2E3CFB79004C598A /* wrong.wav */,
 				13B07FAE1A68108700A75B9A /* ModernJamaica */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -197,6 +200,7 @@
 				DE4461612E3CCF59004C598A /* success.mp3 in Resources */,
 				DE4461622E3CCF59004C598A /* connect.mp3 in Resources */,
 				DE4461632E3CCF59004C598A /* tap.mp3 in Resources */,
+				DE44616B2E3CFB79004C598A /* wrong.wav in Resources */,
 				DE01C4852E3F54330086064B /* GoogleService-Info-Prod.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

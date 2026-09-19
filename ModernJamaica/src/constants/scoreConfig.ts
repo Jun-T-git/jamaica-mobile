@@ -15,6 +15,7 @@ export const SCORE_CONFIG = {
   // 難易度ボーナス設定
   DIFFICULTY_THRESHOLD: 20,        // 難易度計算の基準値
   DIFFICULTY_MULTIPLIER: 10,       // 難易度ボーナス倍率
+  DIFFICULTY_BONUS_MAX: 1000,      // 難易度ボーナスの上限（目標値の運でスコアが決まらないようにする）
   
   // 連続正解コンボ設定
   COMBO_TIME_LIMIT: 15000,         // コンボ継続制限時間（ミリ秒）
@@ -40,3 +41,18 @@ export interface ProblemResult {
   isCorrect: boolean;             // 正解フラグ
   timestamp: number;              // 正解時刻
 }
+
+// 1問ごとのスコア内訳
+export interface ScoreBreakdown {
+  base: number;                   // 基本スコア
+  time: number;                   // 時間ボーナス
+  target: number;                 // 目標値ボーナス
+  combo: number;                  // コンボボーナス
+}
+
+export const EMPTY_SCORE_BREAKDOWN: ScoreBreakdown = {
+  base: 0,
+  time: 0,
+  target: 0,
+  combo: 0,
+};

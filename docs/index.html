@@ -168,8 +168,14 @@
           チャレンジモードのハイスコアを表示名（ニックネーム）と共にサーバーに送信・保存します（任意）
         </li>
         <li>
-          <strong>デバイス識別子：</strong>
-          ランキング機能のため、匿名化されたデバイスIDを生成・使用します
+          <strong>匿名ユーザーID：</strong>
+          ランキング機能のため、Firebase
+          Authenticationの匿名認証により、個人を特定しないIDを発行・使用します（氏名・メールアドレス等の登録は不要です）
+        </li>
+        <li>
+          <strong>利用状況データ：</strong>
+          アプリの改善のため、Firebase向けGoogle
+          アナリティクスにより、画面の表示やゲームの開始・終了、正解数などの匿名の利用状況を収集します。広告識別子（IDFA）とは連携せず、個人を特定する目的では使用しません
         </li>
         <li>
           <strong>広告識別子：</strong> Google
@@ -226,7 +232,7 @@
         </li>
         <li>
           <strong>Firebase (Google)：</strong>
-          ランキング機能のデータ保存のため（プライバシーポリシー:
+          ランキング機能のデータ保存・匿名認証、および匿名の利用状況の分析のため（プライバシーポリシー:
           <a href="https://firebase.google.com/support/privacy" target="_blank"
             >https://firebase.google.com/support/privacy</a
           >）
@@ -277,7 +283,7 @@
       </div>
 
       <div class="footer">
-        <p>最終更新日: 2025年8月5日</p>
+        <p>最終更新日: 2026年9月19日</p>
         <p>&copy; 2025 Jun Teraoka. All rights reserved.</p>
       </div>
     </div>

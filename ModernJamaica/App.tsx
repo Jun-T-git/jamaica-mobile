@@ -1,5 +1,8 @@
-import React, { useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect, useRef } from 'react';
+import {
+  NavigationContainer,
+  useNavigationContainerRef,
+} from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import mobileAds, { MaxAdContentRating } from 'react-native-google-mobile-ads';
 import {
@@ -16,6 +19,8 @@ import { RankingScreen } from './src/screens/RankingScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { useSettingsStore } from './src/store/settingsStore';
+import { analyticsService } from './src/services/analyticsService';
+import { userService } from './src/services/userService';
 import { GameMode, DifficultyLevel } from './src/types';
 
 type RootStackParamList = {
@@ -38,7 +43,18 @@ type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 function App() {
-  const { loadSoundSetting } = useSettingsStore();
+  const { loadSoundSetting, loadHapticsSetting } = useSettingsStore();
+  const navigationRef = useNavigationContainerRef<RootStackParamList>();
+  const currentRouteName = useRef<string | undefined>(undefined);
+
+  // 画面遷移をAnalyticsに記録
+  const trackScreenView = () => {
+    const routeName = navigationRef.getCurrentRoute()?.name;
+    if (routeName && routeName !== currentRouteName.current) {
+      currentRouteName.current = routeName;
+      analyticsService.logScreen(routeName);
+    }
+  };
 
   useEffect(() => {
     // AdMob SDKの初期化
@@ -57,14 +73,24 @@ function App() {
         console.error('AdMob SDK initialization error:', error);
       });
 
-    // 音声設定の読み込み
+    // 音声・振動設定の読み込み
     loadSoundSetting();
-  }, [loadSoundSetting]);
+    loadHapticsSetting();
+
+    // ランキング用の匿名認証を先に済ませておく（失敗してもランキング利用時に再試行される）
+    userService.getAuthUserId().catch(error => {
+      console.warn('Anonymous sign-in failed:', error);
+    });
+  }, [loadSoundSetting, loadHapticsSetting]);
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <ErrorBoundary>
-        <NavigationContainer>
+        <NavigationContainer
+          ref={navigationRef}
+          onReady={trackScreenView}
+          onStateChange={trackScreenView}
+        >
           <Stack.Navigator
             initialRouteName="Splash"
             screenOptions={{

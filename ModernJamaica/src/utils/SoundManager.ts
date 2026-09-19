@@ -4,6 +4,7 @@ export enum SoundType {
   TAP = 'tap',           // ゲーム内操作音（ノード、演算子など）
   CONNECT = 'connect', 
   CORRECT = 'correct',
+  WRONG = 'wrong',
   COUNTDOWN = 'countdown',
   START = 'start',
   BUTTON = 'button',     // 一般的なボタン操作音（メニュー、設定など）
@@ -14,6 +15,7 @@ class SoundManager {
     [SoundType.TAP]: null,
     [SoundType.CONNECT]: null,
     [SoundType.CORRECT]: null,
+    [SoundType.WRONG]: null,
     [SoundType.COUNTDOWN]: null,
     [SoundType.START]: null,
     [SoundType.BUTTON]: null,
@@ -24,7 +26,8 @@ class SoundManager {
   
   constructor() {
     try {
-      Sound.setCategory('Playback');
+      // Ambient: マナーモード（消音スイッチ）に従い、再生中の音楽やPodcastを止めない
+      Sound.setCategory('Ambient');
       this.initializeSounds();
     } catch (error) {
       console.warn('Failed to initialize SoundManager:', error);
@@ -50,6 +53,13 @@ class SoundManager {
       if (error) {
         console.warn('Failed to load correct sound:', error);
         this.sounds[SoundType.CORRECT] = null;
+      }
+    });
+    
+    this.sounds[SoundType.WRONG] = new Sound('wrong.wav', Sound.MAIN_BUNDLE, (error) => {
+      if (error) {
+        console.warn('Failed to load wrong sound:', error);
+        this.sounds[SoundType.WRONG] = null;
       }
     });
     

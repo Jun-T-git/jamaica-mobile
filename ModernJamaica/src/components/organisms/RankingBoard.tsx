@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { Typography } from '../atoms/Typography';
 import { RankingEntry } from '../molecules/RankingEntry';
-import { RankingEntry as RankingEntryType } from '../../types/ranking';
+import { RankingEntry as RankingEntryType, UserRankInfo } from '../../types/ranking';
 import { GameMode, DifficultyLevel } from '../../types';
 import { rankingService } from '../../services/rankingService';
 import { ModernDesign } from '../../design/modernDesignSystem';
@@ -22,6 +22,7 @@ export const RankingBoard: React.FC<RankingBoardProps> = ({
   selectedDifficulty = DifficultyLevel.NORMAL,
 }) => {
   const [rankings, setRankings] = useState<RankingEntryType[]>([]);
+  const [userRank, setUserRank] = useState<UserRankInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,13 +33,17 @@ export const RankingBoard: React.FC<RankingBoardProps> = ({
       }
       setError(null);
 
-      const rankingData = await rankingService.getRanking({
-        mode,
-        difficulty: selectedDifficulty,
-        limit: 10,
-      });
+      const [rankingData, userRankData] = await Promise.all([
+        rankingService.getRanking({
+          mode,
+          difficulty: selectedDifficulty,
+          limit: 10,
+        }),
+        rankingService.getUserRank(mode, selectedDifficulty),
+      ]);
 
       setRankings(rankingData);
+      setUserRank(userRankData);
     } catch (err) {
       console.error('Failed to load ranking data:', err);
       setError('ランキングの読み込みに失敗しました');
@@ -111,6 +116,25 @@ export const RankingBoard: React.FC<RankingBoardProps> = ({
               ))}
             </View>
           )}
+
+          {/* 自分の順位（トップ10圏外でも分かるように表示） */}
+          <View style={styles.userRankContainer}>
+            <Typography variant="body2" style={styles.userRankLabel}>
+              あなたの順位
+            </Typography>
+            {userRank?.rank ? (
+              <Typography variant="body1" style={styles.userRankValue}>
+                {userRank.rank.toLocaleString()}位
+                <Typography variant="caption" style={styles.userRankTotal}>
+                  {' '}/ {userRank.totalUsers.toLocaleString()}人
+                </Typography>
+              </Typography>
+            ) : (
+              <Typography variant="caption" style={styles.userRankTotal}>
+                チャレンジモードで記録を出すと表示されます
+              </Typography>
+            )}
+          </View>
         </>
       )}
     </View>
@@ -118,6 +142,29 @@ export const RankingBoard: React.FC<RankingBoardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  userRankContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: ModernDesign.spacing[3],
+    paddingVertical: ModernDesign.spacing[3],
+    paddingHorizontal: ModernDesign.spacing[4],
+    borderRadius: ModernDesign.borderRadius.lg,
+    borderWidth: 1,
+    borderColor: ModernDesign.colors.accent.neon,
+    backgroundColor: ModernDesign.colors.background.secondary,
+  },
+  userRankLabel: {
+    color: ModernDesign.colors.text.secondary,
+    fontWeight: ModernDesign.typography.fontWeight.medium,
+  },
+  userRankValue: {
+    color: ModernDesign.colors.accent.neon,
+    fontWeight: ModernDesign.typography.fontWeight.bold,
+  },
+  userRankTotal: {
+    color: ModernDesign.colors.text.tertiary,
+  },
   container: {
     // minHeightを削除して自然なサイズに
   },

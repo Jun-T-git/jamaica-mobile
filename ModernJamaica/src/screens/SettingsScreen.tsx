@@ -29,6 +29,9 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     loadDisplayName,
     soundEnabled,
     toggleSound,
+    hapticsEnabled,
+    toggleHaptics,
+    loadHapticsSetting,
   } = useSettingsStore();
   const [editingName, setEditingName] = useState(false);
   const [newDisplayName, setNewDisplayName] = useState('');
@@ -36,7 +39,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
   useEffect(() => {
     loadDisplayName();
-  }, [loadDisplayName]);
+    loadHapticsSetting();
+  }, [loadDisplayName, loadHapticsSetting]);
 
   useEffect(() => {
     setNewDisplayName(displayName);
@@ -85,6 +89,29 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     soundManager.play(SoundType.BUTTON);
     toggleSound();
   };
+
+  const handleHapticsToggle = () => {
+    soundManager.play(SoundType.BUTTON);
+    toggleHaptics();
+  };
+
+  const renderSwitch = (enabled: boolean) => (
+    <View style={styles.switchContainer}>
+      <View
+        style={[
+          styles.switchTrack,
+          enabled ? styles.switchTrackOn : styles.switchTrackOff,
+        ]}
+      >
+        <View
+          style={[
+            styles.switchThumb,
+            enabled ? styles.switchThumbOn : styles.switchThumbOff,
+          ]}
+        />
+      </View>
+    </View>
+  );
 
   // 設定項目の種類を定義
   type SettingItemType = 'editable' | 'readonly' | 'toggle';
@@ -284,22 +311,17 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
             soundEnabled ? 'volume-up' : 'volume-off',
             '効果音',
             'ボタンのタップ音、ゲーム中のサウンドエフェクト、成功時の効果音などをオン・オフできます。',
-            <View style={styles.switchContainer}>
-              <View
-                style={[
-                  styles.switchTrack,
-                  soundEnabled ? styles.switchTrackOn : styles.switchTrackOff,
-                ]}
-              >
-                <View
-                  style={[
-                    styles.switchThumb,
-                    soundEnabled ? styles.switchThumbOn : styles.switchThumbOff,
-                  ]}
-                />
-              </View>
-            </View>,
+            renderSwitch(soundEnabled),
             handleSoundToggle,
+            'toggle',
+          )}
+
+          {renderSettingRow(
+            'vibration',
+            '振動',
+            'タップや正解・不正解のときの振動をオン・オフできます。',
+            renderSwitch(hapticsEnabled),
+            handleHapticsToggle,
             'toggle',
           )}
         </View>
