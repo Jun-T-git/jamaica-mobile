@@ -53,6 +53,7 @@ export interface UnifiedGameState {
   skipCount: number;       // 残りスキップ回数（無限モードでは999）
   currentCombo: number;    // 現在のコンボ数（無限モードでは0）
   lastProblemScore: number; // 直前の問題のスコア（無限モードでは0）
+  lastTimeBonus: number;    // 直前の正解で得た時間ボーナス（秒。無限モードでは0）
   comboExpiresAt: number;  // この時刻（ミリ秒）までに次を正解するとコンボ継続
   maxCombo: number;        // ゲーム中の最大コンボ数
   scoreBreakdown: ScoreBreakdown; // 獲得スコアの内訳（累計）

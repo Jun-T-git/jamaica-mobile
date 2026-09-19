@@ -10,6 +10,7 @@ import { RankingEntry } from '../molecules/RankingEntry';
 import { RankingEntry as RankingEntryType, UserRankInfo } from '../../types/ranking';
 import { GameMode, DifficultyLevel } from '../../types';
 import { rankingService } from '../../services/rankingService';
+import { RANKING_CONFIG } from '../../config/ranking';
 import { ModernDesign } from '../../design/modernDesignSystem';
 
 interface RankingBoardProps {
@@ -37,7 +38,8 @@ export const RankingBoard: React.FC<RankingBoardProps> = ({
         rankingService.getRanking({
           mode,
           difficulty: selectedDifficulty,
-          limit: 10,
+          // 集計期間かどうかを取得件数で判定するため、公開に必要な人数までは取得する
+          limit: Math.max(RANKING_CONFIG.TOP_LIMIT, RANKING_CONFIG.MIN_PARTICIPANTS),
         }),
         rankingService.getUserRank(mode, selectedDifficulty),
       ]);
@@ -56,13 +58,18 @@ export const RankingBoard: React.FC<RankingBoardProps> = ({
     loadRankingData();
   }, [selectedDifficulty, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const renderEmptyState = () => (
+  // 参加者が集まるまでは集計期間として順位を公開しない
+  const isTallying = rankings.length < RANKING_CONFIG.MIN_PARTICIPANTS;
+
+  const renderTallyingState = () => (
     <View style={styles.emptyContainer}>
       <Typography variant="body1" style={styles.emptyText}>
-        まだランキングがありません
+        ただいま集計期間中です
       </Typography>
       <Typography variant="caption" style={styles.emptySubtext}>
-        最初のプレイヤーになりましょう！
+        ランキングをリニューアルしました。{'\n'}
+        参加者が集まりしだい公開します。{'\n'}
+        チャレンジモードで記録を出してエントリーしよう！
       </Typography>
     </View>
   );
@@ -103,11 +110,11 @@ export const RankingBoard: React.FC<RankingBoardProps> = ({
         </View>
       ) : (
         <>
-          {rankings.length === 0 ? (
-            renderEmptyState()
+          {isTallying ? (
+            renderTallyingState()
           ) : (
             <View style={styles.rankingsContainer}>
-              {rankings.map((entry) => (
+              {rankings.slice(0, RANKING_CONFIG.TOP_LIMIT).map((entry) => (
                 <RankingEntry
                   key={`${entry.userId}-${entry.rank}`}
                   entry={entry}
@@ -122,7 +129,11 @@ export const RankingBoard: React.FC<RankingBoardProps> = ({
             <Typography variant="body2" style={styles.userRankLabel}>
               あなたの順位
             </Typography>
-            {userRank?.rank ? (
+            {userRank?.rank && isTallying ? (
+              <Typography variant="caption" style={styles.userRankTotal}>
+                エントリー済み（集計中）
+              </Typography>
+            ) : userRank?.rank ? (
               <Typography variant="body1" style={styles.userRankValue}>
                 {userRank.rank.toLocaleString()}位
                 <Typography variant="caption" style={styles.userRankTotal}>

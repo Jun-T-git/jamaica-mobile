@@ -28,7 +28,7 @@ src/
 │   └── ErrorBoundary.tsx
 ├── screens/             # 画面（8 つ）
 ├── store/               # Zustand ストア（gameStore, settingsStore）
-├── utils/               # コアロジック（problemGenerator, scoreCalculator, SoundManager, gameUtils, storage）
+├── utils/               # コアロジック（problemGenerator, scoreCalculator, timeBonus, SoundManager, gameUtils, storage）
 ├── services/            # 外部連携（rankingService, userService, adService）
 ├── config/              # モード/難易度/ダイアログ設定（gameMode, difficulty, dialogs, index）
 ├── constants/           # scoreConfig ほか（一部 legacy → CONVENTIONS.md の技術的負債参照）
@@ -78,6 +78,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 - `utils/problemGenerator.ts` … 解ける問題の生成
 - `store/gameStore.ts connectNodes` … ノード結合と正解判定
 - `utils/scoreCalculator.ts` … スコア・コンボ計算
+- `utils/timeBonus.ts` … チャレンジの時間ボーナス（正解のたびに逓減）
 - `components/organisms/GameBoard.tsx` … 盤面 UI（タップで結合、SVG でエッジ描画）
 
 ## 外部サービス
@@ -92,6 +93,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 | サウンド | `utils/SoundManager.ts` | 効果音のプリロード・再生（`Ambient` カテゴリ） | react-native-sound |
 
 - Firestore のセキュリティルールは `firestore.rules`（リポジトリ内。ルートの `firebase.json` から参照され `firebase deploy --only firestore:rules` でデプロイ）。本人（匿名認証 UID）だけが自分のドキュメントを書き込める。経緯は [decisions/0004-ranking-v2-anonymous-auth.md](./decisions/0004-ranking-v2-anonymous-auth.md)。
+- **ランキングの集計期間**（`config/ranking.ts`）: 参加者が `MIN_PARTICIPANTS` 人に達するまでは、その難易度のランキングを「集計期間」として順位・人数を公開しない（`RankingBoard` は集計中の案内、リザルトは「エントリーしました」を出す）。ランキング V2 は空から始まるため、「1位 / 1人」のような過疎に見える表示を避ける。スコアの送信は集計期間中も通常どおり行う。
 - 外部サービス（ランキング・認証・計測・広告）の失敗や遅延で**ゲーム進行を止めない**。スコア送信はリザルト画面への遷移の後ろで行う。
 
 ## 永続化キー

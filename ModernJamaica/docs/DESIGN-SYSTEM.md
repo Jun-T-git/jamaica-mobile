@@ -59,4 +59,4 @@ UI は atoms → molecules → organisms の 3 層（[ARCHITECTURE.md](./ARCHITE
 - 汎用の duration / easing は `ModernDesign.animation`。
 
 ---
-このファイルが説明する主なコード: `src/design/modernDesignSystem.ts`（+ `config/difficulty.ts` の theme）
+このファイルが説明する主なコード: `src/design/modernDesignSystem.ts`（+ `config/difficulty.ts` の theme）。`config/difficulty.ts` の theme 以外（数字・目標値の範囲、時間ボーナスなど）は [GAME-CORE.md](./GAME-CORE.md) が担当。

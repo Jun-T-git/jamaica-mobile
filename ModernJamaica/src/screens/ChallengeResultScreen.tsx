@@ -15,6 +15,7 @@ import { Button } from '../components/atoms/Button';
 import { BannerAdView } from '../components/molecules/BannerAdView';
 import { getDifficultyConfig } from '../config/difficulty';
 import { getGameModeConfig } from '../config/gameMode';
+import { RANKING_CONFIG } from '../config/ranking';
 import { COLORS, ModernDesign } from '../constants';
 import { adService } from '../services/adService';
 import { rankingService } from '../services/rankingService';
@@ -216,11 +217,13 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
         ].filter(row => row.value > 0)
       : [];
 
+  // 参加者が集まるまでは集計期間として順位を公開しない（「1位 / 1人」のような表示を避ける）
+  const isRankingTallying =
+    !!rankInfo?.rank && rankInfo.totalUsers < RANKING_CONFIG.MIN_PARTICIPANTS;
+
   // 上位◯%（1位でも0%にならないよう切り上げ）
-  // 参加者が少ないうちは「1人中 上位100%」のようになるため表示しない
-  const MIN_USERS_FOR_PERCENT = 10;
   const topPercent =
-    rankInfo?.rank && rankInfo.totalUsers >= MIN_USERS_FOR_PERCENT
+    rankInfo?.rank && !isRankingTallying
       ? Math.max(1, Math.ceil((rankInfo.rank / rankInfo.totalUsers) * 100))
       : null;
 
@@ -357,13 +360,20 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
               size={20}
               color={ModernDesign.colors.accent.gold}
             />
-            <Text style={styles.rankText}>
-              全国 {rankInfo.rank.toLocaleString()}位
-              <Text style={styles.rankSubText}>
-                {' '}/ {rankInfo.totalUsers.toLocaleString()}人
-                {topPercent !== null && `（上位${topPercent}%）`}
+            {isRankingTallying ? (
+              <Text style={styles.rankText}>
+                ランキングにエントリーしました
+                <Text style={styles.rankSubText}>（集計期間中）</Text>
               </Text>
-            </Text>
+            ) : (
+              <Text style={styles.rankText}>
+                全国 {rankInfo.rank.toLocaleString()}位
+                <Text style={styles.rankSubText}>
+                  {' '}/ {rankInfo.totalUsers.toLocaleString()}人
+                  {topPercent !== null && `（上位${topPercent}%）`}
+                </Text>
+              </Text>
+            )}
           </View>
         )}
 

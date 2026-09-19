@@ -19,9 +19,16 @@ export interface DifficultyConfig {
     maxPercentile: number;
     minCount: number; // これ未満の解しかない目標値は出題しない
   };
+  /**
+   * 時間設定（チャレンジモード）
+   * 正解ボーナスは正解のたびに減り、bonusMin で下げ止まる（計算は utils/timeBonus.ts）。
+   * 上級者でも 1 ゲーム約 3 分で終わるよう、bonusMin は人が 1 問を解ける時間よりずっと短くすること
+   */
   time: {
-    initial: number;  // 初期時間（秒）
-    bonus: number;    // 正解ボーナス（秒）
+    initial: number;         // 初期時間（秒）
+    bonus: number;           // 最初の正解ボーナス（秒）
+    bonusDecayStep: number;  // 正解のたびにボーナスから減らす秒数
+    bonusMin: number;        // ボーナスの下限（秒）
   };
   label: {
     ja: string;       // 日本語表示名
@@ -47,8 +54,10 @@ export const DIFFICULTY_CONFIG: Record<DifficultyLevel, DifficultyConfig> = {
     targetRange: { min: 10, max: 30 },
     solutionBand: { minPercentile: 0.5, maxPercentile: 1.0, minCount: 60 },
     time: { 
-      initial: 120,  // 2分
-      bonus: 20      // +20秒
+      initial: 120,       // 2分
+      bonus: 10,          // +10秒から始まり
+      bonusDecayStep: 2,  // 正解のたびに -2秒
+      bonusMin: 1         // +1秒で下げ止まる
     },
     label: {
       ja: 'かんたん',
@@ -69,8 +78,10 @@ export const DIFFICULTY_CONFIG: Record<DifficultyLevel, DifficultyConfig> = {
     targetRange: { min: 11, max: 66 },  // 本家ジャマイカと同じ範囲
     solutionBand: { minPercentile: 0.25, maxPercentile: 0.75, minCount: 20 },
     time: { 
-      initial: 90,   // 1分30秒
-      bonus: 15      // +15秒
+      initial: 90,        // 1分30秒
+      bonus: 15,          // +15秒から始まり
+      bonusDecayStep: 2,  // 正解のたびに -2秒
+      bonusMin: 1         // +1秒で下げ止まる
     },
     label: {
       ja: 'ふつう',
@@ -91,8 +102,10 @@ export const DIFFICULTY_CONFIG: Record<DifficultyLevel, DifficultyConfig> = {
     targetRange: { min: 20, max: 99 },
     solutionBand: { minPercentile: 0.1, maxPercentile: 0.5, minCount: 8 },
     time: { 
-      initial: 90,   // 1分30秒
-      bonus: 20      // +20秒
+      initial: 60,        // 1分
+      bonus: 20,          // +20秒から始まり
+      bonusDecayStep: 3,  // 正解のたびに -3秒
+      bonusMin: 1         // +1秒で下げ止まる
     },
     label: {
       ja: 'むずかしい',

@@ -5,6 +5,7 @@ import { getGameModeConfig } from '../config';
 import { getDifficultyConfig, DEFAULT_DIFFICULTY } from '../config/difficulty';
 import { saveHighScoreWithDifficulty, loadAllHighScoresWithDifficulty } from '../utils/storage';
 import { ComboTracker, calculateScoreBreakdown, calculateFinalBonus } from '../utils/scoreCalculator';
+import { calculateTimeBonus } from '../utils/timeBonus';
 import { ProblemResult, EMPTY_SCORE_BREAKDOWN, SCORE_CONFIG } from '../constants/scoreConfig';
 import { analyticsService } from '../services/analyticsService';
 import { hapticService } from '../services/hapticService';
@@ -80,6 +81,7 @@ const createInitialGameState = (mode: GameMode, difficulty: DifficultyLevel = DE
     skipCount: mode === GameMode.CHALLENGE ? modeConfig.gameplay.skipLimit : 999,
     currentCombo: 0,
     lastProblemScore: 0,
+    lastTimeBonus: 0,
     comboExpiresAt: 0,
     maxCombo: 0,
     scoreBreakdown: { ...EMPTY_SCORE_BREAKDOWN },
@@ -333,8 +335,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const breakdown = calculateScoreBreakdown(problemResult, currentCombo);
           const problemScore = breakdown.base + breakdown.time + breakdown.target + breakdown.combo;
           
-          // 難易度に応じたボーナス時間を使用
-          const bonusTime = difficultyConfig.time.bonus;
+          // 時間ボーナスは正解のたびに減り、下限で下げ止まる
+          const timeBonus = calculateTimeBonus(difficultyConfig.time, game.correctCount);
           
           set({
             gameState: {
@@ -343,11 +345,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               problemCount: game.problemCount + 1,
               correctCount: game.correctCount + 1,
               totalSolveTime: game.totalSolveTime + solveTime,
-              timeLeft: game.timeLeft + bonusTime,
+              timeLeft: game.timeLeft + timeBonus,
               currentCombo,
               comboExpiresAt: Date.now() + SCORE_CONFIG.COMBO_TIME_LIMIT,
               maxCombo: Math.max(game.maxCombo, currentCombo),
               lastProblemScore: problemScore,
+              lastTimeBonus: timeBonus,
               scoreBreakdown: {
                 base: game.scoreBreakdown.base + breakdown.base,
                 time: game.scoreBreakdown.time + breakdown.time,
@@ -582,21 +585,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // 最後の操作を取り消し
   undoLastMove: () => {
     const state = get();
-    if (state.historyIndex > 0) {
-      const previousNodes = state.history[state.historyIndex - 1];
-      set({
-        nodes: JSON.parse(JSON.stringify(previousNodes)),
-        selectedNodeId: null,
-        historyIndex: state.historyIndex - 1,
-        gameStatus: GameStatus.BUILDING,
-      });
-    }
+    if (!state.canUndo()) return;
+
+    const previousNodes = state.history[state.historyIndex - 1];
+    set({
+      nodes: JSON.parse(JSON.stringify(previousNodes)),
+      selectedNodeId: null,
+      historyIndex: state.historyIndex - 1,
+    });
   },
   
   // 取り消し可能かチェック
+  // 組み立て中のみ。正解演出中に戻せると、同じ問題でスコアと時間ボーナスを何度でも取り直せてしまう
   canUndo: () => {
     const state = get();
-    return state.historyIndex > 0;
+    return state.gameStatus === GameStatus.BUILDING && state.historyIndex > 0;
   },
   
   // 保存されたデータを読み込み

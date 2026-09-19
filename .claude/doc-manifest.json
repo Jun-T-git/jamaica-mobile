@@ -7,6 +7,7 @@
         "ModernJamaica/src/store/gameStore.ts",
         "ModernJamaica/src/utils/problemGenerator.ts",
         "ModernJamaica/src/utils/scoreCalculator.ts",
+        "ModernJamaica/src/utils/timeBonus.ts",
         "ModernJamaica/src/constants/scoreConfig.ts",
         "ModernJamaica/src/config/difficulty.ts",
         "ModernJamaica/src/config/gameMode.ts",
@@ -26,7 +27,8 @@
       "covers": [
         "ModernJamaica/App.tsx",
         "ModernJamaica/package.json",
-        "ModernJamaica/src/services/*.ts"
+        "ModernJamaica/src/services/*.ts",
+        "ModernJamaica/src/config/ranking.ts"
       ]
     },
     {
