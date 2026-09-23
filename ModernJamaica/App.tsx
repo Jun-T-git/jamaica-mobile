@@ -4,7 +4,6 @@ import {
   useNavigationContainerRef,
 } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import mobileAds, { MaxAdContentRating } from 'react-native-google-mobile-ads';
 import {
   SafeAreaProvider,
   initialWindowMetrics,
@@ -19,6 +18,7 @@ import { RankingScreen } from './src/screens/RankingScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { useSettingsStore } from './src/store/settingsStore';
+import { adService } from './src/services/adService';
 import { analyticsService } from './src/services/analyticsService';
 import { userService } from './src/services/userService';
 import { GameMode, DifficultyLevel } from './src/types';
@@ -57,21 +57,8 @@ function App() {
   };
 
   useEffect(() => {
-    // AdMob SDKの初期化
-    // 家族向けの数字パズルゲームのため、配信される広告コンテンツを
-    // G レーティング（全年齢対象）以下に制限してから初期化する。
-    // これを設定しないと成人向け（T/MA）広告が配信され得る。
-    mobileAds()
-      .setRequestConfiguration({
-        maxAdContentRating: MaxAdContentRating.G,
-      })
-      .then(() => mobileAds().initialize())
-      .then(() => {
-        console.log('AdMob SDK initialized');
-      })
-      .catch((error) => {
-        console.error('AdMob SDK initialization error:', error);
-      });
+    // 広告 SDK の初期化（ATT の許可依頼 → コンテンツ制限 → 初期化）
+    adService.initialize();
 
     // 音声・振動設定の読み込み
     loadSoundSetting();

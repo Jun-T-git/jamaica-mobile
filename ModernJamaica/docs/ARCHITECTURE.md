@@ -12,7 +12,7 @@
 - **react-native-svg** … ゲーム盤面のノード間エッジ描画
 - **react-native-firebase**（app + firestore）… ランキング
 - **@react-native-async-storage/async-storage** … ローカル永続化（ハイスコア・設定・ユーザー ID）
-- **react-native-google-mobile-ads** … 広告（AdMob）
+- **react-native-google-mobile-ads** … 広告（AdMob）。**react-native-tracking-transparency** … iOS の ATT（トラッキング許可）ダイアログ
 - **react-native-sound** … 効果音
 
 > gesture-handler / linear-gradient / vector-icons も依存にあるが、盤面操作は**タップベース**であり drag/pan gesture は使っていない。`react-native-reanimated` は**不使用・未依存**。
@@ -87,7 +87,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 |---|---|---|---|
 | ランキング | `services/rankingService.ts` | スコア送信（新記録時のみ・**チャレンジ専用**・失敗分は次回再送）／取得／順位（件数の集計クエリ） | Firestore `userScoresV2` コレクション |
 | ユーザー | `services/userService.ts` | 匿名認証（UID がランキングのドキュメント ID）・表示名管理・バリデーション | Firebase Auth（匿名）／AsyncStorage |
-| 広告 | `services/adService.ts` | インタースティシャル（数ゲームに 1 回・リザルト離脱時・回数は永続化）／バナー | AdMob |
+| 広告 | `services/adService.ts` | 起動時の初期化（**ATT の許可依頼 → コンテンツを PG 以下に制限 → SDK 初期化**。バナーは `ready` を待ってから読み込む）／リクエストに文脈 keywords を付与／インタースティシャル（数ゲームに 1 回・リザルト離脱時・回数は永続化）／バナー | AdMob（+ `react-native-tracking-transparency`） |
 | 計測 | `services/analyticsService.ts` | 画面表示・ゲーム開始/終了・正解/スキップ・チュートリアルのイベント送信（失敗は握りつぶす） | Firebase Analytics（広告 ID 連携なし） |
 | 触覚 | `services/hapticService.ts` | 選択・結合・正解・不正解の振動 | react-native-haptic-feedback |
 | サウンド | `utils/SoundManager.ts` | 効果音のプリロード・再生（`Ambient` カテゴリ） | react-native-sound |

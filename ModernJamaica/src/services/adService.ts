@@ -1,11 +1,14 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
+import mobileAds, {
   AdEventType,
   BannerAdSize,
   InterstitialAd,
+  MaxAdContentRating,
+  RequestOptions,
   TestIds,
 } from 'react-native-google-mobile-ads';
+import { requestTrackingPermission } from 'react-native-tracking-transparency';
 
 // AdMob IDs
 // __DEV__ ではテスト用ID、本番では各プラットフォームの本番IDを使う。
@@ -27,6 +30,12 @@ const adUnitIds = {
       }),
 };
 
+// 広告リクエストに付ける文脈ヒント。IDFA が無い場合の広告選択はアプリの文脈だけが頼りなので、
+// 「パズルゲーム」であることを伝えてゲーム系の広告が選ばれやすくする
+export const AD_REQUEST_OPTIONS: RequestOptions = {
+  keywords: ['game', 'puzzle', 'math', 'brain training', 'ゲーム', 'パズル', '脳トレ'],
+};
+
 // 前回の広告表示からのゲーム数（アプリを再起動しても引き継ぐ）
 const GAMES_SINCE_INTERSTITIAL_KEY = '@jamaica_games_since_interstitial';
 
@@ -38,15 +47,44 @@ class AdService {
   private readonly maxInterstitialLoadAttempts = 3;
   private readonly interstitialFrequency = 3; // 3ゲームごとに表示
   private onInterstitialClosed: (() => void) | null = null;
+  private resolveReady!: () => void;
+  // SDK の初期化完了。バナーはこれを待ってから読み込む（ATT の回答前にリクエストしない）
+  readonly ready = new Promise<void>(resolve => {
+    this.resolveReady = resolve;
+  });
 
-  constructor() {
-    this.initializeInterstitialAd();
+  /**
+   * 広告 SDK を初期化する（起動時に 1 回）
+   * 1. ATT（トラッキング許可）を先に求める。許可されると IDFA が付き、パーソナライズ広告
+   *    （ゲームをよく遊ぶ人にはゲーム広告、など）が配信される。拒否されても広告は出る
+   * 2. 配信される広告コンテンツを PG 以下に制限する（家族向けアプリのため。
+   *    G だとスマホゲームの広告の大半が除外され、無関係な汎用広告ばかりになる）
+   * 3. SDK を初期化し、インタースティシャルの事前読み込みを始める
+   * 失敗してもゲーム進行には影響させない
+   */
+  async initialize(): Promise<void> {
+    try {
+      if (Platform.OS === 'ios') {
+        const status = await requestTrackingPermission();
+        console.log(`📡 Tracking permission: ${status}`);
+      }
+      await mobileAds().setRequestConfiguration({
+        maxAdContentRating: MaxAdContentRating.PG,
+      });
+      await mobileAds().initialize();
+      console.log('AdMob SDK initialized');
+      this.initializeInterstitialAd();
+    } catch (error) {
+      console.error('AdMob SDK initialization error:', error);
+    } finally {
+      this.resolveReady();
+    }
   }
 
   private initializeInterstitialAd() {
     if (!adUnitIds.interstitial) return;
 
-    interstitialAd = InterstitialAd.createForAdRequest(adUnitIds.interstitial);
+    interstitialAd = InterstitialAd.createForAdRequest(adUnitIds.interstitial, AD_REQUEST_OPTIONS);
 
     // イベントリスナーの設定
     interstitialAd.addAdEventListener(

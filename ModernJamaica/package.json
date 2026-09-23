@@ -27,6 +27,7 @@
     "react-native-screens": "^4.13.1",
     "react-native-sound": "^0.12.0",
     "react-native-svg": "^15.12.0",
+    "react-native-tracking-transparency": "^0.1.2",
     "react-native-vector-icons": "^10.3.0",
     "zustand": "^5.0.6"
   },

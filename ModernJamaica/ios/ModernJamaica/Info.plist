@@ -6,6 +6,8 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>ジャマイカの木</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>許可すると、あなたの興味に合った広告が表示されます。アプリは無料のまま、広告収入で運営しています。</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
