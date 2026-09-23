@@ -39,6 +39,17 @@ jobs:
         run: |
           echo "${{ secrets.APP_STORE_CONNECT_KEY_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/AuthKey.p8"
 
+      # App Review の連絡先（審査提出に必須）。リポジトリは公開なので Secrets から書き出す。
+      # 未設定なら何もしない（App Store Connect の既存値のまま）。
+      - name: Write App Review contact from secrets
+        if: ${{ secrets.APP_REVIEW_CONTACT_EMAIL != '' }}
+        run: |
+          mkdir -p fastlane/metadata/review_information
+          printf '%s' "${{ secrets.APP_REVIEW_CONTACT_FIRST_NAME }}" > fastlane/metadata/review_information/first_name.txt
+          printf '%s' "${{ secrets.APP_REVIEW_CONTACT_LAST_NAME }}"  > fastlane/metadata/review_information/last_name.txt
+          printf '%s' "${{ secrets.APP_REVIEW_CONTACT_EMAIL }}"      > fastlane/metadata/review_information/email_address.txt
+          printf '%s' "${{ secrets.APP_REVIEW_CONTACT_PHONE }}"      > fastlane/metadata/review_information/phone_number.txt
+
       - name: Upload metadata & screenshots
         env:
           ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}

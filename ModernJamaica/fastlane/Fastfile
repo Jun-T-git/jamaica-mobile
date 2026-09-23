@@ -87,6 +87,8 @@ platform :ios do
   desc "使い方: bundle exec fastlane ios metadata version:1.1.4"
   desc ""
   desc "反映するのは fastlane/metadata/ja/*.txt と fastlane/screenshots/ja/*.png。"
+  desc "App Review の連絡先は fastlane/metadata/review_information/*.txt（公開リポジトリのため CI が Secrets から生成。"
+  desc "ローカルでは .gitignore 済みのこのフォルダに手で置く）。審査提出にはこの連絡先が必須。"
   desc "掲載文はリポジトリが正（fastlane/metadata/ja）。実行すると App Store Connect の現行値を上書きするので、"
   desc "変更内容を確認してから流すこと。審査提出はしない。"
   desc "必要な環境変数は beta レーンと同じ（ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_PATH）。"
