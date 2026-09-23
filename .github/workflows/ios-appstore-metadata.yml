@@ -42,13 +42,21 @@ jobs:
       # App Review の連絡先（審査提出に必須）。リポジトリは公開なので Secrets から書き出す。
       # 未設定なら何もしない（App Store Connect の既存値のまま）。
       - name: Write App Review contact from secrets
-        if: ${{ secrets.APP_REVIEW_CONTACT_EMAIL != '' }}
+        env:
+          FIRST_NAME: ${{ secrets.APP_REVIEW_CONTACT_FIRST_NAME }}
+          LAST_NAME: ${{ secrets.APP_REVIEW_CONTACT_LAST_NAME }}
+          EMAIL: ${{ secrets.APP_REVIEW_CONTACT_EMAIL }}
+          PHONE: ${{ secrets.APP_REVIEW_CONTACT_PHONE }}
         run: |
+          if [ -z "$EMAIL" ]; then
+            echo "APP_REVIEW_CONTACT_* secrets が未設定のため連絡先は反映しない"
+            exit 0
+          fi
           mkdir -p fastlane/metadata/review_information
-          printf '%s' "${{ secrets.APP_REVIEW_CONTACT_FIRST_NAME }}" > fastlane/metadata/review_information/first_name.txt
-          printf '%s' "${{ secrets.APP_REVIEW_CONTACT_LAST_NAME }}"  > fastlane/metadata/review_information/last_name.txt
-          printf '%s' "${{ secrets.APP_REVIEW_CONTACT_EMAIL }}"      > fastlane/metadata/review_information/email_address.txt
-          printf '%s' "${{ secrets.APP_REVIEW_CONTACT_PHONE }}"      > fastlane/metadata/review_information/phone_number.txt
+          printf '%s' "$FIRST_NAME" > fastlane/metadata/review_information/first_name.txt
+          printf '%s' "$LAST_NAME"  > fastlane/metadata/review_information/last_name.txt
+          printf '%s' "$EMAIL"      > fastlane/metadata/review_information/email_address.txt
+          printf '%s' "$PHONE"      > fastlane/metadata/review_information/phone_number.txt
 
       - name: Upload metadata & screenshots
         env:
