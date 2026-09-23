@@ -3,13 +3,19 @@ name: iOS App Store Release (Submit for Review)
 # 手動トリガー。App Store の該当バージョンにメタデータ/スクショ/What's New を反映し、
 # 最新ビルドを紐付けて「審査提出」する。承認後は自動で公開される（automatic_release）。
 # ⚠️ 公開に直結する操作。実行前に App Store Connect の内容を確認すること。
-#   gh workflow run ios-appstore-release.yml -f version=1.1.4
+#   gh workflow run ios-appstore-release.yml -f version=1.1.4 -f build=5
+# build を省略すると該当バージョンの最新の処理済みビルドが選ばれる。同じバージョンに複数のビルドが
+# ある（処理待ちのビルドが最新とは限らない）ときは build で番号を固定すること。
 on:
   workflow_dispatch:
     inputs:
       version:
         description: "審査提出する Marketing version, 例: 1.1.4"
         required: true
+        type: string
+      build:
+        description: "紐付けるビルド番号（省略時は最新の処理済みビルド）"
+        required: false
         type: string
 
 concurrency:
@@ -44,4 +50,4 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           ASC_KEY_PATH: ${{ runner.temp }}/AuthKey.p8
         run: |
-          bundle exec fastlane ios release version:"${{ inputs.version }}"
+          bundle exec fastlane ios release version:"${{ inputs.version }}" build:"${{ inputs.build }}"

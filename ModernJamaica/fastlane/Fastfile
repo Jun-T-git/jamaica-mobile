@@ -130,8 +130,10 @@ platform :ios do
   end
 
   desc "本番リリース: 最新ビルドを紐付けて審査提出する（メタデータ/スクショは触らない）"
-  desc "使い方: bundle exec fastlane ios release version:1.1.4"
+  desc "使い方: bundle exec fastlane ios release version:1.1.4 [build:5]"
   desc ""
+  desc "- build を省略すると該当バージョンの最新の処理済みビルドを紐付ける。同じバージョンに複数のビルドが"
+  desc "  あるときは build で番号を固定する（処理待ちの新ビルドではなく古いビルドが選ばれるのを防ぐ）"
   desc "- What's New とスクショは事前に `metadata` レーンで反映しておくこと。ここでは再アップロードしない"
   desc "  （deliver 再アップロードによるスクショ重複を避けるため、掃除と提出を分離）"
   desc "- 輸出コンプライアンス: 非該当（暗号化なし。Info.plist の ITSAppUsesNonExemptEncryption=false と整合）"
@@ -153,13 +155,16 @@ platform :ios do
     version = (options[:version] ||
       get_info_plist_value(path: "ios/ModernJamaica/Info.plist", key: "CFBundleShortVersionString")).to_s.strip
     UI.user_error!("marketing version が空です。version:X.Y.Z を渡してください") if version.empty?
-    UI.important("Submitting #{version} for App Store review (auto-release)")
+    build_number = options[:build].to_s.strip
+    build_number = nil if build_number.empty?
+    UI.important("Submitting #{version} (build #{build_number || 'latest'}) for App Store review (auto-release)")
 
     upload_to_app_store(
       api_key: api_key,
       app_identifier: APP_ID,
       app_version: version,
-      # バイナリは TestFlight/CI で既にアップロード済み。該当バージョンの最新ビルドを紐付ける。
+      # バイナリは TestFlight/CI で既にアップロード済み。build 指定があればそのビルド、無ければ最新ビルドを紐付ける。
+      build_number: build_number,
       skip_binary_upload: true,
       # メタデータ(What's New)とスクショは `metadata` レーンで反映済み。ここでは一切触らず提出のみ行う。
       # deliver の再アップロード時の ASC 結果整合性の競合でスクショが重複するのを防ぐため。
