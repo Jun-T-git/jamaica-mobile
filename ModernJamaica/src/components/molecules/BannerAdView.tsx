@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BannerAd } from 'react-native-google-mobile-ads';
-import { adService } from '../../services/adService';
+import { adService, AD_REQUEST_OPTIONS } from '../../services/adService';
 import { ModernDesign } from '../../constants';
 
 interface BannerAdViewProps {
@@ -12,6 +12,15 @@ interface BannerAdViewProps {
 export const BannerAdView: React.FC<BannerAdViewProps> = ({ style }) => {
   const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [adHeight, setAdHeight] = useState(0);
+  // ATT の回答と SDK 初期化が済むまでリクエストしない（先に読むと IDFA 無しの広告になる）
+  const [isSdkReady, setIsSdkReady] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    adService.ready.then(() => mounted && setIsSdkReady(true));
+    return () => {
+      mounted = false;
+    };
+  }, []);
   // 画面下部のホームインジケータ／角丸ぶんのセーフエリア。バナーは各画面で
   // position:absolute; bottom:0 で貼られ、これは端末の物理的な最下部に吸着する
   // （親のセーフエリアを無視する）。この inset ぶんを下パディングとして確保し、
@@ -20,7 +29,7 @@ export const BannerAdView: React.FC<BannerAdViewProps> = ({ style }) => {
 
   const adUnitId = adService.getBannerAdUnitId();
 
-  if (!adUnitId) {
+  if (!adUnitId || !isSdkReady) {
     return null;
   }
 
@@ -61,6 +70,7 @@ export const BannerAdView: React.FC<BannerAdViewProps> = ({ style }) => {
         unitId={adUnitId}
         // アンカー付きアダプティブバナー: 画面幅いっぱいに広がり高さは自動最適化。
         size={adService.getBannerAdSize()}
+        requestOptions={AD_REQUEST_OPTIONS}
         onAdLoaded={handleAdLoaded}
         onAdFailedToLoad={handleAdFailedToLoad}
       />

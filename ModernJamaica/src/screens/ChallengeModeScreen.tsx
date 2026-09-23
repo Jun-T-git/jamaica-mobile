@@ -88,6 +88,9 @@ export const ChallengeModeScreen: React.FC<ChallengeModeScreenProps> = ({
       <SuccessOverlay
         visible={gameStatus === GameStatus.CORRECT}
         animationValue={successAnim}
+        score={gameState.lastProblemScore}
+        timeBonus={gameState.lastTimeBonus}
+        combo={gameState.currentCombo}
       />
 
       {/* Restart Confirmation Dialog */}

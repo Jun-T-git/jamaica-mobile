@@ -29,7 +29,7 @@ Claude Code がこのアプリのコードで作業するときの最上位ガ�
 
 ## 技術スタック（要点）
 
-React Native 0.80.2 + React 19 + TypeScript(strict) / Zustand / React Navigation 7 / react-native-svg（盤面エッジ）/ Firebase Firestore（ランキング）/ AsyncStorage / AdMob / react-native-sound。
+React Native 0.80.2 + React 19 + TypeScript(strict) / Zustand / React Navigation 7 / react-native-svg（盤面エッジ）/ Firebase（Firestore ランキング・匿名認証・Analytics）/ AsyncStorage / AdMob / react-native-sound / react-native-haptic-feedback。
 
 **盤面操作はタップ方式**（drag&drop ではない）。**`react-native-reanimated` は不使用**（アニメは RN コア `Animated`）。詳細は [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)。
 
@@ -72,4 +72,4 @@ cd ios && bundle install && bundle exec pod install && cd ..
 
 ## 既知の技術的負債（着手時に確認）
 
-Android AdMob 本番 ID 未設定 / Firestore ルールと auth 実装の乖離 / `config` と `GAME_CONFIG` の二重定義 / テストカバレッジ低 / `ProblemData.solutions` 未使用。詳細と背景は [docs/CONVENTIONS.md](./docs/CONVENTIONS.md)。
+Android AdMob 本番 ID 未設定 / `config` と `GAME_CONFIG` の二重定義 / テストカバレッジ低 / `ProblemData.solutions` 未使用 / 旧ランキング `userScores` の残置 / 不正解音が仮の合成音。詳細と背景は [docs/CONVENTIONS.md](./docs/CONVENTIONS.md)。

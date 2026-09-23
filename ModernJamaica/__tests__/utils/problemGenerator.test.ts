@@ -1,11 +1,17 @@
-import { generateProblem } from '../../src/utils/problemGenerator';
-import { getDifficultyConfig } from '../../src/config/difficulty';
+import { generateProblem, countSolutions } from '../../src/utils/problemGenerator';
+import { DIFFICULTY_CONFIG } from '../../src/config/difficulty';
 import { DifficultyLevel } from '../../src/types';
+
+// 再現可能な乱数（テストを安定させる）
+const createRng = (seed: number) => () => {
+  seed = (seed * 1664525 + 1013904223) % 4294967296;
+  return seed / 4294967296;
+};
 
 /**
  * 独立ソルバ: 5つの数字から目標値に到達できるかを総当たりで検証する。
- * generateProblem の「解の保証」不変条件（PHILOSOPHY.md #1 / GAME-CORE.md §2）を確認するためのもの。
- * 生成器の applyOperator セマンティクス（減算は絶対値、除算は割り切れる時のみ）の上位集合を試す。
+ * generateProblem の「解の保証」不変条件（PHILOSOPHY.md #1 / GAME-CORE.md §2）を、
+ * 生成器自身の countSolutions に頼らずに確認するためのもの。
  */
 function isSolvable(numbers: number[], target: number): boolean {
   const EPSILON = 0.001;
@@ -36,53 +42,101 @@ function isSolvable(numbers: number[], target: number): boolean {
 }
 
 describe('problemGenerator', () => {
-  const difficulties = [
-    DifficultyLevel.EASY,
-    DifficultyLevel.NORMAL,
-    DifficultyLevel.HARD,
-  ];
+  describe('countSolutions', () => {
+    it('作れる値と解の数を数え上げる', () => {
+      const counts = countSolutions([4, 4, 3, 2, 1]);
 
-  describe.each(difficulties)('generateProblem(%s)', (difficulty) => {
-    it('5つの数字を生成する', () => {
-      const problem = generateProblem(difficulty);
-      expect(problem.numbers).toHaveLength(5);
+      // 4 × 4 + 3 + 2 − 1 = 20
+      expect(counts.get(20)).toBeGreaterThan(0);
+      // 全部足した値も作れる
+      expect(counts.get(14)).toBeGreaterThan(0);
     });
 
-    it('生成される数字が難易度の範囲内である', () => {
-      const { min, max } = getDifficultyConfig(difficulty).numberRange;
-      for (let i = 0; i < 20; i++) {
-        const problem = generateProblem(difficulty);
-        problem.numbers.forEach((num) => {
-          expect(num).toBeGreaterThanOrEqual(min);
-          expect(num).toBeLessThanOrEqual(max);
+    it('0や負の数、小数は数えない', () => {
+      const counts = countSolutions([1, 1, 2, 2, 3]);
+
+      for (const value of counts.keys()) {
+        expect(Number.isInteger(value)).toBe(true);
+        expect(value).toBeGreaterThan(0);
+      }
+    });
+  });
+
+  describe('generateProblem', () => {
+    const difficulties = Object.values(DifficultyLevel);
+
+    it.each(difficulties)('%s: 数字と目標値が難易度の範囲内に収まる', difficulty => {
+      const config = DIFFICULTY_CONFIG[difficulty];
+      const rng = createRng(1);
+
+      for (let i = 0; i < 200; i++) {
+        const problem = generateProblem(difficulty, rng);
+
+        expect(problem.numbers).toHaveLength(5);
+        problem.numbers.forEach(num => {
+          expect(num).toBeGreaterThanOrEqual(config.numberRange.min);
+          expect(num).toBeLessThanOrEqual(config.numberRange.max);
         });
+        expect(problem.target).toBeGreaterThanOrEqual(config.targetRange.min);
+        expect(problem.target).toBeLessThanOrEqual(config.targetRange.max);
       }
     });
 
-    it('目標値は有限な非負の数である', () => {
-      const problem = generateProblem(difficulty);
-      expect(Number.isFinite(problem.target)).toBe(true);
-      expect(problem.target).toBeGreaterThanOrEqual(0);
+    it.each(difficulties)('%s: 必ず解ける問題だけを出題する', difficulty => {
+      const rng = createRng(2);
+
+      for (let i = 0; i < 200; i++) {
+        const problem = generateProblem(difficulty, rng);
+        const solutions = countSolutions(problem.numbers).get(problem.target) || 0;
+
+        expect(solutions).toBeGreaterThan(0);
+        expect(problem.solutionCount).toBe(solutions);
+      }
     });
 
-    it('5つの数字すべてで目標値に到達できる（解の保証・不変条件）', () => {
-      for (let i = 0; i < 20; i++) {
-        const problem = generateProblem(difficulty);
+    it.each(difficulties)('%s: 独立ソルバでも解ける（解の保証）', difficulty => {
+      const rng = createRng(6);
+
+      for (let i = 0; i < 50; i++) {
+        const problem = generateProblem(difficulty, rng);
+
         expect(isSolvable(problem.numbers, problem.target)).toBe(true);
       }
     });
 
-    it('difficulty フィールドが設定される', () => {
-      const problem = generateProblem(difficulty);
-      expect(problem.difficulty).toBe(difficulty);
-    });
-  });
+    it.each(difficulties)('%s: 全部足すだけで解ける問題は出題しない', difficulty => {
+      const rng = createRng(3);
 
-  it('複数回実行すると異なる目標値が生成される', () => {
-    const targets = new Set<number>();
-    for (let i = 0; i < 20; i++) {
-      targets.add(generateProblem(DifficultyLevel.NORMAL).target);
-    }
-    expect(targets.size).toBeGreaterThan(1);
+      for (let i = 0; i < 200; i++) {
+        const problem = generateProblem(difficulty, rng);
+        const sum = problem.numbers.reduce((total, num) => total + num, 0);
+
+        expect(problem.target).not.toBe(sum);
+      }
+    });
+
+    it('難易度が上がるほど解の数が少ない問題になる', () => {
+      const medianSolutionCount = (difficulty: DifficultyLevel) => {
+        const rng = createRng(4);
+        const counts = Array.from({ length: 300 }, () =>
+          generateProblem(difficulty, rng).solutionCount || 0,
+        ).sort((a, b) => a - b);
+        return counts[Math.floor(counts.length / 2)];
+      };
+
+      const easy = medianSolutionCount(DifficultyLevel.EASY);
+      const normal = medianSolutionCount(DifficultyLevel.NORMAL);
+      const hard = medianSolutionCount(DifficultyLevel.HARD);
+
+      expect(easy).toBeGreaterThan(normal);
+      expect(normal).toBeGreaterThan(hard);
+    });
+
+    it('同じ乱数列からは同じ問題が生成される', () => {
+      const first = generateProblem(DifficultyLevel.NORMAL, createRng(5));
+      const second = generateProblem(DifficultyLevel.NORMAL, createRng(5));
+
+      expect(second).toEqual(first);
+    });
   });
 });

@@ -80,20 +80,22 @@ function slide({ eyebrow, headline, accent, screenHTML }) {
 }
 
 // 見出し・アイブロウは実装の文言に準拠。AdMob テストバナーがある画面(hero/ranking)は showPx でクリップ。
+// 並び順（ファイル名の連番）がストアの表示順。最初の 1〜3 枚で「ルール」「快感」「遊び方」が伝わるようにする
+// （検索結果とストアページの初見で見えるのはこの範囲）。素材のスクショ名は shot で指定する。
 const slides = [
-  { name: '01-hero', eyebrow: 'MODERN JAMAICA', accent: C.neon,
-    headline: '数字をつなげて、<br>目標の数をつくる。', screenHTML: screenShot('01-hero', 2520) },
-  { name: '02-core', eyebrow: 'コアパズル', accent: C.purple,
-    headline: '5つの数字を<br>組み合わせて解く。', screenHTML: screenShot('02-core') },
-  { name: '03-solved', eyebrow: '正解！', accent: C.mint,
-    headline: '解けた瞬間の、<br>この気持ちよさ。', screenHTML: screenShot('03-solved') },
-  { name: '04-challenge', eyebrow: 'チャレンジモード', accent: C.coral,
-    headline: '時間との勝負。<br>何問解ける？', screenHTML: screenShot('04-challenge') },
-  { name: '05-difficulty', eyebrow: 'かんたん / ふつう / むずかしい', accent: C.gold,
-    headline: 'こどもから大人まで、<br>3つの難易度。', screenHTML: screenShot('05-difficulty') },
-  { name: '06-ranking', eyebrow: 'ランキング', accent: C.neon,
-    headline: '全国のプレイヤーと、<br>スコアで競う。', screenHTML: screenShot('06-ranking', 2530) },
-];
+  { name: '01-core', shot: '02-core', eyebrow: 'ルールはこれだけ', accent: C.purple,
+    headline: '5つの数字と＋−×÷で、<br>目標の数をつくる。', showPx: undefined },
+  { name: '02-solved', shot: '03-solved', eyebrow: '正解！', accent: C.mint,
+    headline: '解けた瞬間の、<br>この気持ちよさ。', showPx: undefined },
+  { name: '03-challenge', shot: '04-challenge', eyebrow: 'チャレンジモード', accent: C.coral,
+    headline: '時間との勝負。<br>何問解ける？', showPx: undefined },
+  { name: '04-difficulty', shot: '05-difficulty', eyebrow: 'かんたん / ふつう / むずかしい', accent: C.gold,
+    headline: 'こどもから大人まで、<br>3つの難易度。', showPx: undefined },
+  { name: '05-ranking', shot: '06-ranking', eyebrow: 'ランキング', accent: C.neon,
+    headline: '全国のプレイヤーと、<br>スコアで競う。', showPx: 2530 },
+  { name: '06-hero', shot: '01-hero', eyebrow: 'MODERN JAMAICA', accent: C.neon,
+    headline: '数字をつなげる、<br>新感覚の計算パズル。', showPx: 2520 },
+].map(sl => ({ ...sl, screenHTML: screenShot(sl.shot, sl.showPx ?? SHOT_H) }));
 
 for (const sl of slides) {
   writeFileSync(new URL(`./out/${sl.name}.html`, import.meta.url), slide(sl));

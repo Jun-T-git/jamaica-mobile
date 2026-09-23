@@ -20,7 +20,10 @@ const STORAGE_KEYS = {
  * 難易度別のストレージキーを取得
  */
 const getScoreKey = (mode: GameMode, difficulty: DifficultyLevel): string => {
-  return `@jamaica_${mode}_${difficulty}_high_score`;
+  // チャレンジモードはスコア計算式を見直したため、旧スコアと比較しないようキーを分ける
+  // （旧式の高すぎるスコアが残ると新記録が出せず、ランキングにも送信されなくなる）
+  const version = mode === GameMode.CHALLENGE ? '_v2' : '';
+  return `@jamaica_${mode}_${difficulty}_high_score${version}`;
 };
 
 /**
@@ -75,6 +78,9 @@ export const loadHighScore = async (mode: GameMode): Promise<number | null> => {
   const normalScore = await loadHighScoreWithDifficulty(mode, DEFAULT_DIFFICULTY);
   if (normalScore !== null) return normalScore;
   
+  // チャレンジの旧スコアは計算式が違うため移行しない（_v2 キーに混入させない）
+  if (mode === GameMode.CHALLENGE) return null;
+
   // 旧形式のキーからも読み込みを試みる
   try {
     const config = getGameModeConfig(mode);

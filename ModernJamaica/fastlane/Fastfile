@@ -83,12 +83,14 @@ platform :ios do
     UI.success("Uploaded #{version} (#{build_number}). App Store Connect で処理完了後、内部テスターに配信されます。")
   end
 
-  desc "App Store の What's New(リリースノート)とスクリーンショットを反映する（バイナリは送らない）"
+  desc "App Store の掲載文(タイトル/サブタイトル/説明/キーワード/宣伝文/URL/What's New)とスクリーンショットを反映する（バイナリは送らない）"
   desc "使い方: bundle exec fastlane ios metadata version:1.1.4"
   desc ""
-  desc "反映するのは fastlane/metadata/ja/release_notes.txt と fastlane/screenshots/ja/*.png のみ。"
-  desc "タイトル・サブタイトル・説明・キーワード・宣伝文など既存メタデータは意図的に置いていない"
-  desc "ため上書きされない（App Store Connect の現行値を維持）。審査提出もしない。"
+  desc "反映するのは fastlane/metadata/ja/*.txt と fastlane/screenshots/ja/*.png。"
+  desc "App Review の連絡先は fastlane/metadata/review_information/*.txt（公開リポジトリのため CI が Secrets から生成。"
+  desc "ローカルでは .gitignore 済みのこのフォルダに手で置く）。審査提出にはこの連絡先が必須。"
+  desc "掲載文はリポジトリが正（fastlane/metadata/ja）。実行すると App Store Connect の現行値を上書きするので、"
+  desc "変更内容を確認してから流すこと。審査提出はしない。"
   desc "必要な環境変数は beta レーンと同じ（ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_PATH）。"
   lane :metadata do |options|
     key_id    = ENV.fetch("ASC_KEY_ID")
@@ -111,7 +113,7 @@ platform :ios do
       api_key: api_key,
       app_identifier: APP_ID,
       app_version: version,
-      # メタデータ本文とスクショのみ。ビルド(ipa)は beta レーン/CI で別途アップロード。
+      # 掲載文(fastlane/metadata/ja)とスクショのみ。ビルド(ipa)は beta レーン/CI で別途アップロード。
       skip_binary_upload: true,
       # 既存スクショを今回の6枚で置き換える。
       overwrite_screenshots: true,
@@ -130,12 +132,14 @@ platform :ios do
   end
 
   desc "本番リリース: 最新ビルドを紐付けて審査提出する（メタデータ/スクショは触らない）"
-  desc "使い方: bundle exec fastlane ios release version:1.1.4"
+  desc "使い方: bundle exec fastlane ios release version:1.1.4 [build:5]"
   desc ""
+  desc "- build を省略すると該当バージョンの最新の処理済みビルドを紐付ける。同じバージョンに複数のビルドが"
+  desc "  あるときは build で番号を固定する（処理待ちの新ビルドではなく古いビルドが選ばれるのを防ぐ）"
   desc "- What's New とスクショは事前に `metadata` レーンで反映しておくこと。ここでは再アップロードしない"
   desc "  （deliver 再アップロードによるスクショ重複を避けるため、掃除と提出を分離）"
   desc "- 輸出コンプライアンス: 非該当（暗号化なし。Info.plist の ITSAppUsesNonExemptEncryption=false と整合）"
-  desc "- 広告識別子(IDFA): 使用しない（ATT 未実装。AdMob は SKAdNetwork で配信・計測）"
+  desc "- 広告識別子(IDFA): 使用する（広告配信のため。ATT で許可を求め、iOS の制限設定を尊重する。ADR-0007）"
   desc "- 審査承認後は自動で公開（automatic_release）"
   desc "必要な環境変数は beta レーンと同じ（ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_PATH）。"
   lane :release do |options|
@@ -153,13 +157,16 @@ platform :ios do
     version = (options[:version] ||
       get_info_plist_value(path: "ios/ModernJamaica/Info.plist", key: "CFBundleShortVersionString")).to_s.strip
     UI.user_error!("marketing version が空です。version:X.Y.Z を渡してください") if version.empty?
-    UI.important("Submitting #{version} for App Store review (auto-release)")
+    build_number = options[:build].to_s.strip
+    build_number = nil if build_number.empty?
+    UI.important("Submitting #{version} (build #{build_number || 'latest'}) for App Store review (auto-release)")
 
     upload_to_app_store(
       api_key: api_key,
       app_identifier: APP_ID,
       app_version: version,
-      # バイナリは TestFlight/CI で既にアップロード済み。該当バージョンの最新ビルドを紐付ける。
+      # バイナリは TestFlight/CI で既にアップロード済み。build 指定があればそのビルド、無ければ最新ビルドを紐付ける。
+      build_number: build_number,
       skip_binary_upload: true,
       # メタデータ(What's New)とスクショは `metadata` レーンで反映済み。ここでは一切触らず提出のみ行う。
       # deliver の再アップロード時の ASC 結果整合性の競合でスクショが重複するのを防ぐため。
@@ -173,7 +180,11 @@ platform :ios do
       automatic_release: true,
       submission_information: {
         export_compliance_uses_encryption: false,
-        add_id_info_uses_idfa: false,
+        add_id_info_uses_idfa: true,
+        add_id_info_serves_ads: true,          # アプリ内で広告を配信する
+        add_id_info_tracks_install: false,     # インストール計測には使わない
+        add_id_info_tracks_action: false,      # 広告経由の行動計測には使わない
+        add_id_info_limits_tracking: true,     # ATT / 追跡制限の設定を尊重する
       },
     )
 
