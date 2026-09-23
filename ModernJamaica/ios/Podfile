@@ -40,6 +40,21 @@ target 'ModernJamaica' do
     # （ローカル / Xcode Cloud / GitHub Actions）で一貫して回避する。
     # pod install の度に再適用されるため gitignore な Pods/ を直接触る必要がない。
     patch_fmt_consteval(installer)
+
+    # Pod 側の古い deployment target（9.0〜13.x）を揃える。新しい Xcode（Xcode Cloud の 27 系など）は
+    # サポート範囲外の deployment target をエラー扱いにしてアーカイブが落ちるため、アプリと同じ値に引き上げる。
+    raise_pods_deployment_target(installer, min_ios_version_supported)
+  end
+end
+
+def raise_pods_deployment_target(installer, minimum)
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      current = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+      if current.nil? || Gem::Version.new(current) < Gem::Version.new(minimum)
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = minimum
+      end
+    end
   end
 end
 
