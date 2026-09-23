@@ -51,10 +51,17 @@
 				<string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
 			</array>
 			<key>NSPrivacyCollectedDataTypeTracking</key>
-			<true/>
+			<false/>
 		</dict>
 	</array>
+	<!--
+	  NSPrivacyTracking を true にすると NSPrivacyTrackingDomains に 1 つ以上のドメインが必須になり、
+	  無いと審査提出時に ITMS-91064（バイナリが無効）で弾かれる。広告 SDK（Google Mobile Ads）は
+	  IDFA の利用を ATT の許可状態で自前で制御し、SDK 自身のマニフェストも false を宣言しているため、
+	  アプリ側も false にする（ドメインを列挙すると ATT 拒否時にその通信が遮断され広告が出なくなる）。
+	  トラッキングの申告は App Store Connect の「アプリのプライバシー」で行う（デバイス ID → 広告 → トラッキングあり）。
+	-->
 	<key>NSPrivacyTracking</key>
-	<true/>
+	<false/>
 </dict>
 </plist>
