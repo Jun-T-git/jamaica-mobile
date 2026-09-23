@@ -135,7 +135,7 @@ platform :ios do
   desc "- What's New とスクショは事前に `metadata` レーンで反映しておくこと。ここでは再アップロードしない"
   desc "  （deliver 再アップロードによるスクショ重複を避けるため、掃除と提出を分離）"
   desc "- 輸出コンプライアンス: 非該当（暗号化なし。Info.plist の ITSAppUsesNonExemptEncryption=false と整合）"
-  desc "- 広告識別子(IDFA): 使用しない（ATT 未実装。AdMob は SKAdNetwork で配信・計測）"
+  desc "- 広告識別子(IDFA): 使用する（広告配信のため。ATT で許可を求め、iOS の制限設定を尊重する。ADR-0007）"
   desc "- 審査承認後は自動で公開（automatic_release）"
   desc "必要な環境変数は beta レーンと同じ（ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_PATH）。"
   lane :release do |options|
@@ -173,7 +173,11 @@ platform :ios do
       automatic_release: true,
       submission_information: {
         export_compliance_uses_encryption: false,
-        add_id_info_uses_idfa: false,
+        add_id_info_uses_idfa: true,
+        add_id_info_serves_ads: true,          # アプリ内で広告を配信する
+        add_id_info_tracks_install: false,     # インストール計測には使わない
+        add_id_info_tracks_action: false,      # 広告経由の行動計測には使わない
+        add_id_info_limits_tracking: true,     # ATT / 追跡制限の設定を尊重する
       },
     )
 
