@@ -66,11 +66,6 @@ export const RankingBoard: React.FC<RankingBoardProps> = ({
       <Typography variant="body1" style={styles.emptyText}>
         ただいま集計期間中です
       </Typography>
-      <Typography variant="caption" style={styles.emptySubtext}>
-        ランキングをリニューアルしました。{'\n'}
-        参加者が集まりしだい公開します。{'\n'}
-        チャレンジモードで記録を出してエントリーしよう！
-      </Typography>
     </View>
   );
 
@@ -205,11 +200,6 @@ const styles = StyleSheet.create({
     fontWeight: ModernDesign.typography.fontWeight.medium,
     textAlign: 'center',
     marginBottom: ModernDesign.spacing[2],
-  },
-  emptySubtext: {
-    color: ModernDesign.colors.text.secondary,
-    fontSize: ModernDesign.typography.fontSize.base,
-    textAlign: 'center',
   },
   errorContainer: {
     flex: 1,
