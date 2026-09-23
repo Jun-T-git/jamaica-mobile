@@ -15,7 +15,7 @@
 
 ## 状態管理（Zustand）
 
-- 状態は `store/gameStore.ts`（ゲーム）と `store/settingsStore.ts`（設定）に集約。
+- 状態は `store/gameStore.ts`（ゲーム）、`store/settingsStore.ts`（設定）、`store/statsStore.ts`（自己記録）に集約。
 - **prop drilling を避け、コンポーネントで Zustand フックを直接使う**。
 - 新しいゲーム状態フィールド／アクションは既存ストアの型定義に追加し、[GAME-CORE.md](./GAME-CORE.md) / [ARCHITECTURE.md](./ARCHITECTURE.md) の該当箇所を追随更新（下の「ドキュメント更新規約」）。
 
@@ -33,7 +33,7 @@
 ## テスト
 
 - **Jest**（`preset: react-native`、`jest.config.js`）。
-- 現状のテストは `__tests__/utils/problemGenerator.test.ts` のみ。**カバレッジは低い**（下記負債）。
+- テストは `__tests__/utils/` の純ロジック（problemGenerator, scoreCalculator, timeBonus, playStreak, scoreTier, reviewPolicy）のみ。**カバレッジは低い**（下記負債）。
 - 純ロジック（`utils/`）は React 非依存でテストしやすい。新規のコアロジックには最低限のユニットテストを付けること。
 - 実行: `npm test` / `npm test -- --coverage`。
 
@@ -48,9 +48,9 @@ npm test                  # Jest
 npx tsc --noEmit          # 型チェック（CI 相当のゲート）
 ```
 
-**変更を「検証済み」と言う前に最低限**: `npm test` が green であること（16 tests）、UI/挙動を変えた場合はシミュレータ/実機で実際に動かして確認する（`/run`・`/verify` も利用可）。
+**変更を「検証済み」と言う前に最低限**: `npm test` が green であること、UI/挙動を変えた場合はシミュレータ/実機で実際に動かして確認する（`/run`・`/verify` も利用可）。
 
-> ⚠️ **ベースラインの注意**: 現状 `npx tsc --noEmit` と `npm run lint` は**既存エラーで red**（下記「既知の技術的負債」#6/#7）。したがって合否は「全て green」ではなく **「自分の変更で新たなエラーを増やしていないこと」** で判断する。触れたファイルにエラーが出たら是正する。ベースラインの是正は歓迎だが別タスク。
+> `npx tsc --noEmit` と `npm run lint` は現在 green（lint は既存の warning が 1 件。下記「既知の技術的負債」#6/#7 は解消済み）。自分の変更で新たなエラーや warning を増やさないこと。
 
 ### iOS 初回セットアップ
 
@@ -81,7 +81,7 @@ canonical 文書は**薄く保つ**。関数シグネチャや具体数値を散
 1. **Android AdMob 本番 ID 未取得**: `services/adService.ts` の Android 広告 ID（バナー/インタースティシャル）は本番 ID が未取得のため `undefined`（無効なプレースホルダ ID を渡すと広告枠が壊れるため）。この間 Android 本番では広告を出さない（`getBannerAdUnitId()` が `undefined` を返し BannerAdView は null、interstitial は未初期化）。iOS は設定済み。**本アプリは iOS のみをリリース対象とする方針のため、この負債は実質的に問題にならない**（Android を配信する場合のみ本番 ID の取得と `Platform.select` の `android` への設定が必要）。
 2. ~~Firestore ルールと実装の乖離~~ **解消**: Firebase 匿名認証を導入し、ランキングは認証 UID をドキュメント ID とする `userScoresV2` に移行（[decisions/0004-ranking-v2-anonymous-auth.md](./decisions/0004-ranking-v2-anonymous-auth.md)）。**運用上の前提**: Firebase コンソールで Anonymous 認証が有効であること、`firestore.rules` がデプロイ済みであること（`firebase deploy --only firestore:rules`）。未対応だとスコア送信だけが失敗する（ゲーム進行には影響しない。失敗分は端末に控えて次回再送）。
 3. **設定の重複**: `config/gameMode.ts` と `constants/index.ts` の `GAME_CONFIG` に同種の値（チャレンジ 60s / スキップ 2 等）が二重定義。`GAME_CONFIG` は主にテスト参照で、`TARGET.MIN/MAX` は現行生成器で未使用。config/ 系に一本化するのが望ましい。
-4. **テストカバレッジが低い**: `gameStore`（connectNodes・判定・タイマー）/ services / stores / 画面が未テスト。（`problemGenerator` と `scoreCalculator` はテストあり）
+4. **テストカバレッジが低い**: `gameStore`（connectNodes・判定・タイマー）/ services / stores / 画面が未テスト。（`utils/` の純ロジックにはテストあり）
 5. **`ProblemData.solutions` 未使用**: 型にあるが生成器は設定しない（将来用予約）。
 6. ~~既存の型エラー~~ **解消**: `tsc --noEmit` は green。
 7. ~~既存の lint エラー~~ **解消**: `npm run lint` はエラー 0。

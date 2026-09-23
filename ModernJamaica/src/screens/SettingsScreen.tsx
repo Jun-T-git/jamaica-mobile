@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
+  Linking,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -12,7 +13,9 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Typography } from '../components/atoms/Typography';
 import { BannerAdView } from '../components/molecules/BannerAdView';
+import { LINKS } from '../config/links';
 import { ModernDesign } from '../design/modernDesignSystem';
+import { analyticsService } from '../services/analyticsService';
 import { useSettingsStore } from '../store/settingsStore';
 import { soundManager, SoundType } from '../utils/SoundManager';
 
@@ -87,12 +90,32 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
   const handleSoundToggle = () => {
     soundManager.play(SoundType.BUTTON);
+    analyticsService.logEvent('setting_change', {
+      setting: 'sound',
+      enabled: !soundEnabled,
+    });
     toggleSound();
   };
 
   const handleHapticsToggle = () => {
     soundManager.play(SoundType.BUTTON);
+    analyticsService.logEvent('setting_change', {
+      setting: 'haptics',
+      enabled: !hapticsEnabled,
+    });
     toggleHaptics();
+  };
+
+  // 外部リンク（お問い合わせ・プライバシーポリシー）。開けなくてもアプリは止めない
+  const openLink = async (url: string, name: string) => {
+    soundManager.play(SoundType.BUTTON);
+    analyticsService.logEvent('link_open', { link: name });
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      console.warn(`Failed to open ${name}:`, error);
+      Alert.alert('エラー', 'ページを開けませんでした');
+    }
   };
 
   const renderSwitch = (enabled: boolean) => (
@@ -114,7 +137,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   );
 
   // 設定項目の種類を定義
-  type SettingItemType = 'editable' | 'readonly' | 'toggle';
+  type SettingItemType = 'editable' | 'readonly' | 'toggle' | 'link';
 
   const renderSettingRow = (
     icon: string,
@@ -146,9 +169,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 name={icon}
                 size={20}
                 color={
-                  type === 'editable'
-                    ? ModernDesign.colors.accent.neon
-                    : type === 'toggle'
+                  type === 'editable' || type === 'toggle' || type === 'link'
                     ? ModernDesign.colors.accent.neon
                     : ModernDesign.colors.text.tertiary
                 }
@@ -323,6 +344,32 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
             renderSwitch(hapticsEnabled),
             handleHapticsToggle,
             'toggle',
+          )}
+
+          {renderSettingRow(
+            'mail-outline',
+            'お問い合わせ・ご要望',
+            'ご意見、不具合の報告、ほしい機能などをお寄せください。フォームが開きます。',
+            <MaterialIcons
+              name="open-in-new"
+              size={18}
+              color={ModernDesign.colors.text.tertiary}
+            />,
+            () => openLink(LINKS.SUPPORT_FORM, 'support_form'),
+            'link',
+          )}
+
+          {renderSettingRow(
+            'privacy-tip',
+            'プライバシーポリシー',
+            undefined,
+            <MaterialIcons
+              name="open-in-new"
+              size={18}
+              color={ModernDesign.colors.text.tertiary}
+            />,
+            () => openLink(LINKS.PRIVACY_POLICY, 'privacy_policy'),
+            'link',
           )}
         </View>
 

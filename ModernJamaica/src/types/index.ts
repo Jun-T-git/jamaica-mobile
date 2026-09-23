@@ -94,3 +94,15 @@ export interface NodeData {
   depth: number;
   isUsed: boolean;
 }
+/**
+ * 端末に保存するプレイヤー自身の記録（他のプレイヤーに依存しない自己記録）
+ * 永続化は services/playerStatsService.ts、状態は store/statsStore.ts
+ */
+export interface PlayerStats {
+  gamesPlayed: number;       // 始めたゲーム数（モード問わず）
+  totalCorrect: number;      // 累計正解数（モード問わず）
+  streakDays: number;        // 連続プレイ日数（utils/playStreak.ts）
+  bestStreakDays: number;    // 連続プレイ日数の自己最高
+  lastPlayDate: string | null; // 最後に遊んだ日（ローカル日付 YYYY-MM-DD）
+  firstPlayedAt: number | null; // 初めて遊んだ時刻（ミリ秒）
+}

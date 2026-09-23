@@ -11,8 +11,10 @@ import { analyticsService } from '../services/analyticsService';
 import { hapticService } from '../services/hapticService';
 import { soundManager, SoundType } from '../utils/SoundManager';
 import { rankingService } from '../services/rankingService';
+import { playerStatsService } from '../services/playerStatsService';
 import { ScoreSubmission } from '../types/ranking';
 import { useSettingsStore } from './settingsStore';
+import { useStatsStore } from './statsStore';
 
 interface GameStore extends GameState {
   // UI関連の状態
@@ -188,9 +190,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       rankingSubmissionResult: null,
     });
     
-    analyticsService.logEvent('game_start', { mode, difficulty });
-    
+    // コア（問題生成）は自己記録や計測の I/O を待たない
     get().generateNewProblem();
+    
+    // 自己記録（ゲーム数・連続プレイ日数）を進め、初めてのゲームかどうかを計測のファネルに使う。
+    // 失敗しても記録と計測が欠けるだけでゲームは進む
+    useStatsStore
+      .getState()
+      .recordGameStart()
+      .then(stats => {
+        analyticsService.logEvent('game_start', {
+          mode,
+          difficulty,
+          games_played: stats.gamesPlayed,
+          is_first_game: stats.gamesPlayed === 1,
+          streak_days: stats.streakDays,
+        });
+      })
+      .catch(() => {
+        analyticsService.logEvent('game_start', { mode, difficulty });
+      });
   },
   
   // カウントダウン開始
@@ -377,6 +396,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           difficulty: game.difficulty,
           solve_time: Math.round(solveTime),
         });
+        // 生まれて初めての正解は一度だけ別イベントに（初回起動→初正解のファネル）
+        playerStatsService.markFirstSolve().then(isFirst => {
+          if (isFirst) {
+            analyticsService.logEvent('first_problem_solved', {
+              mode: game.mode,
+              difficulty: game.difficulty,
+              solve_time: Math.round(solveTime),
+            });
+          }
+        });
         
         // 次の問題を生成（待っている間にリスタートや終了が行われた場合は何もしない）
         setTimeout(() => {
@@ -539,6 +568,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     }
     
+    // 累計正解数を自己記録に足す（失敗してもゲーム進行に影響させない）
+    useStatsStore.getState().recordGameEnd(game.correctCount).catch(() => {});
+    
     analyticsService.logEvent('game_end', {
       mode: game.mode,
       difficulty: game.difficulty,
@@ -548,6 +580,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       max_combo: game.maxCombo,
       is_new_high_score: isNewHighScore,
       is_manual: isManual,
+      games_played: useStatsStore.getState().stats.gamesPlayed,
     });
     
     // リザルト画面への遷移

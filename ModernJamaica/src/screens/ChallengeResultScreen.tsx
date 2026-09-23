@@ -13,13 +13,16 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Button } from '../components/atoms/Button';
 import { BannerAdView } from '../components/molecules/BannerAdView';
+import { ScoreTierBar } from '../components/molecules/ScoreTierBar';
 import { getDifficultyConfig } from '../config/difficulty';
 import { getGameModeConfig } from '../config/gameMode';
 import { RANKING_CONFIG } from '../config/ranking';
 import { COLORS, ModernDesign } from '../constants';
 import { adService } from '../services/adService';
 import { rankingService } from '../services/rankingService';
+import { reviewService } from '../services/reviewService';
 import { useGameStore } from '../store/gameStore';
+import { useStatsStore } from '../store/statsStore';
 import { DifficultyLevel, GameMode } from '../types';
 import { UserRankInfo } from '../types/ranking';
 
@@ -55,6 +58,8 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
     difficulty,
   } = route.params;
   const { initGame, gameState, isSubmittingScore } = useGameStore();
+  const { stats, getDisplayStreakDays } = useStatsStore();
+  const streakDays = getDisplayStreakDays();
 
   // ゲームモード設定を取得
   const gameMode = mode === 'infinite' ? GameMode.INFINITE : GameMode.CHALLENGE;
@@ -77,6 +82,19 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
   // ランキング順位（チャレンジモードのみ）
   const [rankInfo, setRankInfo] = useState<UserRankInfo | null>(null);
   const [isLeaving, setIsLeaving] = useState(false);
+
+  // 新記録の余韻の後にレビューを頼む（出すかどうかの条件は utils/reviewPolicy.ts）。
+  // 画面を離れたら取りやめる
+  useEffect(() => {
+    if (!isNewHighScore) return;
+    const timer = setTimeout(() => {
+      reviewService.maybeRequestReview({
+        isNewHighScore,
+        gamesPlayed: stats.gamesPlayed,
+      });
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, [isNewHighScore, stats.gamesPlayed]);
 
   // スコア送信の完了を待ってから自分の順位を取得する
   useEffect(() => {
@@ -377,6 +395,30 @@ export const ChallengeResultScreen: React.FC<ChallengeResultScreenProps> = ({
           </View>
         )}
 
+        {/* 基準スコア（チャレンジのみ。他のプレイヤーがいなくても目標が分かる） */}
+        {gameMode === GameMode.CHALLENGE && (
+          <ScoreTierBar
+            difficulty={currentDifficulty}
+            score={finalScore}
+            style={styles.tierBar}
+          />
+        )}
+
+        {/* 自己記録 */}
+        {stats.gamesPlayed > 0 && (
+          <View style={styles.selfRecordRow}>
+            <MaterialIcons
+              name="local-fire-department"
+              size={16}
+              color={ModernDesign.colors.accent.coral}
+            />
+            <Text style={styles.selfRecordText}>
+              {streakDays > 0 ? `連続プレイ ${streakDays}日目` : '今日から再開'}
+              {'  ・  '}累計 {stats.totalCorrect.toLocaleString()}問正解
+            </Text>
+          </View>
+        )}
+
         {/* Score Breakdown */}
         {breakdownRows.length > 0 && (
           <View style={styles.breakdownSection}>
@@ -626,6 +668,19 @@ const styles = StyleSheet.create({
   rankSubText: {
     fontSize: ModernDesign.typography.fontSize.sm,
     fontWeight: ModernDesign.typography.fontWeight.medium,
+    color: ModernDesign.colors.text.secondary,
+  },
+  tierBar: {
+    marginBottom: ModernDesign.spacing[3],
+  },
+  selfRecordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: ModernDesign.spacing[1],
+    marginBottom: ModernDesign.spacing[4],
+  },
+  selfRecordText: {
+    fontSize: ModernDesign.typography.fontSize.xs,
     color: ModernDesign.colors.text.secondary,
   },
   breakdownSection: {

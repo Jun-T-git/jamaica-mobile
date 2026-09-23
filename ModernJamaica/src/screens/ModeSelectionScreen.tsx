@@ -11,10 +11,12 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Logo } from '../components/atoms/Logo';
 import { Typography } from '../components/atoms/Typography';
 import { BannerAdView } from '../components/molecules/BannerAdView';
+import { PlayerStatsStrip } from '../components/molecules/PlayerStatsStrip';
 import { TutorialModal } from '../components/organisms/TutorialModal';
 import { ModernDesign } from '../constants';
 import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';
+import { useStatsStore } from '../store/statsStore';
 import { GameMode } from '../types';
 import { soundManager, SoundType } from '../utils/SoundManager';
 
@@ -29,6 +31,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
 }) => {
   const { loadStoredData } = useGameStore();
   const { loadDisplayName, loadSoundSetting, displayName } = useSettingsStore();
+  const { stats, loadStats, getDisplayStreakDays } = useStatsStore();
   const [showTutorial, setShowTutorial] = useState(false);
 
   // 初回起動時は遊び方を自動で表示
@@ -57,7 +60,9 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
     loadDisplayName();
     // 音声設定を読み込み
     loadSoundSetting();
-  }, [loadStoredData, loadDisplayName, loadSoundSetting]);
+    // 自己記録（連続日数・累計正解）を読み込み
+    loadStats();
+  }, [loadStoredData, loadDisplayName, loadSoundSetting, loadStats]);
 
   useEffect(() => {
     // 表示名の状態をログに出力（デバッグ用）
@@ -113,6 +118,13 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
 
       {/* Game Mode Selection */}
       <View style={styles.modesContainer}>
+        {/* 自己記録（まだ遊んでいなければ出ない） */}
+        <PlayerStatsStrip
+          streakDays={getDisplayStreakDays()}
+          totalCorrect={stats.totalCorrect}
+          gamesPlayed={stats.gamesPlayed}
+        />
+
         {/* Challenge Mode Button */}
         <TouchableOpacity
           onPress={() => handleModeSelect(GameMode.CHALLENGE)}

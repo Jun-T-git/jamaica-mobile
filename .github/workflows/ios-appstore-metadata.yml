@@ -1,6 +1,7 @@
 name: iOS App Store Metadata
 
-# 手動トリガー。App Store のメタデータ(日本語)とスクリーンショットを App Store Connect へ反映する。
+# 手動トリガー。App Store の掲載文(ModernJamaica/fastlane/metadata/ja、タイトル・説明・キーワード・What's New 等)と
+# スクリーンショットを App Store Connect へ反映する（現行値を上書きする）。
 # バイナリ(ipa)は送らず、審査提出もしない（内容確認後に App Store Connect で手動提出）。
 #   gh workflow run ios-appstore-metadata.yml -f version=1.1.4
 on:

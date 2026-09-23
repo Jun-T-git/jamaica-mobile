@@ -83,12 +83,12 @@ platform :ios do
     UI.success("Uploaded #{version} (#{build_number}). App Store Connect で処理完了後、内部テスターに配信されます。")
   end
 
-  desc "App Store の What's New(リリースノート)とスクリーンショットを反映する（バイナリは送らない）"
+  desc "App Store の掲載文(タイトル/サブタイトル/説明/キーワード/宣伝文/URL/What's New)とスクリーンショットを反映する（バイナリは送らない）"
   desc "使い方: bundle exec fastlane ios metadata version:1.1.4"
   desc ""
-  desc "反映するのは fastlane/metadata/ja/release_notes.txt と fastlane/screenshots/ja/*.png のみ。"
-  desc "タイトル・サブタイトル・説明・キーワード・宣伝文など既存メタデータは意図的に置いていない"
-  desc "ため上書きされない（App Store Connect の現行値を維持）。審査提出もしない。"
+  desc "反映するのは fastlane/metadata/ja/*.txt と fastlane/screenshots/ja/*.png。"
+  desc "掲載文はリポジトリが正（fastlane/metadata/ja）。実行すると App Store Connect の現行値を上書きするので、"
+  desc "変更内容を確認してから流すこと。審査提出はしない。"
   desc "必要な環境変数は beta レーンと同じ（ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_PATH）。"
   lane :metadata do |options|
     key_id    = ENV.fetch("ASC_KEY_ID")
@@ -111,7 +111,7 @@ platform :ios do
       api_key: api_key,
       app_identifier: APP_ID,
       app_version: version,
-      # メタデータ本文とスクショのみ。ビルド(ipa)は beta レーン/CI で別途アップロード。
+      # 掲載文(fastlane/metadata/ja)とスクショのみ。ビルド(ipa)は beta レーン/CI で別途アップロード。
       skip_binary_upload: true,
       # 既存スクショを今回の6枚で置き換える。
       overwrite_screenshots: true,
