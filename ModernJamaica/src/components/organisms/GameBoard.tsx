@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,6 +11,7 @@ import {
 import Svg, { Line } from 'react-native-svg';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ModernDesign } from '../../constants';
+import { treeNodeVisuals, treeOperatorColor } from '../../design/treeNodeVisuals';
 import { useGameStore } from '../../store/gameStore';
 import { GameMode, Operator } from '../../types';
 import { Dialog } from '../molecules/Dialog';
@@ -75,7 +77,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     return () => subscription?.remove();
   }, []);
 
-  const { width: screenWidth } = dimensions;
+  const { width: screenWidth, height: screenHeight } = dimensions;
+  const compact = screenHeight < 750;
   const containerPadding = screenWidth * 0.05;
   const availableWidth = screenWidth - containerPadding * 2;
   const cellSize = Math.floor(availableWidth * 0.095);
@@ -346,22 +349,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     { type: Operator.DIVIDE, label: '÷', color: ModernDesign.colors.accent.purple },
   ];
 
-  // Get operator color based on operator type
-  const getOperatorColor = (operator?: Operator): string => {
-    switch (operator) {
-      case Operator.ADD:
-        return ModernDesign.colors.accent.mint;
-      case Operator.SUBTRACT:
-        return ModernDesign.colors.accent.coral;
-      case Operator.MULTIPLY:
-        return ModernDesign.colors.accent.gold;
-      case Operator.DIVIDE:
-        return ModernDesign.colors.accent.purple;
-      default:
-        return ModernDesign.colors.border.medium;
-    }
-  };
-
   // Calculate edges between parent and child nodes
   const getEdges = () => {
     const edges: Array<{
@@ -404,7 +391,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         }
 
         if (parentRow !== -1 && leftChildRow !== -1 && rightChildRow !== -1) {
-          const edgeColor = getOperatorColor(node.operator);
+          const edgeColor = treeOperatorColor(node.operator);
           
           edges.push({
             parentRow,
@@ -436,7 +423,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const GRID_COLS = 9;
   const GRID_ROWS = 5;
   const cellGap = screenWidth * 0.02;
-  const gridPadding = screenWidth * 0.03;
+  // 外側の列のノードがグリッドの枠をはみ出す分も確保する。
+  const gridPadding = screenWidth * 0.04;
 
   // Calculate grid dimensions
   const totalCellWidth = availableWidth - gridPadding * 2;
@@ -445,7 +433,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const actualCellSize = Math.min(cellTotalSize, cellSize);
 
   // Calculate vertical spacing - consistent spacing between all rows
-  const rowGap = actualCellSize * 1.0;
+  const rowGap = actualCellSize * (compact ? 0.55 : 1.0);
 
   // Grid container dimensions
   const gridContainerWidth =
@@ -472,11 +460,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.gameArea}>
+      <ScrollView
+        style={styles.gameScroll}
+        contentContainerStyle={[styles.gameArea, compact && styles.compactGameArea]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Target - Prominent but minimal */}
-        <View style={styles.targetContainer}>
+        <View style={[styles.targetContainer, compact && styles.compactTargetContainer]}>
           <Text style={styles.targetLabel}>つくる数</Text>
-          <Text style={styles.targetNumber}>{gameInfo.target}</Text>
+          <Text style={[styles.targetNumber, compact && styles.compactTargetNumber]}>{gameInfo.target}</Text>
           {gameState?.mode === GameMode.CHALLENGE && (
             <ComboIndicator
               combo={gameState.currentCombo}
@@ -486,7 +478,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         </View>
 
         {/* Main Game Grid */}
-        <View style={styles.gridWrapper}>
+        <View style={[styles.gridWrapper, { minHeight: gridContainerHeight + actualNodeSize }]}>
           <Animated.View
             style={[
               styles.gridInner,
@@ -581,7 +573,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         </View>
 
         {/* Current State Indicator - Visual only */}
-        <View style={styles.stateIndicator}>
+        <View style={[styles.stateIndicator, compact && styles.compactStateIndicator]}>
           {showWrongAnswer && (
             <View style={styles.wrongAnswerDisplay}>
               <MaterialIcons
@@ -615,13 +607,14 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         </View>
 
         {/* Operations - Bottom dock style */}
-        <View style={styles.operationDock}>
-          <View style={styles.operatorRow}>
+        <View style={[styles.operationDock, compact && styles.compactOperationDock]}>
+          <View style={[styles.operatorRow, compact && styles.compactOperatorRow]}>
             {operators.map(op => (
               <TouchableOpacity
                 key={op.type}
                 style={[
                   styles.operatorButton,
+                  compact && styles.compactOperatorButton,
                   selectedOperator === op.type && styles.activeOperator,
                   (!firstNode || disabled) && styles.disabledOperator,
                   selectedOperator === op.type && { backgroundColor: op.color },
@@ -711,7 +704,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </ScrollView>
 
       {/* Skip Confirmation Dialog */}
       <Dialog
@@ -747,10 +740,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ModernDesign.colors.background.primary,
   },
-  gameArea: {
+  gameScroll: {
     flex: 1,
+  },
+  gameArea: {
+    flexGrow: 1,
     paddingHorizontal: ModernDesign.spacing[4],
     paddingVertical: ModernDesign.spacing[3],
+  },
+  compactGameArea: {
+    paddingVertical: ModernDesign.spacing[2],
   },
   // Target - Clean and minimal
   targetContainer: {
@@ -760,6 +759,10 @@ const styles = StyleSheet.create({
     marginHorizontal: ModernDesign.spacing[2],
     borderRadius: ModernDesign.borderRadius.xl,
     marginBottom: ModernDesign.spacing[4],
+  },
+  compactTargetContainer: {
+    paddingVertical: ModernDesign.spacing[2],
+    marginBottom: ModernDesign.spacing[2],
   },
   targetLabel: {
     fontSize: ModernDesign.typography.fontSize.sm,
@@ -772,6 +775,9 @@ const styles = StyleSheet.create({
     fontSize: ModernDesign.typography.fontSize['5xl'],
     fontWeight: ModernDesign.typography.fontWeight.bold,
     color: ModernDesign.colors.accent.neon,
+  },
+  compactTargetNumber: {
+    fontSize: ModernDesign.typography.fontSize['4xl'],
   },
   // Grid
   gridWrapper: {
@@ -786,18 +792,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   cellContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 6,
+    ...treeNodeVisuals.frame,
   },
   filledCell: {
-    backgroundColor: ModernDesign.colors.background.tertiary,
-    borderColor: ModernDesign.colors.border.subtle,
+    ...treeNodeVisuals.fill,
   },
   inactiveCell: {
     backgroundColor: ModernDesign.colors.background.primary,
@@ -819,10 +817,7 @@ const styles = StyleSheet.create({
     borderColor: ModernDesign.colors.error,
   },
   cellText: {
-    textAlign: 'center',
-    fontSize: ModernDesign.typography.fontSize.xl,
-    fontWeight: ModernDesign.typography.fontWeight.bold,
-    color: ModernDesign.colors.text.primary,
+    ...treeNodeVisuals.text,
   },
   inactiveCellText: {
     color: ModernDesign.colors.text.disabled,
@@ -840,6 +835,10 @@ const styles = StyleSheet.create({
     minHeight: ModernDesign.spacing[10],
     justifyContent: 'center',
     marginBottom: ModernDesign.spacing[5],
+  },
+  compactStateIndicator: {
+    minHeight: ModernDesign.spacing[6],
+    marginBottom: ModernDesign.spacing[2],
   },
   selectionDisplay: {
     flexDirection: 'row',
@@ -871,10 +870,16 @@ const styles = StyleSheet.create({
     borderColor: ModernDesign.colors.border.subtle,
     ...ModernDesign.shadows.lg,
   },
+  compactOperationDock: {
+    paddingVertical: ModernDesign.spacing[2],
+  },
   operatorRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     marginBottom: ModernDesign.spacing[4],
+  },
+  compactOperatorRow: {
+    marginBottom: ModernDesign.spacing[2],
   },
   operatorButton: {
     width: 56,
@@ -886,6 +891,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: ModernDesign.colors.border.medium,
     ...ModernDesign.shadows.base,
+  },
+  compactOperatorButton: {
+    width: 48,
+    height: 48,
   },
   activeOperator: {
     transform: [{ scale: 1.1 }],
@@ -938,6 +947,7 @@ const styles = StyleSheet.create({
     backgroundColor: ModernDesign.colors.glass.background,
   },
   wrongAnswerText: {
+    flexShrink: 1,
     fontSize: ModernDesign.typography.fontSize.sm,
     fontWeight: ModernDesign.typography.fontWeight.semibold,
     color: ModernDesign.colors.error,

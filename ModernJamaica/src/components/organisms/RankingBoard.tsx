@@ -150,6 +150,8 @@ export const RankingBoard: React.FC<RankingBoardProps> = ({
 const styles = StyleSheet.create({
   userRankContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: ModernDesign.spacing[2],
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: ModernDesign.spacing[3],

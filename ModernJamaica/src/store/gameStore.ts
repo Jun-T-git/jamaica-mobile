@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { GameState, GameMode, GameStatus, UnifiedGameState, NodeData, DifficultyLevel } from '../types';
+import { GameState, GameMode, GameStatus, UnifiedGameState, NodeData, DifficultyLevel, ProblemData } from '../types';
 import { generateProblem } from '../utils/problemGenerator';
 import { getGameModeConfig } from '../config';
 import { getDifficultyConfig, DEFAULT_DIFFICULTY } from '../config/difficulty';
@@ -17,6 +17,8 @@ import { useSettingsStore } from './settingsStore';
 import { useStatsStore } from './statsStore';
 
 interface GameStore extends GameState {
+  reviewProblems: { problem: ProblemData; result: 'correct' | 'skipped' | 'unfinished' }[];
+  gameSessionId: number;
   // UI関連の状態
   nodes: NodeData[];
   selectedNodeId: string | null;
@@ -92,6 +94,8 @@ const createInitialGameState = (mode: GameMode, difficulty: DifficultyLevel = DE
 };
 
 export const useGameStore = create<GameStore>((set, get) => ({
+  reviewProblems: [],
+  gameSessionId: 0,
   // 初期状態
   gameState: createInitialGameState(GameMode.CHALLENGE, DEFAULT_DIFFICULTY),
   gameStatus: GameStatus.MENU,
@@ -185,6 +189,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     set({
       gameState: createInitialGameState(mode, difficulty),
+      reviewProblems: [],
+      gameSessionId: get().gameSessionId + 1,
       gameStatus: GameStatus.COUNTDOWN,
       highScores: savedHighScores,
       rankingSubmissionResult: null,
@@ -329,7 +335,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const isCorrect = Math.abs(finalValue - state.targetNumber) < 0.001;
       
       if (isCorrect) {
-        set({ gameStatus: GameStatus.CORRECT });
+        set({
+          gameStatus: GameStatus.CORRECT,
+          reviewProblems: [...state.reviewProblems, {
+            problem: { ...state.currentProblem, numbers: [...state.currentProblem.numbers] },
+            result: 'correct',
+          }],
+        });
         
         // 問題正解効果音
         soundManager.play(SoundType.CORRECT);
@@ -461,9 +473,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { gameState: game } = state;
     
     // スキップ可能かチェック
-    if (game.skipCount <= 0) return;
+    if (game.skipCount <= 0 || state.gameStatus !== GameStatus.BUILDING) return;
     
     set({
+      reviewProblems: [...state.reviewProblems, { problem: { ...state.currentProblem, numbers: [...state.currentProblem.numbers] }, result: 'skipped' }],
       gameState: {
         ...game,
         skipCount: game.skipCount - 1,
@@ -520,6 +533,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     const { gameState: game } = state;
     
+    if (game.finalScore !== undefined) return;
+
     // タイマー停止
     get().stopTimer();
     
@@ -544,6 +559,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // 状態を更新
     // リザルト画面が「送信完了を待ってから順位を取得」できるよう、送信中フラグは遷移前に立てる
     set({
+      reviewProblems: state.gameStatus !== GameStatus.CORRECT && state.currentProblem.numbers.length === 5
+        ? [...state.reviewProblems, { problem: { ...state.currentProblem, numbers: [...state.currentProblem.numbers] }, result: 'unfinished' }]
+        : state.reviewProblems,
       gameStatus: isManual ? GameStatus.MANUALLY_ENDED : GameStatus.TIMEUP,
       gameState: {
         ...game,

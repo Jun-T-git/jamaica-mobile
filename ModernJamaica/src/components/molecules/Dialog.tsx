@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
+import { ScrollView, View, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { Button } from '../atoms/Button';
 import { Icon } from '../atoms/Icon';
 import { Typography } from '../atoms/Typography';
@@ -66,7 +66,11 @@ export const Dialog: React.FC<DialogProps> = ({
         onPress={handleBackdropPress}
         activeOpacity={1}
       />
-      <View style={cardStyle}>
+      <ScrollView
+        style={cardStyle}
+        contentContainerStyle={styles.cardContent}
+        showsVerticalScrollIndicator={false}
+      >
         {hasStructuredContent ? (
           <>
             {/* Structured Header */}
@@ -125,7 +129,7 @@ export const Dialog: React.FC<DialogProps> = ({
           /* Custom Content */
           children
         )}
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -154,10 +158,13 @@ const styles = StyleSheet.create({
     borderRadius: ModernDesign.borderRadius['2xl'],
     ...ModernDesign.shadows.lg,
     zIndex: 1000,
-    paddingVertical: ModernDesign.spacing[8],
-    paddingHorizontal: ModernDesign.spacing[6],
     maxWidth: '90%',
     maxHeight: '80%',
+    flexGrow: 0,
+  },
+  cardContent: {
+    paddingVertical: ModernDesign.spacing[8],
+    paddingHorizontal: ModernDesign.spacing[6],
   },
   header: {
     alignItems: 'center',

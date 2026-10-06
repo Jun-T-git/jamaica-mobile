@@ -1,207 +1,195 @@
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import mobileAds, {
-  AdEventType,
-  BannerAdSize,
-  InterstitialAd,
-  MaxAdContentRating,
-  RequestOptions,
-  TestIds,
+  AdEventType, InterstitialAd, MaxAdContentRating,
+  RequestOptions, RewardedAd, RewardedAdEventType, TestIds,
 } from 'react-native-google-mobile-ads';
 import { requestTrackingPermission } from 'react-native-tracking-transparency';
+import { MONETIZATION } from '../config/monetization';
+import { useMonetizationStore } from '../store/monetizationStore';
+import { canReview, shouldShowInterstitial } from '../utils/monetizationPolicy';
+import { analyticsService } from './analyticsService';
+import { purchaseService } from './purchaseService';
+import { reviewAccessService } from './reviewAccessService';
 
-// AdMob IDs
-// __DEV__ ではテスト用ID、本番では各プラットフォームの本番IDを使う。
-// Android の本番広告IDは未取得（技術的負債）。プレースホルダを渡すと
-// 無効IDへのリクエストで広告枠が壊れるため、取得できるまで undefined とし、
-// 呼び出し側で広告自体を出さない（BannerAdView は null、interstitial は未初期化）。
 const adUnitIds = {
-  banner: __DEV__
-    ? TestIds.BANNER
-    : Platform.select({
-        ios: 'ca-app-pub-9884011718535966/5647036127', // 本番用iOSバナー広告ID
-        android: undefined, // TODO: 本番Androidバナー広告ID未設定
-      }),
-  interstitial: __DEV__
-    ? TestIds.INTERSTITIAL
-    : Platform.select({
-        ios: 'ca-app-pub-9884011718535966/7002465924', // 本番用iOSインタースティシャル広告ID
-        android: undefined, // TODO: 本番Androidインタースティシャル広告ID未設定
-      }),
+  interstitial: __DEV__ ? TestIds.INTERSTITIAL : Platform.select({ ios: 'ca-app-pub-9884011718535966/7002465924', android: undefined }),
+  rewarded: __DEV__ ? TestIds.REWARDED : Platform.select({ ios: MONETIZATION.rewardedIosAdUnitId, android: undefined }),
 };
-
-// 広告リクエストに付ける文脈ヒント。IDFA が無い場合の広告選択はアプリの文脈だけが頼りなので、
-// 「パズルゲーム」であることを伝えてゲーム系の広告が選ばれやすくする
 export const AD_REQUEST_OPTIONS: RequestOptions = {
   keywords: ['game', 'puzzle', 'math', 'brain training', 'ゲーム', 'パズル', '脳トレ'],
 };
+const COUNTER_KEY = '@jamaica_games_since_interstitial';
+const LAST_SHOWN_KEY = '@jamaica_last_fullscreen_ad_at';
 
-// 前回の広告表示からのゲーム数（アプリを再起動しても引き継ぐ）
-const GAMES_SINCE_INTERSTITIAL_KEY = '@jamaica_games_since_interstitial';
+export class AdService {
+  private interstitial: InterstitialAd | null = null;
+  private startedAt = Date.now();
+  private lastShownAt = 0;
+  private games = 0;
+  private policyLoaded = false;
+  private lastRecordedSession = -1;
+  private fullscreenBusy = false;
+  private sdkReady = false;
+  private initialization?: Promise<void>;
+  private persistence = Promise.resolve();
 
-// インタースティシャル広告のインスタンス
-let interstitialAd: InterstitialAd | null = null;
+  initialize(): Promise<void> {
+    if (!this.initialization) this.initialization = this.initializeOnce();
+    return this.initialization;
+  }
 
-class AdService {
-  private interstitialLoadAttempts = 0;
-  private readonly maxInterstitialLoadAttempts = 3;
-  private readonly interstitialFrequency = 3; // 3ゲームごとに表示
-  private onInterstitialClosed: (() => void) | null = null;
-  private resolveReady!: () => void;
-  // SDK の初期化完了。バナーはこれを待ってから読み込む（ATT の回答前にリクエストしない）
-  readonly ready = new Promise<void>(resolve => {
-    this.resolveReady = resolve;
-  });
-
-  /**
-   * 広告 SDK を初期化する（起動時に 1 回）
-   * 1. ATT（トラッキング許可）を先に求める。許可されると IDFA が付き、パーソナライズ広告
-   *    （ゲームをよく遊ぶ人にはゲーム広告、など）が配信される。拒否されても広告は出る
-   * 2. 配信される広告コンテンツを PG 以下に制限する（家族向けアプリのため。
-   *    G だとスマホゲームの広告の大半が除外され、無関係な汎用広告ばかりになる）
-   * 3. SDK を初期化し、インタースティシャルの事前読み込みを始める
-   * 失敗してもゲーム進行には影響させない
-   */
-  async initialize(): Promise<void> {
+  private async initializeOnce(): Promise<void> {
     try {
-      if (Platform.OS === 'ios') {
-        const status = await requestTrackingPermission();
-        console.log(`📡 Tracking permission: ${status}`);
-      }
-      await mobileAds().setRequestConfiguration({
-        maxAdContentRating: MaxAdContentRating.PG,
-      });
+      await Promise.all([purchaseService.initialize(), reviewAccessService.initialize(), this.loadPolicy()]);
+      if (Platform.OS === 'ios' && !useMonetizationStore.getState().hasRemovedAds) await requestTrackingPermission();
+      await mobileAds().setRequestConfiguration({ maxAdContentRating: MaxAdContentRating.PG });
       await mobileAds().initialize();
-      console.log('AdMob SDK initialized');
-      this.initializeInterstitialAd();
+      this.sdkReady = true;
+      if (adUnitIds.interstitial) {
+        this.interstitial = InterstitialAd.createForAdRequest(adUnitIds.interstitial, AD_REQUEST_OPTIONS);
+        this.interstitial.addAdEventListener(AdEventType.PAID, payload => this.trackRevenue('interstitial', payload, 'result_menu'));
+        this.interstitial.addAdEventListener(AdEventType.OPENED, () => {
+          this.games = 0;
+          this.lastShownAt = Date.now();
+          this.persistPolicy();
+          analyticsService.logEvent('ad_shown', { format: 'interstitial', placement: 'result_menu' });
+        });
+        this.loadInterstitial();
+      }
     } catch (error) {
-      console.error('AdMob SDK initialization error:', error);
-    } finally {
-      this.resolveReady();
+      console.warn('広告を初期化できませんでした', error);
     }
   }
 
-  private initializeInterstitialAd() {
-    if (!adUnitIds.interstitial) return;
-
-    interstitialAd = InterstitialAd.createForAdRequest(adUnitIds.interstitial, AD_REQUEST_OPTIONS);
-
-    // イベントリスナーの設定
-    interstitialAd.addAdEventListener(
-      AdEventType.LOADED,
-      () => {
-        console.log('✅ Interstitial ad loaded successfully!');
-        console.log(`🎯 Ad Unit ID: ${adUnitIds.interstitial}`);
-        console.log(`🔧 Is Dev Mode: ${__DEV__}`);
-        this.interstitialLoadAttempts = 0;
-      },
-    );
-
-    interstitialAd.addAdEventListener(
-      AdEventType.ERROR,
-      error => {
-        console.error('❌ Interstitial ad failed to load!');
-        console.error(`🎯 Ad Unit ID: ${adUnitIds.interstitial}`);
-        console.error(`🔧 Is Dev Mode: ${__DEV__}`);
-        console.error('📋 Error details:', error);
-        this.handleInterstitialLoadError();
-      },
-    );
-
-    interstitialAd.addAdEventListener(
-      AdEventType.CLOSED,
-      () => {
-        console.log('Interstitial ad closed');
-        this.onInterstitialClosed?.();
-        this.onInterstitialClosed = null;
-        // 次の広告を事前読み込み
-        this.loadInterstitialAd();
-      },
-    );
-
-    // 初回読み込み
-    this.loadInterstitialAd();
-  }
-
-  private loadInterstitialAd() {
-    if (!interstitialAd) return;
-
-    interstitialAd.load();
-  }
-
-  private handleInterstitialLoadError() {
-    this.interstitialLoadAttempts++;
-
-    if (this.interstitialLoadAttempts < this.maxInterstitialLoadAttempts) {
-      // リトライ
-      setTimeout(() => {
-        this.loadInterstitialAd();
-      }, 2000 * this.interstitialLoadAttempts); // 指数バックオフ
-    }
-  }
-
-  // バナー広告のユニットIDを取得
-  getBannerAdUnitId(): string | undefined {
-    return adUnitIds.banner;
-  }
-
-  // バナー広告のサイズを取得（全デバイス共通）
-  getBannerAdSize(): BannerAdSize {
-    // アンカー付きアダプティブバナーは画面幅いっぱいに広がり、各デバイスに
-    // 最適な高さへ自動調整される（Google 推奨）。固定サイズをデバイス幅で
-    // 出し分けると横幅の隙間や高さの不揃いで表示崩れの原因になるため使わない。
-    return BannerAdSize.ANCHORED_ADAPTIVE_BANNER;
-  }
-
-  /**
-   * ゲーム終了を記録し、表示タイミングならインタースティシャル広告を表示する
-   * 広告が閉じられるまで待つので、呼び出し側は await してから画面遷移すること
-   *
-   * ゲーム数はAsyncStorageに保存する（1回の起動で1〜2ゲームしか遊ばない
-   * ユーザーにも、通算3ゲームごとに表示されるようにするため）
-   */
-  async showInterstitialAfterGame(): Promise<boolean> {
-    const gamesSinceLastAd = (await this.loadGamesSinceInterstitial()) + 1;
-
-    if (gamesSinceLastAd < this.interstitialFrequency || !interstitialAd?.loaded) {
-      // 広告の準備ができていない場合はカウントを持ち越し、次のゲーム後に表示する
-      await this.saveGamesSinceInterstitial(gamesSinceLastAd);
-      return false;
-    }
-
-    const ad = interstitialAd;
+  private async loadPolicy() {
     try {
-      await new Promise<void>((resolve, reject) => {
-        this.onInterstitialClosed = resolve;
-        ad.show().catch(reject);
+      const values = await AsyncStorage.multiGet([COUNTER_KEY, LAST_SHOWN_KEY]);
+      const games = Number(values[0][1]);
+      const shownAt = Number(values[1][1]);
+      this.games += Number.isFinite(games) ? Math.max(0, games) : 0;
+      this.lastShownAt = Number.isFinite(shownAt) ? Math.max(0, shownAt) : 0;
+    } catch { /* 永続化の失敗ではゲームを止めない */ }
+    this.policyLoaded = true;
+    this.persistPolicy();
+  }
+
+  private persistPolicy() {
+    if (!this.policyLoaded) return;
+    const entries: [string, string][] = [[COUNTER_KEY, String(this.games)], [LAST_SHOWN_KEY, String(this.lastShownAt)]];
+    this.persistence = this.persistence.then(() => AsyncStorage.multiSet(entries)).catch(() => {});
+  }
+
+  recordCompletedGame(session: number) {
+    if (this.lastRecordedSession === session) return;
+    this.lastRecordedSession = session;
+    this.games++;
+    this.persistPolicy();
+  }
+
+  private loadInterstitial() {
+    if (useMonetizationStore.getState().hasRemovedAds) return;
+    try { this.interstitial?.load(); } catch { /* 次のメニュー遷移で再試行 */ }
+  }
+
+  isRewardConfigured(): boolean { return !!adUnitIds.rewarded; }
+
+  trackRevenue(format: string, payload: unknown, placement = 'result_review') {
+    // SDK 15 の PAID コールバック型は undefined だが、ネイティブは PaidEvent を送る。
+    if (!payload || typeof payload !== 'object') return;
+    const event = payload as { value?: number; currency?: string; precision?: number };
+    if (typeof event.value !== 'number' || !event.currency) return;
+    analyticsService.logEvent('ad_revenue', {
+      format, placement, value: event.value, currency: event.currency,
+      precision: event.precision ?? 0,
+    });
+  }
+
+  async showInterstitialOnMenu(): Promise<boolean> {
+    const state = useMonetizationStore.getState();
+    if (this.fullscreenBusy || state.purchaseBusy || state.rewardBusy || AppState.currentState !== 'active'
+      || !shouldShowInterstitial({ ...state, now: Date.now(), startedAt: this.startedAt,
+        lastShownAt: this.lastShownAt, games: this.games })) return false;
+    const ad = this.interstitial;
+    if (!ad?.loaded) { this.loadInterstitial(); return false; }
+    this.fullscreenBusy = true;
+    try {
+      return await new Promise<boolean>(resolve => {
+        let opened = false;
+        let settled = false;
+        const unsubscribers: (() => void)[] = [];
+        const finish = (shown: boolean) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeout);
+          unsubscribers.forEach(unsubscribe => unsubscribe());
+          resolve(shown);
+        };
+        const timeout = setTimeout(() => finish(false), MONETIZATION.adLoadTimeoutMs);
+        unsubscribers.push(ad.addAdEventListener(AdEventType.OPENED, () => { opened = true; clearTimeout(timeout); }));
+        unsubscribers.push(ad.addAdEventListener(AdEventType.CLOSED, () => finish(opened)));
+        unsubscribers.push(ad.addAdEventListener(AdEventType.ERROR, () => finish(false)));
+        ad.show().catch(() => finish(false));
       });
-      await this.saveGamesSinceInterstitial(0);
-      return true;
-    } catch (error) {
-      console.error('Error showing interstitial ad:', error);
-      this.onInterstitialClosed = null;
-      await this.saveGamesSinceInterstitial(gamesSinceLastAd);
+    } catch {
       return false;
+    } finally {
+      this.fullscreenBusy = false;
+      this.loadInterstitial();
     }
   }
 
-  private async loadGamesSinceInterstitial(): Promise<number> {
+  async showRewardForReview(): Promise<'earned' | 'cancelled' | 'unavailable'> {
+    const state = useMonetizationStore.getState();
+    if (canReview(state.hasRemovedAds, state.reviewExpiresAt, Date.now())) return 'earned';
+    if (!this.sdkReady || !adUnitIds.rewarded || this.fullscreenBusy || state.purchaseBusy
+      || state.rewardBusy || AppState.currentState !== 'active') return 'unavailable';
+    this.fullscreenBusy = true;
+    useMonetizationStore.setState({ rewardBusy: true });
+    analyticsService.logEvent('review_reward_requested');
     try {
-      const stored = await AsyncStorage.getItem(GAMES_SINCE_INTERSTITIAL_KEY);
-      return stored ? parseInt(stored, 10) || 0 : 0;
-    } catch (error) {
-      return 0;
-    }
-  }
-
-  private async saveGamesSinceInterstitial(count: number): Promise<void> {
-    try {
-      await AsyncStorage.setItem(GAMES_SINCE_INTERSTITIAL_KEY, count.toString());
-    } catch (error) {
-      console.warn('Failed to save interstitial counter:', error);
+      const ad = RewardedAd.createForAdRequest(adUnitIds.rewarded, AD_REQUEST_OPTIONS);
+      return await new Promise<'earned' | 'cancelled' | 'unavailable'>(resolve => {
+        let earned = false;
+        let settled = false;
+        let grant = Promise.resolve();
+        const unsubscribers: (() => void)[] = [];
+        const finish = (result: 'earned' | 'cancelled' | 'unavailable') => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeout);
+          unsubscribers.forEach(unsubscribe => unsubscribe());
+          grant.finally(() => resolve(result));
+        };
+        const timeout = setTimeout(() => finish('unavailable'), MONETIZATION.adLoadTimeoutMs);
+        unsubscribers.push(ad.addAdEventListener(RewardedAdEventType.LOADED, () => {
+          if (AppState.currentState !== 'active') { finish('unavailable'); return; }
+          ad.show().catch(() => finish('unavailable'));
+        }));
+        unsubscribers.push(ad.addAdEventListener(AdEventType.OPENED, () => {
+          clearTimeout(timeout);
+          this.lastShownAt = Date.now();
+          this.persistPolicy();
+          analyticsService.logEvent('ad_shown', { format: 'rewarded', placement: 'result_review' });
+        }));
+        unsubscribers.push(ad.addAdEventListener(AdEventType.PAID, payload => this.trackRevenue('rewarded', payload)));
+        unsubscribers.push(ad.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
+          if (earned) return;
+          earned = true;
+          grant = reviewAccessService.grant();
+          analyticsService.logEvent('review_reward_earned');
+        }));
+        unsubscribers.push(ad.addAdEventListener(AdEventType.CLOSED, () => finish(earned ? 'earned' : 'cancelled')));
+        unsubscribers.push(ad.addAdEventListener(AdEventType.ERROR, () => finish(earned ? 'earned' : 'unavailable')));
+        try { ad.load(); } catch { finish('unavailable'); }
+      });
+    } catch {
+      return 'unavailable';
+    } finally {
+      this.fullscreenBusy = false;
+      useMonetizationStore.setState({ rewardBusy: false });
     }
   }
 }
 
-// シングルトンインスタンス
 export const adService = new AdService();

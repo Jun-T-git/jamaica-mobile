@@ -61,7 +61,14 @@ export const SuccessOverlay: React.FC<SuccessOverlayProps> = ({
         </Typography>
 
         {score !== undefined && score > 0 && (
-          <Typography variant="h4" style={styles.scoreText} textAlign="center">
+          <Typography
+            variant="h4"
+            style={styles.scoreText}
+            textAlign="center"
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.5}
+          >
             +{score.toLocaleString()}点
           </Typography>
         )}
@@ -94,6 +101,7 @@ const styles = StyleSheet.create({
     zIndex: 2000,
   },
   content: {
+    maxWidth: '90%',
     backgroundColor: ModernDesign.colors.background.tertiary,
     borderRadius: ModernDesign.borderRadius.xl,
     borderWidth: 1,

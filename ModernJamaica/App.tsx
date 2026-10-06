@@ -15,6 +15,8 @@ import { ChallengeModeScreen } from './src/screens/ChallengeModeScreen';
 import { InfiniteModeScreen } from './src/screens/InfiniteModeScreen';
 import { ChallengeResultScreen } from './src/screens/ChallengeResultScreen';
 import { RankingScreen } from './src/screens/RankingScreen';
+import { PurchaseScreen } from './src/screens/PurchaseScreen';
+import { PurchaseSource } from './src/types/purchase';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { useSettingsStore } from './src/store/settingsStore';
@@ -38,6 +40,7 @@ type RootStackParamList = {
   };
   Ranking: undefined;
   Settings: undefined;
+  Purchase: { source: PurchaseSource };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -92,6 +95,7 @@ function App() {
             <Stack.Screen name="ChallengeResult" component={ChallengeResultScreen} />
             <Stack.Screen name="Ranking" component={RankingScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="Purchase" component={PurchaseScreen} options={{ presentation: 'modal' }} />
           </Stack.Navigator>
         </NavigationContainer>
       </ErrorBoundary>

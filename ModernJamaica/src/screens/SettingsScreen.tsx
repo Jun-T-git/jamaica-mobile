@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Typography } from '../components/atoms/Typography';
-import { BannerAdView } from '../components/molecules/BannerAdView';
+import { PurchaseCard } from '../components/molecules/PurchaseCard';
 import { LINKS } from '../config/links';
 import { ModernDesign } from '../design/modernDesignSystem';
 import { analyticsService } from '../services/analyticsService';
@@ -326,6 +326,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.settingsList}>
+          <PurchaseCard onPress={() => navigation.navigate('Purchase', { source: 'settings' })} />
           {renderNicknameRow()}
 
           {renderSettingRow(
@@ -376,7 +377,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         <View style={styles.bottomSpacer} />
       </ScrollView>
 
-      <BannerAdView style={styles.bannerAd} />
+
     </SafeAreaView>
   );
 };
@@ -451,11 +452,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    minWidth: 0,
   },
   inlineTitleIcon: {
     marginRight: ModernDesign.spacing[3],
   },
   settingTitle: {
+    flexShrink: 1,
     color: ModernDesign.colors.text.primary,
     fontWeight: ModernDesign.typography.fontWeight.semibold,
     fontSize: ModernDesign.typography.fontSize.lg,
@@ -471,8 +474,11 @@ const styles = StyleSheet.create({
   settingRight: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 1,
+    maxWidth: '48%',
   },
   currentValue: {
+    flexShrink: 1,
     color: ModernDesign.colors.text.secondary,
     fontSize: ModernDesign.typography.fontSize.lg,
     marginRight: ModernDesign.spacing[3],
@@ -621,12 +627,6 @@ const styles = StyleSheet.create({
 
   // その他
   bottomSpacer: {
-    height: ModernDesign.spacing[24], // 広告＋下部セーフエリアぶんを確保
-  },
-  bannerAd: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    height: ModernDesign.spacing[4],
   },
 });

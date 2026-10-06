@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Button } from '../atoms/Button';
 import { ModernDesign } from '../../constants';
@@ -185,7 +185,11 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
       onRequestClose={handleSkip}
     >
       <View style={styles.overlay}>
-        <View style={styles.card}>
+        <ScrollView
+          style={styles.card}
+          contentContainerStyle={styles.cardContent}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.header}>
             <Text style={styles.stepCount}>
               遊び方 {stepIndex + 1}/{STEPS.length}
@@ -220,13 +224,13 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
             onPress={handleNext}
             variant="primary"
           />
-        </View>
+        </ScrollView>
       </View>
     </Modal>
   );
 };
 
-const NODE_SIZE = 48;
+const NODE_SIZE = 40;
 
 const styles = StyleSheet.create({
   overlay: {
@@ -239,12 +243,16 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 360,
-    padding: ModernDesign.spacing[5],
+    maxHeight: '100%',
+    flexGrow: 0,
     borderRadius: ModernDesign.borderRadius['2xl'],
     borderWidth: 1,
     borderColor: ModernDesign.colors.border.subtle,
     backgroundColor: ModernDesign.colors.background.tertiary,
     ...ModernDesign.shadows.xl,
+  },
+  cardContent: {
+    padding: ModernDesign.spacing[5],
   },
   header: {
     flexDirection: 'row',
@@ -263,7 +271,7 @@ const styles = StyleSheet.create({
     color: ModernDesign.colors.text.tertiary,
   },
   illustration: {
-    height: 200,
+    minHeight: 168,
     justifyContent: 'center',
     alignItems: 'center',
     gap: ModernDesign.spacing[3],

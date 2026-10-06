@@ -2,21 +2,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Logo } from '../components/atoms/Logo';
 import { Typography } from '../components/atoms/Typography';
-import { BannerAdView } from '../components/molecules/BannerAdView';
-import { PlayerStatsStrip } from '../components/molecules/PlayerStatsStrip';
 import { TutorialModal } from '../components/organisms/TutorialModal';
 import { ModernDesign } from '../constants';
+import { useMonetizationStore } from '../store/monetizationStore';
 import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';
-import { useStatsStore } from '../store/statsStore';
 import { GameMode } from '../types';
 import { soundManager, SoundType } from '../utils/SoundManager';
 
@@ -29,9 +29,11 @@ interface ModeSelectionScreenProps {
 export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   navigation,
 }) => {
+  const hasRemovedAds = useMonetizationStore(state => state.hasRemovedAds);
   const { loadStoredData } = useGameStore();
+  const { height: windowHeight } = useWindowDimensions();
+  const compact = windowHeight < 750;
   const { loadDisplayName, loadSoundSetting, displayName } = useSettingsStore();
-  const { stats, loadStats, getDisplayStreakDays } = useStatsStore();
   const [showTutorial, setShowTutorial] = useState(false);
 
   // 初回起動時は遊び方を自動で表示
@@ -60,9 +62,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
     loadDisplayName();
     // 音声設定を読み込み
     loadSoundSetting();
-    // 自己記録（連続日数・累計正解）を読み込み
-    loadStats();
-  }, [loadStoredData, loadDisplayName, loadSoundSetting, loadStats]);
+  }, [loadStoredData, loadDisplayName, loadSoundSetting]);
 
   useEffect(() => {
     // 表示名の状態をログに出力（デバッグ用）
@@ -100,10 +100,29 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
         backgroundColor={ModernDesign.colors.background.primary}
       />
 
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+      {!hasRemovedAds && (
+        <View style={styles.purchaseEntryRow}>
+          <TouchableOpacity style={styles.purchaseEntry} activeOpacity={0.8}
+            onPress={() => navigation.navigate('Purchase', { source: 'menu' })}
+            accessibilityRole="button" accessibilityLabel="広告を削除する。買い切り特典を見る">
+            <MaterialIcons name="block" size={18} color={ModernDesign.colors.accent.neon} />
+            <Typography variant="body2" style={styles.purchaseEntryText}>広告を削除</Typography>
+            <Typography variant="caption" color="secondary">買い切り</Typography>
+          </TouchableOpacity>
+        </View>
+      )}
       {/* Header with logo and typography */}
-      <View style={styles.header}>
-        <Logo size={100} style={styles.logo} />
-        <Typography variant="h4" textAlign="center" style={styles.title}>
+      <View style={[styles.header, compact && styles.compactHeader]}>
+        <Logo
+          size={compact ? 72 : 100}
+          style={compact ? styles.compactLogo : styles.logo}
+        />
+        <Typography variant="h4" textAlign="center" style={[styles.title, compact && styles.compactTitle]}>
           ジャマイカの木
         </Typography>
         <Typography
@@ -117,22 +136,15 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
       </View>
 
       {/* Game Mode Selection */}
-      <View style={styles.modesContainer}>
-        {/* 自己記録（まだ遊んでいなければ出ない） */}
-        <PlayerStatsStrip
-          streakDays={getDisplayStreakDays()}
-          totalCorrect={stats.totalCorrect}
-          gamesPlayed={stats.gamesPlayed}
-        />
-
+      <View style={[styles.modesContainer, compact && styles.compactModesContainer]}>
         {/* Challenge Mode Button */}
         <TouchableOpacity
           onPress={() => handleModeSelect(GameMode.CHALLENGE)}
-          style={styles.modeButton}
+          style={[styles.modeButton, compact && styles.compactModeButton]}
           activeOpacity={0.8}
         >
           <View style={styles.modeContent}>
-            <View style={styles.modeIconContainer}>
+            <View style={[styles.modeIconContainer, compact && styles.compactModeIconContainer]}>
               <MaterialIcons
                 name="timer"
                 size={28}
@@ -140,13 +152,13 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               />
             </View>
             <View style={styles.modeTextContainer}>
-              <Typography variant="h4" style={styles.modeTitle}>
+              <Typography variant="h4" style={[styles.modeTitle, compact && styles.compactModeTitle]}>
                 チャレンジモード
               </Typography>
               <Typography
                 variant="body2"
                 color="secondary"
-                style={styles.modeDescription}
+                style={[styles.modeDescription, compact && styles.compactModeDescription]}
               >
                 時間制限内に何問解けるか挑戦
               </Typography>
@@ -164,11 +176,11 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
         {/* Infinite Mode Button */}
         <TouchableOpacity
           onPress={() => handleModeSelect(GameMode.INFINITE)}
-          style={styles.modeButton}
+          style={[styles.modeButton, compact && styles.compactModeButton]}
           activeOpacity={0.8}
         >
           <View style={styles.modeContent}>
-            <View style={styles.modeIconContainer}>
+            <View style={[styles.modeIconContainer, compact && styles.compactModeIconContainer]}>
               <MaterialIcons
                 name="all-inclusive"
                 size={28}
@@ -176,13 +188,13 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               />
             </View>
             <View style={styles.modeTextContainer}>
-              <Typography variant="h4" style={styles.modeTitle}>
+              <Typography variant="h4" style={[styles.modeTitle, compact && styles.compactModeTitle]}>
                 練習モード
               </Typography>
               <Typography
                 variant="body2"
                 color="secondary"
-                style={styles.modeDescription}
+                style={[styles.modeDescription, compact && styles.compactModeDescription]}
               >
                 自分のペースでじっくり練習
               </Typography>
@@ -199,7 +211,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
       </View>
 
       {/* セカンダリナビゲーション */}
-      <View style={styles.secondaryNavigation}>
+      <View style={[styles.secondaryNavigation, compact && styles.compactSecondaryNavigation]}>
         <TouchableOpacity
           onPress={handleTutorialPress}
           style={styles.navButton}
@@ -245,9 +257,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
           </Typography>
         </TouchableOpacity>
       </View>
-
-      {/* バナー広告 */}
-      <BannerAdView style={styles.bannerAd} />
+      </ScrollView>
 
       <TutorialModal visible={showTutorial} onClose={handleTutorialClose} />
     </SafeAreaView>
@@ -259,14 +269,31 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ModernDesign.colors.background.primary,
   },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'space-between',
+  },
+  purchaseEntryRow: { alignItems: 'flex-end', paddingHorizontal: ModernDesign.spacing[5] },
+  purchaseEntry: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: ModernDesign.spacing[2], paddingHorizontal: ModernDesign.spacing[3] },
+  purchaseEntryText: { color: ModernDesign.colors.accent.neon },
   header: {
-    paddingTop: ModernDesign.spacing[16],
+    paddingTop: ModernDesign.spacing[6],
     paddingBottom: ModernDesign.spacing[4],
     paddingHorizontal: ModernDesign.spacing[6],
     alignItems: 'center',
   },
+  compactHeader: {
+    paddingTop: ModernDesign.spacing[3],
+    paddingBottom: ModernDesign.spacing[2],
+  },
   logo: {
     marginBottom: ModernDesign.spacing[4],
+  },
+  compactLogo: {
+    marginBottom: ModernDesign.spacing[2],
   },
   title: {
     marginBottom: ModernDesign.spacing[2], // マージンを少し縮小
@@ -277,12 +304,19 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     fontSize: ModernDesign.typography.fontSize.lg,
   },
+  compactTitle: {
+    fontSize: ModernDesign.typography.fontSize['3xl'],
+  },
   modesContainer: {
-    flex: 1,
     paddingHorizontal: ModernDesign.spacing[6],
     paddingTop: ModernDesign.spacing[8],
     paddingBottom: ModernDesign.spacing[8],
     gap: ModernDesign.spacing[4],
+  },
+  compactModesContainer: {
+    paddingTop: ModernDesign.spacing[3],
+    paddingBottom: ModernDesign.spacing[3],
+    gap: ModernDesign.spacing[3],
   },
   secondaryNavigation: {
     flexDirection: 'row',
@@ -290,8 +324,12 @@ const styles = StyleSheet.create({
     gap: ModernDesign.spacing[2],
     paddingHorizontal: ModernDesign.spacing[6],
     paddingTop: ModernDesign.spacing[6],
-    paddingBottom: ModernDesign.spacing[24], // 広告＋下部セーフエリアぶんを確保
+    paddingBottom: ModernDesign.spacing[6],
     backgroundColor: ModernDesign.colors.background.primary,
+  },
+  compactSecondaryNavigation: {
+    paddingTop: ModernDesign.spacing[2],
+    paddingBottom: ModernDesign.spacing[3],
   },
   navButton: {
     alignItems: 'center',
@@ -322,6 +360,9 @@ const styles = StyleSheet.create({
     borderColor: ModernDesign.colors.border.subtle,
     ...ModernDesign.shadows.base,
   },
+  compactModeButton: {
+    padding: ModernDesign.spacing[4],
+  },
   modeContent: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -334,26 +375,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: ModernDesign.spacing[4],
+    flexShrink: 0,
+  },
+  compactModeIconContainer: {
+    width: 48,
+    height: 48,
+    marginRight: ModernDesign.spacing[3],
   },
   modeTextContainer: {
     flex: 1,
+    minWidth: 0,
   },
   modeTitle: {
     marginBottom: ModernDesign.spacing[1],
     fontWeight: ModernDesign.typography.fontWeight.semibold,
     fontSize: ModernDesign.typography.fontSize['2xl'],
   },
+  compactModeTitle: {
+    fontSize: ModernDesign.typography.fontSize.xl,
+    lineHeight: ModernDesign.typography.fontSize.xl * 1.25,
+  },
   modeDescription: {
     fontSize: ModernDesign.typography.fontSize.sm,
     lineHeight: ModernDesign.typography.fontSize.sm * 1.3,
   },
+  compactModeDescription: {
+    fontSize: ModernDesign.typography.fontSize.xs,
+    lineHeight: ModernDesign.typography.fontSize.xs * 1.3,
+  },
   modeArrow: {
     marginLeft: ModernDesign.spacing[2],
-  },
-  bannerAd: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
 });

@@ -5,6 +5,6 @@
 export const LINKS = {
   /** お問い合わせ・ご要望フォーム（Google フォーム） */
   SUPPORT_FORM: 'https://forms.gle/weXFZRkyJYMtCp6o9',
-  /** プライバシーポリシー（GitHub Pages） */
-  PRIVACY_POLICY: 'https://jun-t-git.github.io/jamaica-mobile/',
+  /** プライバシーポリシー（App Store の掲載 URL と共通） */
+  PRIVACY_POLICY: 'https://modern-jamaica.web.app/',
 } as const;

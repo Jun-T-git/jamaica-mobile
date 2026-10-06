@@ -42,10 +42,12 @@
 UI は atoms → molecules → organisms の 3 層（[ARCHITECTURE.md](./ARCHITECTURE.md) のディレクトリ参照）。
 
 - **atoms**: 最小単位（Button, Card, Typography, Icon, StatValue, Logo, SoundToggleButton）。
-- **molecules**: atoms の組み合わせ（Dialog, GameStat, RankingEntry, DifficultyTabs, CountdownOverlay, SuccessOverlay, BannerAdView 等）。
+- **molecules**: atoms の組み合わせ（Dialog, GameStat, RankingEntry, DifficultyTabs, CountdownOverlay, SuccessOverlay 等）。
 - **organisms**: 複雑な機能単位（GameBoard, GameHeader, PauseMenu, RankingBoard）。
 
 新規 UI は既存の atoms/molecules を再利用し、直接のスタイル値ではなく `ModernDesign` トークンを使う。
+
+ゲーム盤面と復習の計算の木は `design/treeNodeVisuals.ts` の通常ノードの円・文字・影と演算子色を共有する。復習は目標を上、元の数字を下に置く。練習とヒント/答えの表示には `design/treeBoardLayout.ts` の共通座標を使い、葉ノード位置と盤面の高さを揃える。ヒントは途中結果ノード・接続線・演算子を段階表示し、練習に戻ると保持していた手順を再表示する。演算子はノードの外の接続線上に表示する。共有対象は見た目であり、ゲームの操作・判定ロジックではない。
 
 ## アクセシビリティ
 

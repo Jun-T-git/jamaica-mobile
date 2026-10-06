@@ -78,11 +78,11 @@ UI 操作は**タップで繋ぐ**（ノード → 演算子 → ノード）。
 - **コンボボーナス**: `ComboTracker` が `COMBO_TIME_LIMIT`（15s）以内の連続正解を追跡。`COMBO_MIN_COUNT`（3）以上で `COMBO_BONUS_RATE` 加算、**`COMBO_BONUS_MAX_RATE` で頭打ち**（長時間プレイでスコアが際限なく伸び、ランキングのスコア上限を超えるのを防ぐ）。
 - **最終ボーナス**（ゲーム終了時, `calculateFinalBonus`）: **正解数**（スキップを除く）の達成しきい値ボーナス + `EXCELLENCE_THRESHOLD` 超で優秀ボーナス。
 
-1 問ごとの内訳は `calculateScoreBreakdown` が返し、ストアが `scoreBreakdown` に累計する。プレイ中は獲得点とコンボ（`ComboIndicator`・正解オーバーレイ）、リザルト画面は内訳・最大コンボ・平均回答時間（`totalSolveTime / correctCount`）を表示する。
+1 問ごとの内訳は `calculateScoreBreakdown` が返し、ストアが `scoreBreakdown` に累計する。プレイ中は獲得点とコンボ（`ComboIndicator`・正解オーバーレイ）、正解がある場合のリザルトでは「今回の記録」に内訳・最大コンボ・平均回答時間（`totalSolveTime / correctCount`）を操作不要で表示する。正解が 0 問なら記録領域を省略する。
 
 無限モードのスコアは「正解数」。ランキング送信対象外。
 
-**基準スコア**（`config/scoreTiers.ts`）: チャレンジの最終スコアを難易度ごとの固定しきい値（ブロンズ/シルバー/ゴールド）と比べ、リザルトに「次のランクまであと何点」を出す（`utils/scoreTier.ts getScoreTierProgress`）。スコア計算には影響しない表示専用の目安だが、しきい値はこの節の計算式のシミュレーションから決めているので、**計算式や時間設定を変えたら合わせて見直す**。
+**基準スコア**（`config/scoreTiers.ts`）: チャレンジの最終スコアを難易度ごとの固定しきい値（ブロンズ/シルバー/ゴールド）と比べ、正解がある場合のリザルトの「今回の記録」に「次のランクまであと何点」を出す（`utils/scoreTier.ts getScoreTierProgress`）。スコア計算には影響しない表示専用の目安だが、しきい値はこの節の計算式のシミュレーションから決めているので、**計算式や時間設定を変えたら合わせて見直す**。
 
 **自己記録との連携**: `initGame` は問題を生成した**後**に `store/statsStore.ts` の `recordGameStart` を投げっぱなしで呼び（ゲーム数と連続プレイ日数を進め、結果を `game_start` イベントに添える）、`endGame` も `recordGameEnd` を投げっぱなしで呼ぶ。コアの開始は自己記録や計測の I/O を待たず、失敗しても記録と計測が欠けるだけ（不変条件 #6 の精神）。「もう一度」も 1 ゲームとして数える。
 
@@ -96,7 +96,7 @@ UI 操作は**タップで繋ぐ**（ノード → 演算子 → ノード）。
 | ランキング | 対象 | 非対象 |
 | ハイスコアキー（難易度別, `utils/storage.ts`） | `@jamaica_challenge_<難易度>_high_score_v2` | `@jamaica_infinite_<難易度>_high_score` |
 
-注: チャレンジの時間は難易度設定（§3）で上書きされる。
+注: チャレンジの時間は難易度設定（§3）で上書きされる。広告はゲームモード設定から分離し、`config/monetization.ts` と `utils/monetizationPolicy.ts` で共通に制御する。
 
 チャレンジのハイスコアキーが `_v2` なのは、スコア計算式の見直し（目標値ボーナスの上限など）で旧スコアと比較できなくなったため（[decisions/0004](./decisions/0004-ranking-v2-anonymous-auth.md)）。
 
@@ -104,7 +104,15 @@ UI 操作は**タップで繋ぐ**（ノード → 演算子 → ノード）。
 
 `MENU → COUNTDOWN → BUILDING → (CORRECT で次問題ループ) → TIMEUP / MANUALLY_ENDED`。定義は `types/index.ts` の `GameStatus` enum。
 
-## 9. サウンドと触覚（`utils/SoundManager.ts` / `services/hapticService.ts`）
+## 9. プレイした問題の復習
+
+`store/gameStore.ts` の `reviewProblems` は、正解・スキップ・終了時の未解答問題のスナップショットを結果とともにプレイ順で保持する。正解演出中の問題は正解として記録済みで、終了時に未解答として重複追加しない。次の `initGame` で一覧をリセットし、永続的な問題履歴にはしない。
+
+リザルトからの問題一覧と問題文の閲覧は無料。「解けなかった」フィルターはスキップと未解答を含む。正解した問題は無料で練習・ヒント・答えを使える。解けなかった問題は開く時に購入またはリワード権利を確認する。開いた問題は元の 5 数字から解き直せる。`utils/reviewPractice.ts` が復習専用のノード結合を扱い、`components/molecules/ReviewGame.tsx` が独立した局所履歴を持つ。操作はノード→演算子→ノードで、戻す・最初から・正誤表示を提供する。使用済みノードの再利用とゼロ除算を防ぎ、全数字を結合した結果を目標と比較する。本番の `gameStore` は更新しない。
+
+ヒント・答えは初期状態では隠し、開いた問題の詳細から表示できる。ヒント 1/2/3 は解答例の最初の 1/2/3 計算、答えは全計算を示す。現在の練習手順への次の一手の提案ではない。閲覧中も練習履歴を保持し、自分の手順に戻れる。ヒント 1〜3 は明示操作で途中状態を練習履歴へ適用できる（`utils/reviewPractice.ts`）。この場合は元の履歴をヒントの履歴で置き換え、そこから操作・Undo を続ける。別の問題へ移動すると練習は初期状態になる。解答例の表示時に、`utils/solutionExample.ts` が数字の位置を各 1 回消費して解答例と計算手順を探し、同じ探索結果の計算の木も返す。葉の `sourceIndex` に元の数字の位置を保持し、解答を表示しても元の並びを変えない。初期数字の並びで線が交差しにくいよう、隣接する項を組み合わせる探索を優先し、解が見つからなければ全組み合わせの探索へフォールバックする。生成器と同じ正の整数の探索空間を使い、重複した数字も個別に扱う。復習は終了後だけで、問題生成・採点・制限時間・ランキングには作用しない。権利と広告の仕様は [MONETIZATION.md](./MONETIZATION.md)。
+
+## 10. サウンドと触覚（`utils/SoundManager.ts` / `services/hapticService.ts`）
 
 `soundManager` シングルトンが効果音（button, connect, countdown, start, success, tap, wrong）をプリロード。`SoundType` enum で参照。設定でミュート可能（`settingsStore`）。オーディオカテゴリは **`Ambient`**（マナーモードに従い、再生中の音楽を止めない）。
 
