@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth, signInAnonymously } from '@react-native-firebase/auth';
 
 const USER_ID_KEY = '@user_id';
 const DEFAULT_DISPLAY_NAME = 'プレイヤー';
@@ -6,6 +7,7 @@ const DEFAULT_DISPLAY_NAME = 'プレイヤー';
 export class UserService {
   private static instance: UserService;
   private userId: string | null = null;
+  private signInPromise: Promise<string> | null = null;
 
   private constructor() {}
 
@@ -46,6 +48,29 @@ export class UserService {
       this.userId = tempId;
       return tempId;
     }
+  }
+
+  /**
+   * Firebase匿名認証のUIDを取得（未サインインならサインインする）
+   * Firestoreのセキュリティルールが request.auth.uid で本人確認するため、
+   * ランキングの読み書きには端末内で生成したIDではなくこのUIDを使う
+   */
+  async getAuthUserId(): Promise<string> {
+    const auth = getAuth();
+    if (auth.currentUser) {
+      return auth.currentUser.uid;
+    }
+
+    // 同時に複数回呼ばれても匿名アカウントを1つしか作らない
+    if (!this.signInPromise) {
+      this.signInPromise = signInAnonymously(auth)
+        .then(credential => credential.user.uid)
+        .finally(() => {
+          this.signInPromise = null;
+        });
+    }
+
+    return this.signInPromise;
   }
 
   /**

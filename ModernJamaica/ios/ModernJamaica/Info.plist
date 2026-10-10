@@ -6,6 +6,8 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>ジャマイカの木</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>許可すると、お客様に合わせた広告の配信に広告識別子を使用します。許可しなくても遊べます。</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -17,11 +19,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.4</string>
+	<string>1.3.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>202607062249</string>
+	<string>202610062250</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-9884011718535966~4581366468</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
@@ -43,8 +45,6 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>SKAdNetworkItems</key>

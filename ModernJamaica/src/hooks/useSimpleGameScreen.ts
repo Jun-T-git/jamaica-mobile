@@ -52,7 +52,7 @@ export const useSimpleGameScreen = (
   // 成功アニメーション（無限モードは自動で次の問題生成）
   const successAnim = useSuccessAnimation(
     gameStatus,
-    mode === GameMode.CHALLENGE ? 200 : 500,
+    mode === GameMode.CHALLENGE ? 600 : 500, // チャレンジは獲得スコアを読めるよう少し長めに表示
     // 無限モードでは自動で次の問題を生成しない（Store内で処理）
   );
 

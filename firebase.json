@@ -1,4 +1,7 @@
 {
+  "firestore": {
+    "rules": "ModernJamaica/firestore.rules"
+  },
   "hosting": {
     "public": "docs",
     "ignore": [

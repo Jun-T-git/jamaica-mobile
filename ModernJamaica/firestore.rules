@@ -1,71 +1,59 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // ユーザースコアコレクション
-    match /userScores/{userId} {
-      
+
+    // ランキング用スコア（V2）
+    // ドキュメントIDはFirebase匿名認証のUID。本人だけが自分のドキュメントを書き込める
+    match /userScoresV2/{userId} {
+
       // 読み取り: 誰でも可能（ランキング表示用）
       allow read: if true;
-      
-      // 作成: 認証済みユーザーが自分のドキュメントを作成する場合のみ
-      allow create: if request.auth != null 
-        && request.auth.uid == userId
-        && isBasicValidDocument(request.data);
-      
-      // 更新: 認証済みユーザーが自分のドキュメントを更新する場合のみ
-      allow update: if request.auth != null 
-        && request.auth.uid == userId
-        && isBasicValidUpdate(request.data, resource.data);
-      
-      // 削除: 認証済みユーザーが自分のドキュメントを削除する場合のみ（デバッグ用）
-      allow delete: if request.auth != null 
-        && request.auth.uid == userId;
+
+      allow create: if isOwner(userId)
+        && isValidDocument(request.resource.data, userId);
+
+      allow update: if isOwner(userId)
+        && isValidDocument(request.resource.data, userId)
+        && request.resource.data.createdAt == resource.data.createdAt;
+
+      allow delete: if isOwner(userId);
+    }
+
+    // 旧ランキング（V1）: 認証導入前のデータ。閲覧のみ許可し、書き込みは受け付けない
+    match /userScores/{userId} {
+      allow read: if true;
+      allow write: if false;
     }
   }
-  
-  // 基本的なドキュメント構造検証（緩い設定）
-  function isBasicValidDocument(data) {
-    return data.userId is string
+
+  function isOwner(userId) {
+    return request.auth != null && request.auth.uid == userId;
+  }
+
+  function isValidDocument(data, userId) {
+    return data.keys().hasOnly(['userId', 'displayName', 'createdAt', 'lastUpdated', 'challengeScores'])
+      && data.userId == userId
       && data.displayName is string
-      && data.displayName.size() <= 50  // 緩い制限
+      && data.displayName.size() >= 1
+      && data.displayName.size() <= 20
       && data.createdAt is number
-      && data.lastUpdated is number;
+      && data.lastUpdated is number
+      && data.challengeScores is map
+      && data.challengeScores.keys().hasOnly(['easy', 'normal', 'hard'])
+      && isValidScore(data.challengeScores.easy)
+      && isValidScore(data.challengeScores.normal)
+      && isValidScore(data.challengeScores.hard);
   }
-  
-  // 基本的な更新検証（緩い設定）
-  function isBasicValidUpdate(newData, currentData) {
-    return 
-      // 基本フィールドの保護（変更不可）
-      newData.userId == currentData.userId
-      && newData.createdAt == currentData.createdAt
-      &&
-      // 表示名の基本チェック
-      (newData.displayName is string && newData.displayName.size() <= 50)
-      &&
-      // lastUpdatedの基本チェック
-      (newData.lastUpdated is number)
-      &&
-      // challengeScoresの基本チェック（存在する場合）
-      (!('challengeScores' in newData) || isBasicValidScores(newData.challengeScores));
-  }
-  
-  // 基本的なスコア検証（緩い設定）
-  function isBasicValidScores(challengeScores) {
-    return challengeScores is map
-      && (!('easy' in challengeScores) || isBasicValidScore(challengeScores.easy))
-      && (!('normal' in challengeScores) || isBasicValidScore(challengeScores.normal))
-      && (!('hard' in challengeScores) || isBasicValidScore(challengeScores.hard));
-  }
-  
-  // 個別スコアの基本検証（緩い設定）
-  function isBasicValidScore(score) {
+
+  function isValidScore(score) {
     return score is map
+      && score.keys().hasOnly(['score', 'timestamp', 'problemCount'])
       && score.score is number
       && score.score >= 0
-      && score.score <= 999999  // 非常に緩い上限
+      && score.score <= 999999
       && score.timestamp is number
       && score.problemCount is number
-      && score.problemCount >= 0;
+      && score.problemCount >= 0
+      && score.problemCount <= 999;
   }
 }

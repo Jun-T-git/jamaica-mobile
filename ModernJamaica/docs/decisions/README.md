@@ -21,5 +21,9 @@
 | [0001](./0001-tap-to-connect.md) | 盤面操作は drag&drop でなく tap-to-connect | Accepted |
 | [0002](./0002-zustand-unified-store.md) | 単一 Zustand ストアで 2 モードを扱う | Accepted |
 | [0003](./0003-firestore-ranking.md) | Firestore による匿名ランキング | Accepted（既知の乖離あり） |
+| [0004](./0004-ranking-v2-anonymous-auth.md) | ランキングを匿名認証 + `userScoresV2` に移行し、チャレンジのハイスコアを分離 | Accepted |
+| [0005](./0005-anonymous-analytics.md) | 匿名の利用状況計測（Firebase Analytics）を導入 | Accepted |
+| [0006](./0006-time-bonus-decay.md) | チャレンジの時間ボーナスを逓減させ、上級者でも 1 ゲーム約 3 分で終わるようにする | Accepted |
+| [0007](./0007-att-and-ad-targeting.md) | ATT で IDFA の利用を求め、広告コンテンツ制限を PG に緩める | Accepted |
 
 > 注: 0001–0003 は本ドキュメント整備時（2026-07-05）に、**既存のリリース済み実装から遡って**記録したもの。当時の一次資料ではなく、コードから読み取れる意図の再構成である。

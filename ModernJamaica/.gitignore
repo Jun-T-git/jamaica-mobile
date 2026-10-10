@@ -78,3 +78,6 @@ appstore/generator/out/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# App Review の連絡先（個人情報。CI が Secrets から生成する）
+fastlane/metadata/review_information/

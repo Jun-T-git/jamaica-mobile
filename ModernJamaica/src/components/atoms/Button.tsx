@@ -105,8 +105,9 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: ModernDesign.components.button.height.medium,
+    minHeight: ModernDesign.components.button.height.medium,
     paddingHorizontal: ModernDesign.components.button.padding.medium.horizontal,
+    paddingVertical: ModernDesign.spacing[2],
     borderRadius: ModernDesign.components.button.borderRadius,
     backgroundColor: 'transparent',
     borderWidth: 1,
@@ -133,6 +134,7 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
+    minWidth: 0,
     fontSize: ModernDesign.typography.fontSize.lg,
     fontWeight: ModernDesign.typography.fontWeight.medium,
   },

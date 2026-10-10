@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Typography } from '../components/atoms/Typography';
-import { BannerAdView } from '../components/molecules/BannerAdView';
 import { DifficultyTabs } from '../components/molecules/DifficultyTabs';
 import { RankingBoard } from '../components/organisms/RankingBoard';
 import { ModernDesign } from '../constants';
@@ -94,7 +93,13 @@ export const RankingScreen: React.FC<RankingScreenProps> = ({ navigation }) => {
       <View style={styles.bestScoreCard}>
         {currentBestScore > 0 ? (
           <>
-            <Typography variant="h3" style={styles.bestScoreValue}>
+            <Typography
+              variant="h3"
+              style={styles.bestScoreValue}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.5}
+            >
               {currentBestScore.toLocaleString()}
               <Typography variant="body2" style={styles.bestScoreUnit}>
                 点
@@ -197,8 +202,6 @@ export const RankingScreen: React.FC<RankingScreenProps> = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      {/* バナー広告 */}
-      <BannerAdView style={styles.bannerAd} />
     </SafeAreaView>
   );
 };
@@ -242,7 +245,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: ModernDesign.spacing[24], // 広告＋下部セーフエリアぶんを確保
+    paddingBottom: ModernDesign.spacing[4],
   },
   tabsContainer: {
     marginTop: ModernDesign.spacing[2],
@@ -287,6 +290,7 @@ const styles = StyleSheet.create({
   },
   bestScoreDetails: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
     gap: ModernDesign.spacing[4],
   },
@@ -306,11 +310,5 @@ const styles = StyleSheet.create({
     color: ModernDesign.colors.text.secondary,
     textAlign: 'center',
     fontStyle: 'italic',
-  },
-  bannerAd: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
 });

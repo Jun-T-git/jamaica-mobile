@@ -1,18 +1,24 @@
 import { create } from 'zustand';
-import { GameState, GameMode, GameStatus, UnifiedGameState, NodeData, DifficultyLevel } from '../types';
+import { GameState, GameMode, GameStatus, UnifiedGameState, NodeData, DifficultyLevel, ProblemData } from '../types';
 import { generateProblem } from '../utils/problemGenerator';
 import { getGameModeConfig } from '../config';
 import { getDifficultyConfig, DEFAULT_DIFFICULTY } from '../config/difficulty';
 import { saveHighScoreWithDifficulty, loadAllHighScoresWithDifficulty } from '../utils/storage';
-import { adService } from '../services/adService';
-import { ComboTracker, calculateProblemScore, calculateFinalBonus } from '../utils/scoreCalculator';
-import { ProblemResult } from '../constants/scoreConfig';
+import { ComboTracker, calculateScoreBreakdown, calculateFinalBonus } from '../utils/scoreCalculator';
+import { calculateTimeBonus } from '../utils/timeBonus';
+import { ProblemResult, EMPTY_SCORE_BREAKDOWN, SCORE_CONFIG } from '../constants/scoreConfig';
+import { analyticsService } from '../services/analyticsService';
+import { hapticService } from '../services/hapticService';
 import { soundManager, SoundType } from '../utils/SoundManager';
 import { rankingService } from '../services/rankingService';
+import { playerStatsService } from '../services/playerStatsService';
 import { ScoreSubmission } from '../types/ranking';
 import { useSettingsStore } from './settingsStore';
+import { useStatsStore } from './statsStore';
 
 interface GameStore extends GameState {
+  reviewProblems: { problem: ProblemData; result: 'correct' | 'skipped' | 'unfinished' }[];
+  gameSessionId: number;
   // UI関連の状態
   nodes: NodeData[];
   selectedNodeId: string | null;
@@ -24,6 +30,7 @@ interface GameStore extends GameState {
   problemStartTime: number;
   navigationCallback: ((params: any) => void) | null;
   timerInterval: NodeJS.Timeout | null;
+  wrongAnswerCount: number; // 不正解のたびに増える（UIの揺れアニメーションのトリガー）
   
   // ランキング関連
   isSubmittingScore: boolean;
@@ -72,13 +79,23 @@ const createInitialGameState = (mode: GameMode, difficulty: DifficultyLevel = DE
     isActive: false,
     score: 0,
     problemCount: 0,
+    correctCount: 0,
+    skippedCount: 0,
+    totalSolveTime: 0,
     skipCount: mode === GameMode.CHALLENGE ? modeConfig.gameplay.skipLimit : 999,
     currentCombo: 0,
     lastProblemScore: 0,
+    lastTimeBonus: 0,
+    comboExpiresAt: 0,
+    maxCombo: 0,
+    scoreBreakdown: { ...EMPTY_SCORE_BREAKDOWN },
+    finalBonus: 0,
   };
 };
 
 export const useGameStore = create<GameStore>((set, get) => ({
+  reviewProblems: [],
+  gameSessionId: 0,
   // 初期状態
   gameState: createInitialGameState(GameMode.CHALLENGE, DEFAULT_DIFFICULTY),
   gameStatus: GameStatus.MENU,
@@ -108,6 +125,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   problemStartTime: Date.now(),
   navigationCallback: null,
   timerInterval: null,
+  wrongAnswerCount: 0,
   
   // ランキング関連の初期状態
   isSubmittingScore: false,
@@ -171,11 +189,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     set({
       gameState: createInitialGameState(mode, difficulty),
+      reviewProblems: [],
+      gameSessionId: get().gameSessionId + 1,
       gameStatus: GameStatus.COUNTDOWN,
       highScores: savedHighScores,
+      rankingSubmissionResult: null,
     });
     
+    // コア（問題生成）は自己記録や計測の I/O を待たない
     get().generateNewProblem();
+    
+    // 自己記録（ゲーム数・連続プレイ日数）を進め、初めてのゲームかどうかを計測のファネルに使う。
+    // 失敗しても記録と計測が欠けるだけでゲームは進む
+    useStatsStore
+      .getState()
+      .recordGameStart()
+      .then(stats => {
+        analyticsService.logEvent('game_start', {
+          mode,
+          difficulty,
+          games_played: stats.gamesPlayed,
+          is_first_game: stats.gamesPlayed === 1,
+          streak_days: stats.streakDays,
+        });
+      })
+      .catch(() => {
+        analyticsService.logEvent('game_start', { mode, difficulty });
+      });
   },
   
   // カウントダウン開始
@@ -251,7 +291,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       case '÷':
         if (secondNode.value === 0) return;
-        result = Math.round((firstNode.value / secondNode.value) * 100) / 100;
+        // 丸めずに保持する（(1÷3)×3 が 0.99 にならないように）。表示側で丸める
+        result = firstNode.value / secondNode.value;
         break;
       default:
         return;
@@ -285,6 +326,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     // ノード結合効果音
     soundManager.play(SoundType.CONNECT);
+    hapticService.connect();
     
     // パズル完成チェック
     const activeNodes = updatedNodes.filter(n => !n.isUsed);
@@ -293,10 +335,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const isCorrect = Math.abs(finalValue - state.targetNumber) < 0.001;
       
       if (isCorrect) {
-        set({ gameStatus: GameStatus.CORRECT });
+        set({
+          gameStatus: GameStatus.CORRECT,
+          reviewProblems: [...state.reviewProblems, {
+            problem: { ...state.currentProblem, numbers: [...state.currentProblem.numbers] },
+            result: 'correct',
+          }],
+        });
         
         // 問題正解効果音
         soundManager.play(SoundType.CORRECT);
+        hapticService.success();
         
         // スコア更新
         const { gameState: game } = state;
@@ -314,19 +363,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
           };
           
           const currentCombo = state.comboTracker.onCorrectAnswer(Date.now());
-          const problemScore = calculateProblemScore(problemResult, currentCombo);
+          const breakdown = calculateScoreBreakdown(problemResult, currentCombo);
+          const problemScore = breakdown.base + breakdown.time + breakdown.target + breakdown.combo;
           
-          // 難易度に応じたボーナス時間を使用
-          const bonusTime = difficultyConfig.time.bonus;
+          // 時間ボーナスは正解のたびに減り、下限で下げ止まる
+          const timeBonus = calculateTimeBonus(difficultyConfig.time, game.correctCount);
           
           set({
             gameState: {
               ...game,
               score: game.score + problemScore,
               problemCount: game.problemCount + 1,
-              timeLeft: game.timeLeft + bonusTime,
+              correctCount: game.correctCount + 1,
+              totalSolveTime: game.totalSolveTime + solveTime,
+              timeLeft: game.timeLeft + timeBonus,
               currentCombo,
+              comboExpiresAt: Date.now() + SCORE_CONFIG.COMBO_TIME_LIMIT,
+              maxCombo: Math.max(game.maxCombo, currentCombo),
               lastProblemScore: problemScore,
+              lastTimeBonus: timeBonus,
+              scoreBreakdown: {
+                base: game.scoreBreakdown.base + breakdown.base,
+                time: game.scoreBreakdown.time + breakdown.time,
+                target: game.scoreBreakdown.target + breakdown.target,
+                combo: game.scoreBreakdown.combo + breakdown.combo,
+              },
             },
           });
         } else {
@@ -336,14 +397,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...game,
               score: game.score + 1,
               problemCount: game.problemCount + 1,
+              correctCount: game.correctCount + 1,
+              totalSolveTime: game.totalSolveTime + solveTime,
             },
           });
         }
         
-        // 次の問題を生成
+        analyticsService.logEvent('problem_solved', {
+          mode: game.mode,
+          difficulty: game.difficulty,
+          solve_time: Math.round(solveTime),
+        });
+        // 生まれて初めての正解は一度だけ別イベントに（初回起動→初正解のファネル）
+        playerStatsService.markFirstSolve().then(isFirst => {
+          if (isFirst) {
+            analyticsService.logEvent('first_problem_solved', {
+              mode: game.mode,
+              difficulty: game.difficulty,
+              solve_time: Math.round(solveTime),
+            });
+          }
+        });
+        
+        // 次の問題を生成（待っている間にリスタートや終了が行われた場合は何もしない）
         setTimeout(() => {
-          get().generateNewProblem();
+          if (get().gameStatus === GameStatus.CORRECT) {
+            get().generateNewProblem();
+          }
         }, 1500);
+      } else {
+        // 不正解: 音・振動・揺れで知らせる（戻すボタンでやり直せる）
+        soundManager.play(SoundType.WRONG);
+        hapticService.error();
+        set({ wrongAnswerCount: state.wrongAnswerCount + 1 });
       }
     }
     
@@ -387,14 +473,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { gameState: game } = state;
     
     // スキップ可能かチェック
-    if (game.skipCount <= 0) return;
+    if (game.skipCount <= 0 || state.gameStatus !== GameStatus.BUILDING) return;
     
     set({
+      reviewProblems: [...state.reviewProblems, { problem: { ...state.currentProblem, numbers: [...state.currentProblem.numbers] }, result: 'skipped' }],
       gameState: {
         ...game,
         skipCount: game.skipCount - 1,
         problemCount: game.problemCount + 1,
+        skippedCount: game.skippedCount + 1,
       }
+    });
+    
+    analyticsService.logEvent('problem_skipped', {
+      mode: game.mode,
+      difficulty: game.difficulty,
     });
     
     get().generateNewProblem();
@@ -408,19 +501,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     try {
       set({ isSubmittingScore: true, rankingSubmissionResult: null });
       
-      let finalScore = game.finalScore || game.score;
-      
-      // チャレンジモードの場合は最終ボーナスを適用
-      if (game.mode === GameMode.CHALLENGE && !game.finalScore) {
-        const finalBonus = calculateFinalBonus(game.score, game.problemCount);
-        finalScore = game.score + finalBonus;
-      }
-      
       const submission: ScoreSubmission = {
         mode: game.mode,
         difficulty: game.difficulty,
-        score: finalScore,
-        problemCount: game.problemCount,
+        score: game.finalScore ?? game.score,
+        problemCount: game.correctCount,
         timestamp: Date.now(),
         displayName: displayName.trim(),
       };
@@ -447,32 +532,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
   endGame: async (isManual: boolean = false, displayName?: string) => {
     const state = get();
     const { gameState: game } = state;
-    const config = getGameModeConfig(game.mode);
     
+    if (game.finalScore !== undefined) return;
+
     // タイマー停止
     get().stopTimer();
     
-    let finalScore = game.score;
-    let isNewHighScore = false;
-    let previousHighScore = state.highScores[game.mode][game.difficulty];
+    const previousHighScore = state.highScores[game.mode][game.difficulty];
     
-    if (game.mode === GameMode.CHALLENGE) {
-      // 最終ボーナスを追加
-      const finalBonus = calculateFinalBonus(game.score, game.problemCount);
-      finalScore = game.score + finalBonus;
-    }
+    // チャレンジモードは最終ボーナスを追加（スキップした問題は正解数に含めない）
+    const finalBonus = game.mode === GameMode.CHALLENGE
+      ? calculateFinalBonus(game.score, game.correctCount)
+      : 0;
+    const finalScore = game.score + finalBonus;
     
     // ハイスコア判定
-    isNewHighScore = finalScore > previousHighScore;
+    const isNewHighScore = finalScore > previousHighScore;
+    
+    // ランキング対象はチャレンジモードのみ
+    const nameToUse = displayName && displayName.trim().length > 0
+      ? displayName
+      : useSettingsStore.getState().displayName;
+    const canSubmit = game.mode === GameMode.CHALLENGE
+      && !!nameToUse && nameToUse.trim().length > 0;
     
     // 状態を更新
+    // リザルト画面が「送信完了を待ってから順位を取得」できるよう、送信中フラグは遷移前に立てる
     set({
+      reviewProblems: state.gameStatus !== GameStatus.CORRECT && state.currentProblem.numbers.length === 5
+        ? [...state.reviewProblems, { problem: { ...state.currentProblem, numbers: [...state.currentProblem.numbers] }, result: 'unfinished' }]
+        : state.reviewProblems,
       gameStatus: isManual ? GameStatus.MANUALLY_ENDED : GameStatus.TIMEUP,
       gameState: {
         ...game,
         isActive: false,
         finalScore,
+        finalBonus,
       },
+      isSubmittingScore: canSubmit && isNewHighScore,
     });
     
     // ハイスコア保存
@@ -489,36 +586,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     }
     
-    // ランキングに自動提出（新記録達成時のみ）
-    if (isNewHighScore && game.mode === GameMode.CHALLENGE) {
-      console.log('🏆 New high score detected in challenge mode, attempting to submit to ranking...');
-      console.log('📊 Final score:', finalScore, 'Previous high score:', previousHighScore);
-      
-      // 提供されたdisplayNameがあればそれを使用、なければsettingsStoreから取得
-      let nameToUse = displayName;
-      if (!nameToUse || nameToUse.trim().length === 0) {
-        const settingsState = useSettingsStore.getState();
-        nameToUse = settingsState.displayName;
-        console.log('📝 Using display name from settings:', nameToUse);
-      }
-      
-      if (nameToUse && nameToUse.trim().length > 0) {
-        console.log('🚀 Submitting new high score with name:', nameToUse);
-        const submissionResult = await get().submitScoreToRanking(nameToUse);
-        console.log('✅ Ranking submission result:', submissionResult);
-      } else {
-        console.log('⚠️ No valid display name found, skipping ranking submission');
-      }
-    } else if (game.mode === GameMode.CHALLENGE) {
-      console.log('📝 Challenge mode ended but no new high score (Final:', finalScore, 'vs Previous:', previousHighScore, ')');
-    }
+    // 累計正解数を自己記録に足す（失敗してもゲーム進行に影響させない）
+    useStatsStore.getState().recordGameEnd(game.correctCount).catch(() => {});
     
-    // 広告表示（手動終了以外）
-    if (config.ad.enabled && !isManual) {
-      await adService.showInterstitialAd();
-    }
+    analyticsService.logEvent('game_end', {
+      mode: game.mode,
+      difficulty: game.difficulty,
+      score: finalScore,
+      correct_count: game.correctCount,
+      skipped_count: game.skippedCount,
+      max_combo: game.maxCombo,
+      is_new_high_score: isNewHighScore,
+      is_manual: isManual,
+      games_played: useStatsStore.getState().stats.gamesPlayed,
+    });
     
     // リザルト画面への遷移
+    // （インタースティシャル広告はスコアを見る瞬間を遮らないよう、リザルト画面を離れる時に表示する）
     const navigationCallback = state.navigationCallback;
     if (navigationCallback && !isManual) {
       setTimeout(() => {
@@ -531,6 +615,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
       }, 100);
     }
+    
+    // ランキングへの送信は待たない（タイムアップ時のリザルト遷移も、手動終了時のメニュー遷移も
+    // 通信の完了を待たせない）。どちらも内部で例外を処理するため投げっぱなしでよい
+    if (canSubmit) {
+      if (isNewHighScore) {
+        get().submitScoreToRanking(nameToUse);
+      } else {
+        // 過去に通信エラーなどで送信できなかった自己ベストがあれば再送する
+        rankingService.retryUnsentScore(game.difficulty, nameToUse.trim());
+      }
+    }
   },
   
   // ナビゲーションコールバック設定
@@ -541,21 +636,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // 最後の操作を取り消し
   undoLastMove: () => {
     const state = get();
-    if (state.historyIndex > 0) {
-      const previousNodes = state.history[state.historyIndex - 1];
-      set({
-        nodes: JSON.parse(JSON.stringify(previousNodes)),
-        selectedNodeId: null,
-        historyIndex: state.historyIndex - 1,
-        gameStatus: GameStatus.BUILDING,
-      });
-    }
+    if (!state.canUndo()) return;
+
+    const previousNodes = state.history[state.historyIndex - 1];
+    set({
+      nodes: JSON.parse(JSON.stringify(previousNodes)),
+      selectedNodeId: null,
+      historyIndex: state.historyIndex - 1,
+    });
   },
   
   // 取り消し可能かチェック
+  // 組み立て中のみ。正解演出中に戻せると、同じ問題でスコアと時間ボーナスを何度でも取り直せてしまう
   canUndo: () => {
     const state = get();
-    return state.historyIndex > 0;
+    return state.gameStatus === GameStatus.BUILDING && state.historyIndex > 0;
   },
   
   // 保存されたデータを読み込み
