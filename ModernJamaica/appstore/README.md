@@ -67,18 +67,18 @@ cd ModernJamaica/appstore/generator
 `ios metadata` レーンを流すと App Store Connect の現行値を上書きする。
 アプリ内の「お問い合わせ」「プライバシーポリシー」のリンク（`src/config/links.ts`）は `support_url.txt` / `privacy_url.txt` と同じ URL にしておくこと。
 
-## アプリプレビュー動画（未制作・絵コンテ）
+## App Store動画（2026-10-10制作）
 
-App Store のプレビュー動画は**まだ作っていない**。作るときの絵コンテと手順:
+日本語のヘッダー・検索結果・App Previewの3本を **[videos/](./videos/README.md)** に収録。
+実画面の収録原本、再生成スクリプト、ポスター、技術検証結果、プレビューページを同梱。
+Apple公式仕様、類似ゲームの事例、絵コンテは **[調査メモ](./videos/RESEARCH.md)** を参照。
 
-| 秒 | 見せるもの |
-|---|---|
-| 0–3 | 盤面。「つくる数」と 5 つの数字が出る（ルールが一目で分かる） |
-| 3–10 | 数字 → 記号 → 数字 の 3 タップで木が育つ（2〜3 手） |
-| 10–14 | 最後の 1 手で「正解！」オーバーレイと +N秒 |
-| 14–20 | チャレンジのリザルト（スコアのカウントアップ・基準スコアのバー・新記録） |
-| 20–25 | 難易度選択 → ロゴとアプリ名で締める |
+| 用途 | ファイル | サイズ・尺 |
+|---|---|---|
+| ヘッダー | `videos/01-product-header-ja.mp4` | 3840×1646 / 12秒 |
+| 検索結果 | `videos/02-search-results-ja.mp4` | 1920×1280 / 12秒 |
+| App Preview | `videos/03-app-preview-ja.mp4` | 886×1920 / 24.3秒 |
 
-撮影: シミュレータで `xcrun simctl io <UDID> recordVideo --codec h264 preview.mov` を回しながら実際にプレイする（音は後付け）。
-仕様: 15〜30 秒・縦・6.9″ は 886×1920 または 1290×2796 に書き出す（ffmpeg で `-vf scale` とトリム）。
-アップロードは App Store Connect で手動（deliver の対象にしていない）。
+すべて30fps・H.264・無音。App Previewにスクリーンショット用の1290×2796は使わない。
+ヘッダー・検索用クリエイティブの対象はiOS/iPadOS 27以降。
+App Store Connectへのアップロード・審査提出は未実施。既存deliverレーンの対象には追加していない。

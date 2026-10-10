@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ジャマイカの木 — App Store動画</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#13141b;color:#f9fafb;font:16px/1.7 -apple-system,BlinkMacSystemFont,sans-serif}main{max-width:1200px;margin:auto;padding:48px 28px}header{margin-bottom:35px}.eyebrow{color:#6ee7b7;font-size:13px;letter-spacing:.12em}h1{font-size:32px;margin:8px 0}p{color:#cbd5e1;margin:8px 0}article{padding:24px;border:1px solid #353748;border-radius:20px;background:#1a1b23;margin:22px 0}h2{font-size:21px;margin:0 0 4px}.meta{font-size:13px;color:#93a5be}video{display:block;width:100%;margin:20px auto;background:#1a1b23;border-radius:10px}.grid{display:grid;grid-template-columns:1.3fr 1fr;gap:22px}.grid article{margin:0}.portrait{max-width:330px}a{color:#93c5fd}button{border:1px solid #45506b;background:#242530;color:white;border-radius:8px;padding:8px 14px;cursor:pointer}nav{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.note{font-size:13px;margin-top:28px}@media(max-width:800px){.grid{grid-template-columns:1fr}main{padding:24px 16px}h1{font-size:25px}}@media(prefers-reduced-motion:reduce){video{scroll-behavior:auto}}
+</style>
+<main><header><span class="eyebrow">APP STORE / 日本語</span><h1>ひらめきが、木になる。</h1><p>ヘッダー・検索結果・App Previewの3本。実プレイ映像とブランド表現を、配置ごとに設計。</p><nav><button id="play">すべて再生</button><button id="pause">すべて停止</button><a href="RESEARCH.md">調査と絵コンテ</a><a href="README.md">仕様と登録手順</a></nav></header>
+<article><h2>01 プロダクトページのヘッダー</h2><span class="meta">3840 × 1646 · 12秒 · 30fps · 無音ループ</span><video controls muted loop playsinline preload="metadata" poster="posters/01-product-header-ja.png" src="01-product-header-ja.mp4"></video><p>5つの数字から、14へ。実際に解いた式をブランドの図案として表現。</p><a href="01-product-header-ja.mp4" download>MP4を保存</a></article>
+<div class="grid"><article><h2>02 検索結果</h2><span class="meta">1920 × 1280 · 12秒 · 30fps · 無音ループ</span><video controls muted loop playsinline preload="metadata" poster="posters/02-search-results-ja.png" src="02-search-results-ja.mp4"></video><p>「この数字で、14をつくれる？」と問いかけ、実際の盤面で答えを見せる。</p><a href="02-search-results-ja.mp4" download>MP4を保存</a></article>
+<article><h2>03 App Preview</h2><span class="meta">886 × 1920 · 約24秒 · 30fps · 実画面収録</span><video class="portrait" controls muted playsinline preload="metadata" poster="posters/03-app-preview-ja.png" src="03-app-preview-ja.mp4"></video><p>数字 → 記号 → 数字。操作から正解、モードと難易度まで。</p><a href="03-app-preview-ja.mp4" download>MP4を保存</a></article></div>
+<p class="note">制作日: 2026-10-10。ヘッダー・検索専用クリエイティブの対象はiOS/iPadOS 27以降。App Store Connectでの処理・表示確認と審査提出は未実施。</p></main>
+<script>document.querySelector('#play').onclick=()=>document.querySelectorAll('video').forEach(v=>v.play().catch(()=>{}));document.querySelector('#pause').onclick=()=>document.querySelectorAll('video').forEach(v=>v.pause());</script>
+</html>

@@ -1,0 +1,49 @@
+{
+  "checked_on": "2026-10-11",
+  "results": [
+    {
+      "file": "01-product-header-ja.mp4",
+      "width": 3840,
+      "height": 1646,
+      "seconds": 12.0,
+      "fps": 30,
+      "frames_decoded": 360,
+      "bytes": 462215,
+      "codec": "H.264 High",
+      "pixel_format": "yuv420p",
+      "audio": "none",
+      "decode": "passed",
+      "loop_seam_mean_absolute_error_0_to_255": 0.028
+    },
+    {
+      "file": "02-search-results-ja.mp4",
+      "width": 1920,
+      "height": 1280,
+      "seconds": 12.0,
+      "fps": 30,
+      "frames_decoded": 360,
+      "bytes": 359831,
+      "codec": "H.264 High",
+      "pixel_format": "yuv420p",
+      "audio": "none",
+      "decode": "passed",
+      "loop_seam_mean_absolute_error_0_to_255": 0.756
+    },
+    {
+      "file": "03-app-preview-ja.mp4",
+      "width": 886,
+      "height": 1920,
+      "seconds": 24.3,
+      "fps": 30,
+      "frames_decoded": 729,
+      "bytes": 36212239,
+      "codec": "H.264 High",
+      "pixel_format": "yuv420p",
+      "audio": "AAC stereo 48kHz (silent, 256kbps target)",
+      "decode": "passed",
+      "h264_level": "4.0",
+      "container_bitrate_kbps": 11921.0
+    }
+  ],
+  "connect_upload_and_review": "See README.md for live submission status"
+}
