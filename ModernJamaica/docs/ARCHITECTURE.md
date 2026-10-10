@@ -66,6 +66,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 - ルート定義とパラメータ型は `App.tsx` の `RootStackParamList` が正。
 - `DifficultySelection` で `initGame(mode, difficulty)` を呼んでからゲーム画面へ遷移。
 - `ChallengeMode` / `InfiniteMode` はどちらも `<GameBoard>` を描画し、`hooks/useSimpleGameScreen` で状態を駆動する。
+- 盤面の表示領域への収まりとスクロールの方針は [DESIGN-SYSTEM.md](./DESIGN-SYSTEM.md) を参照。
 
 ## 状態管理（Zustand）
 

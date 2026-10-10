@@ -49,6 +49,8 @@ UI は atoms → molecules → organisms の 3 層（[ARCHITECTURE.md](./ARCHITE
 
 ゲーム盤面と復習の計算の木は `design/treeNodeVisuals.ts` の通常ノードの円・文字・影と演算子色を共有する。復習は目標を上、元の数字を下に置く。練習とヒント/答えの表示には `design/treeBoardLayout.ts` の共通座標を使い、葉ノード位置と盤面の高さを揃える。ヒントは途中結果ノード・接続線・演算子を段階表示し、練習に戻ると保持していた手順を再表示する。演算子はノードの外の接続線上に表示する。共有対象は見た目であり、ゲームの操作・判定ロジックではない。
 
+本番の `components/organisms/GameBoard.tsx` は、画面サイズとヘッダー・セーフエリアを除いた実際の表示領域に応じてコンパクト表示へ切り替える。内容が収まるときの不要なバウンスを無効にし、文字拡大などで内容が収まらない場合はスクロールで操作にアクセスできるようにする。
+
 ## アクセシビリティ
 
 - **Dynamic Type**: `getDynamicFontSize(base, scale, maxScale=1.3)` で文字拡大に対応（レイアウト破綻を防ぐ上限付き）。`getDynamicLineHeight` も対で使う。

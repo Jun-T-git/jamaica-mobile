@@ -54,6 +54,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     Record<string, { row: number; col: number }>
   >({});
   const [dimensions, setDimensions] = useState(() => Dimensions.get('window'));
+  const [boardHeight, setBoardHeight] = useState<number | null>(null);
+  const [fullContentHeight, setFullContentHeight] = useState<number | null>(null);
   const [firstNode, setFirstNode] = useState<GridNode | null>(null);
   const [selectedOperator, setSelectedOperator] = useState<Operator | null>(
     null,
@@ -69,6 +71,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   useEffect(() => {
     const updateDimensions = () => {
       setDimensions(Dimensions.get('window'));
+      setFullContentHeight(null);
     };
     const subscription = Dimensions.addEventListener(
       'change',
@@ -78,7 +81,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   }, []);
 
   const { width: screenWidth, height: screenHeight } = dimensions;
-  const compact = screenHeight < 750;
+  // ヘッダーとセーフエリアを除いた、盤面が実際に使える高さで判断する。
+  const compact = screenHeight < 750 || (
+    boardHeight !== null && fullContentHeight !== null &&
+    fullContentHeight > boardHeight + 1
+  );
   const containerPadding = screenWidth * 0.05;
   const availableWidth = screenWidth - containerPadding * 2;
   const cellSize = Math.floor(availableWidth * 0.095);
@@ -459,11 +466,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
 
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      onLayout={event => setBoardHeight(event.nativeEvent.layout.height)}
+    >
       <ScrollView
         style={styles.gameScroll}
         contentContainerStyle={[styles.gameArea, compact && styles.compactGameArea]}
         showsVerticalScrollIndicator={false}
+        bounces={false}
+        alwaysBounceVertical={false}
+        onContentSizeChange={(_width, height) => {
+          // コンパクト化後の高さで判定を戻すとレイアウトが往復してしまう。
+          if (!compact) setFullContentHeight(height);
+        }}
       >
         {/* Target - Prominent but minimal */}
         <View style={[styles.targetContainer, compact && styles.compactTargetContainer]}>
