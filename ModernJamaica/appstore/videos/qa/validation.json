@@ -1,5 +1,5 @@
 {
-  "checked_on": "2026-10-11",
+  "checked_on": "2026-10-12",
   "results": [
     {
       "file": "01-product-header-ja.mp4",
@@ -8,12 +8,27 @@
       "seconds": 12.0,
       "fps": 30,
       "frames_decoded": 360,
-      "bytes": 462215,
+      "bytes": 242056,
       "codec": "H.264 High",
       "pixel_format": "yuv420p",
       "audio": "none",
       "decode": "passed",
-      "loop_seam_mean_absolute_error_0_to_255": 0.028
+      "loop_seam_mean_absolute_error_0_to_255": 0.008,
+      "art_safe_area": {
+        "template_bounds": [
+          1097,
+          493,
+          2743,
+          1154
+        ],
+        "artwork_bounds": [
+          1173,
+          530,
+          2683,
+          1133
+        ],
+        "check": "passed"
+      }
     },
     {
       "file": "02-search-results-ja.mp4",

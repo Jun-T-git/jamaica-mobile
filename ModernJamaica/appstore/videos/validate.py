@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Decode deliverables, check Apple dimensions/rate/duration, and measure loop seams."""
 import json
+from datetime import date
 import os
 from pathlib import Path
 import re
@@ -43,5 +44,12 @@ for name,width,height,duration in [('01-product-header-ja',3840,1646,12),('02-se
         assert 10000<=bitrate<=12300,bitrate
         result['container_bitrate_kbps']=bitrate
     results.append(result)
-(ROOT/'qa'/'validation.json').write_text(json.dumps({'checked_on':'2026-10-11','results':results,'connect_upload_and_review':'See README.md for live submission status'},ensure_ascii=False,indent=2)+'\n')
+# Check lossless source artwork against Apple's official template (not codec noise).
+source=Image.open(ROOT/'posters'/'01-product-header-source.png').convert('RGB')
+bounds=ImageChops.difference(source,Image.new('RGB',source.size,'#1A1B23')).getbbox()
+assert bounds and bounds[0]>=1097 and bounds[1]>=493 and bounds[2]<=2743 and bounds[3]<=1154,bounds
+results[0]['art_safe_area']={'template_bounds':[1097,493,2743,1154],'artwork_bounds':bounds,'check':'passed'}
+source.crop((685,0,3155,1646)).resize((900,600)).save(ROOT/'qa'/'01-header-phone-crop.png')
+source.crop((1097,493,2743,1154)).resize((1000,402)).save(ROOT/'qa'/'01-header-safe-area.png')
+(ROOT/'qa'/'validation.json').write_text(json.dumps({'checked_on':date.today().isoformat(),'results':results,'connect_upload_and_review':'See README.md for live submission status'},ensure_ascii=False,indent=2)+'\n')
 print(json.dumps(results,ensure_ascii=False,indent=2))

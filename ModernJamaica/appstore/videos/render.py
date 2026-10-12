@@ -105,33 +105,26 @@ def make_header():
     w,h = 3840,1646
     base = Image.new('RGB',(w,h),BG)
     d = ImageDraw.Draw(base)
-    # One focal idea, spacious typography and an original graphic of the real solution.
-    d.rounded_rectangle((155,205,690,285),40,fill='#242530')
-    text(d,(423,245),'5つの数字 × ＋−×÷',40,MINT,'mm')
-    text(d,(155,380),'ひらめきが、',172)
-    text(d,(155,605),'木になる。',196)
-    text(d,(165,940),'5つの数字で、14をつくろう。',63,MUTED)
-    brand(d,165,1225,65)
-    # Keep the goal prominent before any branches grow, separate from the result node.
-    d.rounded_rectangle((2395,70,3175,240),radius=42,fill='#242530',outline=BLUE,width=3)
-    text(d,(2605,155),'つくる数',62,MUTED,'mm')
-    text(d,(2980,155),'14',126,BLUE,'mm')
-    # Coordinates use the same tree topology and operator colors as the captured game.
-    nodes = {'a':(2110,1240,'2'), 'b':(2410,1240,'1'), 'c':(2710,1240,'3'),
-             'd':(3010,1240,'4'), 'e':(3310,1240,'3'),
-             'f':(2410,960,'1'), 'g':(2410,680,'2'), 'h':(3160,960,'7'), 'i':(2785,400,'14')}
+    # Apple Photoshop header template: Art Safe Area (1097,493)-(2743,1154).
+    # Keep every meaningful element here; the 21:9 canvas is cropped on phones.
+    text(d,(1170,690),'5つの数字で',64,MUTED)
+    text(d,(1170,790),'14をつくる。',92,BLUE)
+    text(d,(1175,955),'ひらめきが、木になる。',40,WHITE)
+    nodes = {'a':(1930,1080,'2'), 'b':(2105,1080,'1'), 'c':(2280,1080,'3'),
+             'd':(2455,1080,'4'), 'e':(2630,1080,'3'),
+             'f':(2105,920,'1'), 'g':(2105,760,'2'), 'h':(2540,920,'7'), 'i':(2315,600,'14')}
     steps = [(2.0,'f','c','a',ORANGE,'3 − 2 = 1'),(4.0,'g','f','b',MINT,'1 ＋ 1 = 2'),
              (6.0,'h','d','e',MINT,'4 ＋ 3 = 7'),(8.0,'i','g','h',GOLD,'2 × 7 = 14')]
     def node(layer,key,color=BLUE,alpha=1):
         x,y,label=nodes[key]
         ld=ImageDraw.Draw(layer)
-        r=83 if key!='i' else 105
-        ld.ellipse((x-r,y-r,x+r,y+r),fill='#242530',outline=color,width=6)
-        text(ld,(x,y),label,76 if key!='i' else 98,WHITE,'mm')
+        r=52 if key!='i' else 70
+        ld.ellipse((x-r,y-r,x+r,y+r),fill='#242530',outline=color,width=5)
+        text(ld,(x,y),label,49 if key!='i' else 64,WHITE,'mm')
         operations={'f':'−','g':'＋','h':'＋','i':'×'}
         if key in operations:
-            ld.ellipse((x+49,y-97,x+109,y-37),fill=color)
-            text(ld,(x+79,y-67),operations[key],38,BG,'mm')
+            ld.ellipse((x+29,y-66,x+71,y-24),fill=color)
+            text(ld,(x+50,y-45),operations[key],28,BG,'mm')
     base.save(ROOT/'build'/'header-base.png')
     process=subprocess.Popen([FFMPEG,'-hide_banner','-loglevel','error','-y','-f','rawvideo','-pix_fmt','rgb24','-s',f'{w}x{h}','-r','30','-i','pipe:0','-an','-c:v','libx264','-preset','fast','-crf','18','-pix_fmt','yuv420p','-movflags','+faststart',str(ROOT/'01-product-header-ja.mp4')],stdin=subprocess.PIPE)
     for frame in range(360):
@@ -146,7 +139,7 @@ def make_header():
             x,y,_=nodes[parent]
             for child in (left,right):
                 cx,cy,_=nodes[child]
-                td.line((cx,cy,cx+(x-cx)*p,cy+(y-cy)*p),fill=color,width=9)
+                td.line((cx,cy,cx+(x-cx)*p,cy+(y-cy)*p),fill=color,width=6)
         for key in ('a','b','c','d','e'): node(tree,key)
         for start,parent,left,right,color,copy in steps:
             if t>start+.6: node(tree,parent,color)
@@ -157,10 +150,10 @@ def make_header():
             for key in ('a','b','c','d','e'): node(leaves,key)
             tree=Image.blend(leaves,tree,growth_alpha)
         img.paste(tree,(0,0),tree)
-        draw=ImageDraw.Draw(img)
-        text(draw,(2785,1455),'5つの数字を、ぜんぶ使って。',48,MUTED,'mm')
         if frame==0: img.save(ROOT/'posters'/'01-product-header-first.png')
-        if frame==285: img.save(ROOT/'posters'/'01-product-header-ja.png')
+        if frame==285:
+            img.save(ROOT/'posters'/'01-product-header-ja.png')
+            img.save(ROOT/'posters'/'01-product-header-source.png')
         process.stdin.write(img.tobytes())
     process.stdin.close()
     if process.wait(): raise RuntimeError('Header encoding failed')
