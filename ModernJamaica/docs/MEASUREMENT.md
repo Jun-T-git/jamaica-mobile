@@ -52,3 +52,10 @@ Jest で開始/終端の重複、スキップ/再開始/時間切れ、正解後
 問題単位の共通計測を配信する。初回価値の `CommonMeasurementFirstBuild` は未設定のままとし、取得証拠の実機検証と全バージョン横断のビルド番号管理を完了するまで `value_first_reached` を有効化しない。TestFlight / 本番の完了状態は App Store Connect で別途確認する。
 
 ローカル検証: Jest 18 suites / 122 tests、TypeScript、ESLint、Swift 比較・取得分類・Release/DEBUG/スクリーンショットの収集ゲートが成功。
+
+### 配信結果（2026-10-18）
+
+- ソース: `77ea012d527855c3c3d37f8c0280c1f95fd6a697`。1.3.2 / build 1。
+- [TestFlight CI](https://github.com/Jun-T-git/jamaica-mobile/actions/runs/39086132908) が成功。ビルド処理は `VALID`、内部配信は `IN_BETA_TESTING`。内部テスター向け配信済み。外部テスター向け配信は今回実施していない。
+- [本番審査提出 CI](https://github.com/Jun-T-git/jamaica-mobile/actions/runs/39088078719) が成功。同じビルド `ce7310d0-8c65-474e-af8c-aff07d031dff` の紐付けを API で確認。版の状態は `WAITING_FOR_REVIEW`、公開方式は `AFTER_APPROVAL`。審査承認後に自動公開されるが、記録時点では一般公開前。
+- iOS 26.5 / iPhone 17 Pro シミュレータで Release ビルド成功、ホーム画面の正常な起動・表示を確認。実機での計測配送や StoreKit 本番取得証拠の検証完了を示すものではない。初回価値の計測は未有効化のまま。
