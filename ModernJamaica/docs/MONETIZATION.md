@@ -131,3 +131,7 @@
 - プライバシーポリシーは Firebase Hosting の URL に統一。広告は条件付きインタースティシャルと任意リワードのみで、バナーは廃止済み。
 - App Store Connect で非消耗型商品 `com.junt.modernjamaica.remove_ads`（Apple ID `6819704100`）を登録し、日本を基準に税込500円で設定。日本語の表示名・説明と審査画像・メモを設定し、審査用ドラフトへ追加した。アプリ版 1.3.0 のストア文言も設定済み。Sandbox/実機での購入・復元・承認待ち・返金の検証と、署名済みビルドのアップロードは残る。
 - プライバシーポリシーを Firebase Hosting と GitHub Pages の双方に公開し、公開ページの更新日を確認。App Store Connect では新しい URL と Firebase Analytics の利用目的、Firebase 匿名認証のユーザーIDを申告した。
+
+## 初回価値向けの取得証拠
+
+既存 `PurchaseModule` は `AppTransaction.shared` の検証済み取得情報を初回価値の適格性判定へ渡す。購入権利や売上記録には使わず、復元/refresh/認証 UI は呼ばない。将来配信の cutoff と旧履歴の優先・未確認時抑止は [MEASUREMENT.md](./MEASUREMENT.md) を参照。

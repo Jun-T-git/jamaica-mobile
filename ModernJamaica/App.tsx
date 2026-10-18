@@ -22,6 +22,7 @@ import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { useSettingsStore } from './src/store/settingsStore';
 import { adService } from './src/services/adService';
 import { analyticsService } from './src/services/analyticsService';
+import { firstValueMeasurementService } from './src/services/firstValueMeasurementService';
 import { userService } from './src/services/userService';
 import { GameMode, DifficultyLevel } from './src/types';
 
@@ -60,6 +61,8 @@ function App() {
   };
 
   useEffect(() => {
+    firstValueMeasurementService.refreshInstallEvidence();
+
     // 広告 SDK の初期化（ATT の許可依頼 → コンテンツ制限 → 初期化）
     adService.initialize();
 

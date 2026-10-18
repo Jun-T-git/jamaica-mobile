@@ -121,3 +121,9 @@ UI 操作は**タップで繋ぐ**（ノード → 演算子 → ノード）。
 ---
 このファイルが説明する主なコード:
 `utils/problemGenerator.ts` / `store/gameStore.ts` / `utils/scoreCalculator.ts` / `constants/scoreConfig.ts` / `config/difficulty.ts` / `config/gameMode.ts` / `types/index.ts`
+
+## 共通計測との接続
+
+`gameStore` はカウントダウン完了で最初の問題、正解後/スキップ後の実プレイ開始で次の問題の `solve_problem` を開始する。正解検証で success、受理されたスキップ/再開始/明示終了で cancelled、時間切れで defeat を確定する。誤答は修正できるため終端にしない。開始前のカウントダウン終了や正解演出中の終了では、未開始の問題の結果を送らない。ポーズ・復帰・kill から取消や敗北を推定しない。停止中に次問題が用意された場合は再開時に開始し、同じ問題の通常の再開では開始を重複させない。スコア計算/正解判定は変更しない。詳細は [MEASUREMENT.md](./MEASUREMENT.md)。
+
+初正解の共通初回価値は正解検証時に `firstValueMeasurementService` へ通知する。既存履歴の初期化だけ自己記録書込みより先に行い、盤面生成・採点は待たせない。計測適格性・送信済み管理はゲームスコアから独立する。

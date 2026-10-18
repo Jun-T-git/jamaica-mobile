@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PlayerStats } from '../types';
 
-const PLAYER_STATS_KEY = '@jamaica_player_stats';
-const FIRST_SOLVE_KEY = '@jamaica_first_solve_logged';
+export const PLAYER_STATS_KEY = '@jamaica_player_stats';
+export const FIRST_SOLVE_KEY = '@jamaica_first_solve_logged';
 
 export const EMPTY_PLAYER_STATS: PlayerStats = {
   gamesPlayed: 0,

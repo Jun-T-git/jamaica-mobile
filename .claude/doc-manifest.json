@@ -75,6 +75,21 @@
     {
       "path": "CLAUDE.md",
       "covers": []
+    },
+    {
+      "path": "ModernJamaica/docs/MEASUREMENT.md",
+      "covers": [
+        "ModernJamaica/src/services/problemMeasurementService.ts",
+        "ModernJamaica/src/services/analyticsService.ts",
+        "ModernJamaica/src/store/gameStore.ts",
+        "ModernJamaica/ios/Podfile.lock",
+        "ModernJamaica/ios/ModernJamaica/PurchaseModule.swift",
+        "ModernJamaica/src/services/purchaseService.ts",
+        "ModernJamaica/src/services/firstValueMeasurementService.ts",
+        "ModernJamaica/src/services/playerStatsService.ts",
+        "ModernJamaica/App.tsx",
+        "ModernJamaica/ios/ModernJamaica/PurchaseModuleBridge.m"
+      ]
     }
   ]
 }

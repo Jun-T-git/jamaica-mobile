@@ -6,4 +6,5 @@ RCT_EXTERN_METHOD(getEntitlement:(RCTPromiseResolveBlock)resolve rejecter:(RCTPr
 RCT_EXTERN_METHOD(getProduct:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(purchase:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(restore:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getMeasurementInstallEvidence:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 @end

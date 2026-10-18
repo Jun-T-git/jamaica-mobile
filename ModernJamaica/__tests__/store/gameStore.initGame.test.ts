@@ -43,6 +43,8 @@ jest.mock('react-native-haptic-feedback', () => ({ trigger: jest.fn(), HapticFee
   impactLight: 'impactLight', notificationSuccess: 'notificationSuccess', notificationError: 'notificationError',
 } }));
 
+import { logEvent } from '@react-native-firebase/analytics';
+import { problemMeasurementService } from '../../src/services/problemMeasurementService';
 import { useGameStore } from '../../src/store/gameStore';
 import { useStatsStore } from '../../src/store/statsStore';
 import { DifficultyLevel, GameMode, GameStatus } from '../../src/types';
@@ -112,5 +114,87 @@ describe('このプレイの復習問題', () => {
     useGameStore.getState().skipProblem();
     await useGameStore.getState().endGame(true);
     expect(useGameStore.getState().reviewProblems).toEqual([]);
+  });
+});
+
+
+describe('common problem measurement', () => {
+  const events = (name: string) => (logEvent as jest.Mock).mock.calls
+    .filter(call => call[1] === name).map(call => call[2]);
+  beforeEach(async () => {
+    useGameStore.getState().stopTimer();
+    problemMeasurementService.finish('cancelled');
+    await useGameStore.getState().initGame(GameMode.CHALLENGE);
+    jest.clearAllMocks();
+  });
+  afterEach(() => useGameStore.getState().stopTimer());
+  test('countdown is not a start; duplicate completion, pause and resume do not restart', () => {
+    expect(events('action_start')).toEqual([]);
+    useGameStore.getState().completeCountdown();
+    useGameStore.getState().completeCountdown();
+    useGameStore.getState().pauseGame();
+    useGameStore.getState().resumeGame();
+    expect(events('action_start')).toEqual([{ schema_version: 1, action_name: 'solve_problem' }]);
+    expect(events('action_result')).toEqual([]);
+    expect(events('value_first_reached')).toEqual([]);
+  });
+  test('skip cancels once and starts the next problem, timeout is defeat only once', async () => {
+    useGameStore.getState().completeCountdown();
+    useGameStore.getState().skipProblem();
+    await useGameStore.getState().endGame(false);
+    await useGameStore.getState().endGame(false);
+    expect(events('action_start')).toHaveLength(2);
+    expect(events('action_result').map(params => params.result)).toEqual(['cancelled', 'defeat']);
+  });
+  test('observed processing errors use an allowlisted code and consume the operation', () => {
+    useGameStore.getState().completeCountdown();
+    problemMeasurementService.finish('error', 'validation');
+    problemMeasurementService.finish('defeat');
+    expect(events('action_result')).toEqual([{
+      schema_version: 1, action_name: 'solve_problem', result: 'error', error_code: 'validation',
+    }]);
+  });
+  test('paused next problem starts on resume exactly once', () => {
+    useGameStore.getState().completeCountdown();
+    useGameStore.getState().pauseGame();
+    useGameStore.getState().skipProblem();
+    expect(events('action_start')).toHaveLength(1);
+    useGameStore.getState().resumeGame();
+    useGameStore.getState().resumeGame();
+    expect(events('action_start')).toHaveLength(2);
+  });
+  test('explicit restart cancels unfinished problem and does not start during countdown', async () => {
+    useGameStore.getState().completeCountdown();
+    await useGameStore.getState().initGame(GameMode.CHALLENGE);
+    await useGameStore.getState().endGame(true);
+    expect(events('action_start')).toHaveLength(1);
+    expect(events('action_result').map(params => params.result)).toEqual(['cancelled']);
+  });
+  test('wrong answer remains playable, validated success consumes operation before exit', async () => {
+    jest.useFakeTimers();
+    useGameStore.getState().completeCountdown();
+    const state = useGameStore.getState();
+    const nodes = state.nodes.map((node, index) => ({ ...node, value: index + 1 }));
+    useGameStore.setState({ targetNumber: 99, nodes });
+    const clock = jest.spyOn(Date, 'now');
+    let time = 10000;
+    clock.mockImplementation(() => ++time);
+    const solve = () => {
+      let combinedId = nodes[0].id;
+      for (const next of nodes.slice(1)) {
+        useGameStore.getState().connectNodes(combinedId, next.id, '+');
+        combinedId = useGameStore.getState().nodes.find(node => node.id.startsWith('internal-') && !node.isUsed)!.id;
+      }
+    };
+    solve();
+    expect(events('action_result')).toEqual([]);
+    useGameStore.setState({ targetNumber: 15, nodes });
+    solve();
+    await useGameStore.getState().endGame(true);
+    expect(events('action_result').map(params => params.result)).toEqual(['success']);
+    expect(events('value_first_reached')).toEqual([]);
+    clock.mockRestore();
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
   });
 });

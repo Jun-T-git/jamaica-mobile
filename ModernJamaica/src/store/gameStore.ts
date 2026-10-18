@@ -8,6 +8,8 @@ import { ComboTracker, calculateScoreBreakdown, calculateFinalBonus } from '../u
 import { calculateTimeBonus } from '../utils/timeBonus';
 import { ProblemResult, EMPTY_SCORE_BREAKDOWN, SCORE_CONFIG } from '../constants/scoreConfig';
 import { analyticsService } from '../services/analyticsService';
+import { problemMeasurementService } from '../services/problemMeasurementService';
+import { firstValueMeasurementService } from '../services/firstValueMeasurementService';
 import { hapticService } from '../services/hapticService';
 import { soundManager, SoundType } from '../utils/SoundManager';
 import { rankingService } from '../services/rankingService';
@@ -179,9 +181,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
   
   // ゲーム初期化
   initGame: async (mode: GameMode, difficulty: DifficultyLevel = DEFAULT_DIFFICULTY) => {
+    // Snapshot legacy history before this play writes its own statistics. Core generation does not await it.
+    const measurementReady = firstValueMeasurementService.initialize();
     // 難易度別のハイスコアを読み込み
     const savedHighScores = await loadAllHighScoresWithDifficulty();
     
+    // A confirmed restart cancels the unfinished problem, never an app-background transition.
+    problemMeasurementService.finish('cancelled');
+
     // コンボトラッカーをリセット
     if (mode === GameMode.CHALLENGE) {
       get().comboTracker.reset();
@@ -201,9 +208,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     // 自己記録（ゲーム数・連続プレイ日数）を進め、初めてのゲームかどうかを計測のファネルに使う。
     // 失敗しても記録と計測が欠けるだけでゲームは進む
-    useStatsStore
-      .getState()
-      .recordGameStart()
+    measurementReady
+      .then(() => useStatsStore.getState().recordGameStart())
       .then(stats => {
         analyticsService.logEvent('game_start', {
           mode,
@@ -226,11 +232,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // カウントダウン完了
   completeCountdown: () => {
     const state = get();
+    if (state.gameStatus !== GameStatus.COUNTDOWN) return;
     set({
       gameStatus: GameStatus.BUILDING,
       gameState: { ...state.gameState, isActive: true },
       problemStartTime: Date.now(),
     });
+    problemMeasurementService.start();
     get().startTimer();
   },
   
@@ -265,6 +273,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       historyIndex: 0,
       problemStartTime: Date.now(),
     });
+    if (state.gameState.isActive && state.gameStatus !== GameStatus.COUNTDOWN) {
+      problemMeasurementService.start();
+    }
   },
   
   // ノード接続処理
@@ -335,6 +346,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const isCorrect = Math.abs(finalValue - state.targetNumber) < 0.001;
       
       if (isCorrect) {
+        problemMeasurementService.finish('success');
+        firstValueMeasurementService.recordFirstCorrect();
         set({
           gameStatus: GameStatus.CORRECT,
           reviewProblems: [...state.reviewProblems, {
@@ -408,7 +421,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           difficulty: game.difficulty,
           solve_time: Math.round(solveTime),
         });
-        // 生まれて初めての正解は一度だけ別イベントに（初回起動→初正解のファネル）
+        // 旧ローカル初回フラグのイベント。計測開始後の新規コホートの証拠には使わない。
         playerStatsService.markFirstSolve().then(isFirst => {
           if (isFirst) {
             analyticsService.logEvent('first_problem_solved', {
@@ -463,6 +476,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({
         gameState: { ...state.gameState, isActive: true }
       });
+      problemMeasurementService.start();
       get().startTimer();
     }
   },
@@ -485,6 +499,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     });
     
+    problemMeasurementService.finish('cancelled');
     analyticsService.logEvent('problem_skipped', {
       mode: game.mode,
       difficulty: game.difficulty,
@@ -534,6 +549,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { gameState: game } = state;
     
     if (game.finalScore !== undefined) return;
+
+    problemMeasurementService.finish(isManual ? 'cancelled' : 'defeat');
 
     // タイマー停止
     get().stopTimer();

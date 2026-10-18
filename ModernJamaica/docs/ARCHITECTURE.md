@@ -94,7 +94,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 | 広告 | `services/adService.ts` | 購入・閲覧期限の確認、ATT と SDK 初期化、メニュー離脱時の頻度制限付き全画面広告、任意のリワード広告、配置別の広告収益イベント | AdMob（+ `react-native-tracking-transparency`） |
 | 買い切り購入 | `services/purchaseService.ts` | 商品情報取得の重複防止/タイムアウト・購入/復元と入口別計測・復帰時の権利再確認 | `ios/ModernJamaica/PurchaseModule.swift` / StoreKit 2 |
 | 解答例の閲覧期限 | `services/reviewAccessService.ts` | 報酬獲得時の期限付与と再起動後の復元 | AsyncStorage |
-| 計測 | `services/analyticsService.ts` | 画面表示・ゲーム開始/終了（累計ゲーム数・初ゲームかどうか・連続日数を付与）・正解/スキップ・**生まれて初めての正解**（`first_problem_solved`）・チュートリアル・設定変更・外部リンク・レビュー依頼のイベント送信（失敗は握りつぶす）。初回起動→チュートリアル→初ゲーム→初正解のファネルが追える | Firebase Analytics（広告 ID 連携なし） |
+| 計測 | `services/analyticsService.ts` | 画面表示・ゲーム開始/終了（累計ゲーム数・初ゲームかどうか・連続日数を付与）・正解/スキップ・旧初正解フラグによるイベント（`first_problem_solved`。計測開始後の新規とは判定できない）・チュートリアル・設定変更・外部リンク・レビュー依頼のイベント送信（失敗は握りつぶす）。共通計測は [MEASUREMENT.md](./MEASUREMENT.md) を参照 | Firebase Analytics（広告 ID 連携なし） |
 | 自己記録 | `services/playerStatsService.ts` | ゲーム数・累計正解数・連続プレイ日数の永続化と「初正解済み」フラグ。失敗は空の記録として扱う | AsyncStorage |
 | レビュー依頼 | `services/reviewService.ts` | 新記録の直後・数ゲーム以上遊んだ人・前回から間隔を空けて、OS のレビュー依頼を出す（条件は `utils/reviewPolicy.ts`。実際に出すかは OS が決める） | 自前の最小ネイティブモジュール `ios/ModernJamaica/StoreReviewModule.m`（`SKStoreReviewController`。`NativeModules.StoreReview`） |
 | 触覚 | `services/hapticService.ts` | 選択・結合・正解・不正解の振動 | react-native-haptic-feedback |
@@ -135,3 +135,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 
 ---
 関連: [GAME-CORE.md](./GAME-CORE.md)・[DESIGN-SYSTEM.md](./DESIGN-SYSTEM.md)・[CONVENTIONS.md](./CONVENTIONS.md)
+
+- 共通の問題単位計測は `services/problemMeasurementService.ts`。端末メモリ内の挑戦を開始・終端ごとに一度だけ送信し、ゲーム進行や永続状態の変更を待たせない。
+
+- 初回価値は `services/firstValueMeasurementService.ts` が旧履歴を移行し、native の検証済み取得版の証拠と初正解・送信済みを永続管理する。App 起動で証拠を取得し、gameStore は初正解を通知する。既存/unknownの除外と将来の導入cutoff設定は [MEASUREMENT.md](./MEASUREMENT.md)。
