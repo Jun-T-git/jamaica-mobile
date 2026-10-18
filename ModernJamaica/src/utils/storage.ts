@@ -3,19 +3,6 @@ import { GameMode, DifficultyLevel } from '../types';
 import { getGameModeConfig } from '../config';
 import { DEFAULT_DIFFICULTY } from '../config/difficulty';
 
-export interface StoredData {
-  challengeHighScore?: number;
-  infiniteHighScore?: number;
-  settings?: {
-    soundEnabled: boolean;
-    vibrationEnabled: boolean;
-  };
-}
-
-const STORAGE_KEYS = {
-  SETTINGS: '@jamaica_settings',
-} as const;
-
 /**
  * 難易度別のストレージキーを取得
  */
@@ -44,13 +31,6 @@ export const saveHighScoreWithDifficulty = async (
   } catch (error) {
     console.error(`Failed to save ${mode} ${difficulty} high score:`, error);
   }
-};
-
-/**
- * 統合されたハイスコア保存関数（後方互換性）
- */
-export const saveHighScore = async (mode: GameMode, score: number): Promise<void> => {
-  return saveHighScoreWithDifficulty(mode, DEFAULT_DIFFICULTY, score);
 };
 
 /**
@@ -98,35 +78,6 @@ export const loadHighScore = async (mode: GameMode): Promise<number | null> => {
   return null;
 };
 
-// 後方互換性のための関数（段階的に削除予定）
-export const saveChallengeHighScore = async (score: number): Promise<void> => {
-  return saveHighScore(GameMode.CHALLENGE, score);
-};
-
-export const loadChallengeHighScore = async (): Promise<number | null> => {
-  return loadHighScore(GameMode.CHALLENGE);
-};
-
-// 設定を保存
-export const saveSettings = async (settings: StoredData['settings']): Promise<void> => {
-  try {
-    await AsyncStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-  } catch (error) {
-    console.error('Failed to save settings:', error);
-  }
-};
-
-// 設定を読み込み
-export const loadSettings = async (): Promise<StoredData['settings'] | null> => {
-  try {
-    const jsonValue = await AsyncStorage.getItem(STORAGE_KEYS.SETTINGS);
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  } catch (error) {
-    console.error('Failed to load settings:', error);
-    return null;
-  }
-};
-
 // 難易度別の全ハイスコアを読み込み
 export const loadAllHighScoresWithDifficulty = async (): Promise<{
   challenge: Record<DifficultyLevel, number>;
@@ -140,46 +91,12 @@ export const loadAllHighScoresWithDifficulty = async (): Promise<{
     infinite: {} as Record<DifficultyLevel, number>,
   };
   
-  for (const mode of modes) {
-    for (const difficulty of difficulties) {
+  await Promise.all(modes.flatMap(mode =>
+    difficulties.map(async difficulty => {
       const score = await loadHighScoreWithDifficulty(mode, difficulty);
       result[mode][difficulty] = score || 0;
-    }
-  }
+    }),
+  ));
   
   return result;
-};
-
-// すべてのハイスコアデータを読み込み（後方互換性）
-export const loadAllHighScores = async (): Promise<{
-  challengeHighScore: number | null;
-  infiniteHighScore: number | null;
-}> => {
-  const [challengeHighScore, infiniteHighScore] = await Promise.all([
-    loadHighScore(GameMode.CHALLENGE),
-    loadHighScore(GameMode.INFINITE),
-  ]);
-
-  return {
-    challengeHighScore,
-    infiniteHighScore,
-  };
-};
-
-// すべてのデータをクリア（デバッグ用）
-export const clearAllStoredData = async (): Promise<void> => {
-  try {
-    const keysToRemove = [
-      ...Object.values(STORAGE_KEYS),
-      // 旧形式のキー
-      ...Object.values(GameMode).map(mode => getGameModeConfig(mode).storage.key),
-      // 新形式のキー
-      ...Object.values(GameMode).flatMap(mode =>
-        Object.values(DifficultyLevel).map(difficulty => getScoreKey(mode, difficulty))
-      ),
-    ];
-    await AsyncStorage.multiRemove(keysToRemove);
-  } catch (error) {
-    console.error('Failed to clear stored data:', error);
-  }
 };

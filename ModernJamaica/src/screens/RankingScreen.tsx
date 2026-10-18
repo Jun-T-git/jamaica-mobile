@@ -32,8 +32,9 @@ export const RankingScreen: React.FC<RankingScreenProps> = ({ navigation }) => {
   const [bestScoreRecord, setBestScoreRecord] = useState<ChallengeScore | null>(
     null,
   );
-  const { loadDisplayName } = useSettingsStore();
-  const { highScores, loadStoredData } = useGameStore();
+  const loadDisplayName = useSettingsStore(state => state.loadDisplayName);
+  const highScores = useGameStore(state => state.highScores);
+  const loadStoredData = useGameStore(state => state.loadStoredData);
 
   useEffect(() => {
     // 画面表示時にユーザー表示名とハイスコアを読み込み

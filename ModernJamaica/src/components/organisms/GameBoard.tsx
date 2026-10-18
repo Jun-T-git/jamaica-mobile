@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import {
   Animated,
   Dimensions,
@@ -35,19 +36,33 @@ interface GridNode {
   nodeId: string;
 }
 
-export const GameBoard: React.FC<GameBoardProps> = ({
+export const GameBoard = memo(function GameBoard({
   gameInfo,
   disabled = false,
-}) => {
+}: GameBoardProps) {
   const {
     nodes,
     connectNodes,
     undoLastMove,
     canUndo,
     skipProblem,
-    gameState,
+    mode,
+    currentCombo,
+    comboExpiresAt,
+    skipCount,
     wrongAnswerCount,
-  } = useGameStore();
+  } = useGameStore(useShallow(state => ({
+    nodes: state.nodes,
+    connectNodes: state.connectNodes,
+    undoLastMove: state.undoLastMove,
+    canUndo: state.canUndo,
+    skipProblem: state.skipProblem,
+    mode: state.gameState.mode,
+    currentCombo: state.gameState.currentCombo,
+    comboExpiresAt: state.gameState.comboExpiresAt,
+    skipCount: state.gameState.skipCount,
+    wrongAnswerCount: state.wrongAnswerCount,
+  })));
 
   const [grid, setGrid] = useState<(GridNode | null)[][]>([]);
   const [nodePositions, setNodePositions] = useState<
@@ -485,10 +500,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         <View style={[styles.targetContainer, compact && styles.compactTargetContainer]}>
           <Text style={styles.targetLabel}>つくる数</Text>
           <Text style={[styles.targetNumber, compact && styles.compactTargetNumber]}>{gameInfo.target}</Text>
-          {gameState?.mode === GameMode.CHALLENGE && (
+          {mode === GameMode.CHALLENGE && (
             <ComboIndicator
-              combo={gameState.currentCombo}
-              expiresAt={gameState.comboExpiresAt}
+              combo={currentCombo}
+              expiresAt={comboExpiresAt}
             />
           )}
         </View>
@@ -679,41 +694,41 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               style={[
                 styles.iconButton,
                 styles.skipButton,
-                (disabled || (gameState?.mode === GameMode.CHALLENGE &&
-                  gameState?.skipCount === 0)) &&
+                (disabled || (mode === GameMode.CHALLENGE &&
+                  skipCount === 0)) &&
                   styles.disabledIconButton,
               ]}
               onPress={() => {
                 // スキップボタンタップ時は特別な効果音（TAP）を使用
                 soundManager.play(SoundType.TAP);
                 
-                if (gameState?.mode === GameMode.CHALLENGE) {
-                  if (gameState.skipCount <= 0) {
+                if (mode === GameMode.CHALLENGE) {
+                  if (skipCount <= 0) {
                     return;
                   }
-                  setSkipMessage(`問題をスキップしますか？\n（残り${gameState.skipCount}回）`);
+                  setSkipMessage(`問題をスキップしますか？\n（残り${skipCount}回）`);
                 } else {
                   setSkipMessage('問題をスキップしますか？');
                 }
                 setShowSkipDialog(true);
               }}
               disabled={
-                disabled || (gameState?.mode === GameMode.CHALLENGE && gameState?.skipCount === 0)
+                disabled || (mode === GameMode.CHALLENGE && skipCount === 0)
               }
             >
               <MaterialIcons
                 name="skip-next"
                 size={24}
                 color={
-                  gameState?.mode === GameMode.CHALLENGE && gameState?.skipCount === 0
+                  mode === GameMode.CHALLENGE && skipCount === 0
                     ? ModernDesign.colors.text.disabled
                     : ModernDesign.colors.text.primary
                 }
               />
-              {gameState?.mode === GameMode.CHALLENGE && gameState && (
+              {mode === GameMode.CHALLENGE && (
                 <View style={styles.skipBadge}>
                   <Text style={styles.skipBadgeText}>
-                    {gameState.skipCount}
+                    {skipCount}
                   </Text>
                 </View>
               )}
@@ -749,7 +764,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

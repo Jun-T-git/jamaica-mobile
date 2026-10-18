@@ -5,8 +5,3 @@
 
 export * from './gameMode';
 export * from './dialogs';
-
-// 設定の統合オブジェクト（将来の拡張用）
-export const CONFIG = {
-  // 必要に応じて他の設定も統合
-} as const;

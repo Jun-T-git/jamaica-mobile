@@ -33,11 +33,9 @@ export class RankingService {
    * スコアを提出（チャレンジモードのみ対応）
    */
   async submitScore(submission: ScoreSubmission): Promise<boolean> {
-    console.log('🔄 submitScore called with:', JSON.stringify(submission, null, 2));
     
     // チャレンジモードのみランキング対象
     if (submission.mode !== GameMode.CHALLENGE) {
-      console.log('❌ Ranking is only available for Challenge mode');
       return false;
     }
     
@@ -49,10 +47,8 @@ export class RankingService {
     
     try {
       const userId = await userService.getAuthUserId();
-      console.log('👤 User ID:', userId);
       
       const docRef = firestore().collection(this.collectionName).doc(userId);
-      console.log('📄 Document reference created for collection:', this.collectionName);
 
       // Transactionを使用してアトミックに更新
       const result = await firestore().runTransaction(async (transaction) => {
@@ -67,7 +63,7 @@ export class RankingService {
           userData = doc.data() as UserScoreDocument;
           
           // 現在のスコアと比較
-          const currentScore = this.getCurrentScore(userData, submission.mode, submission.difficulty);
+          const currentScore = this.getScoreFromDocument(userData, submission.difficulty);
           
           if (submission.score > currentScore.score) {
             // 新記録の場合のみ更新
@@ -82,17 +78,13 @@ export class RankingService {
         }
 
         if (shouldUpdate) {
-          console.log('✅ Updating document with data:', JSON.stringify(userData, null, 2));
           transaction.set(docRef, userData);
           return true;
-        } else {
-          console.log('⏭️ No update needed - score not improved');
         }
         
         return false;
       });
 
-      console.log('🎯 Transaction result:', result);
       await this.clearUnsentScore(submission.difficulty);
       return result;
     } catch (error) {
@@ -143,18 +135,15 @@ export class RankingService {
    * ランキングを取得（チャレンジモードのみ）
    */
   async getRanking(query: RankingQuery): Promise<RankingEntry[]> {
-    console.log('📊 getRanking called with:', JSON.stringify(query, null, 2));
     
     // チャレンジモードのみランキング表示
     if (query.mode !== GameMode.CHALLENGE) {
-      console.log('❌ Ranking is only available for Challenge mode');
       return [];
     }
     
     try {
-      const { mode, difficulty, limit = 10 } = query;
-      const fieldPath = this.getScoreFieldPath(mode, difficulty);
-      console.log('🔍 Querying field path:', fieldPath);
+      const { difficulty, limit = 10 } = query;
+      const fieldPath = this.getScoreFieldPath(difficulty);
       
       const snapshot = await firestore()
         .collection(this.collectionName)
@@ -163,13 +152,11 @@ export class RankingService {
         .limit(limit)
         .get();
 
-      console.log('📋 Retrieved documents count:', snapshot.size);
-
       const currentUserId = await userService.getAuthUserId();
       
       const rankings = snapshot.docs.map((doc, index) => {
         const data = doc.data() as UserScoreDocument;
-        const score = this.getScoreFromDocument(data, mode, difficulty);
+        const score = this.getScoreFromDocument(data, difficulty);
         
         return {
           rank: index + 1,
@@ -182,7 +169,6 @@ export class RankingService {
         };
       });
 
-      console.log('🏆 Final rankings:', JSON.stringify(rankings, null, 2));
       return rankings;
     } catch (error) {
       console.error('❌ Failed to get ranking:', error);
@@ -210,8 +196,8 @@ export class RankingService {
       }
 
       const userData = userDoc.data() as UserScoreDocument;
-      const userScore = this.getScoreFromDocument(userData, mode, difficulty);
-      const fieldPath = this.getScoreFieldPath(mode, difficulty);
+      const userScore = this.getScoreFromDocument(userData, difficulty);
+      const fieldPath = this.getScoreFieldPath(difficulty);
 
       if (userScore.score <= 0) {
         return { rank: null, totalUsers: 0 };
@@ -289,11 +275,9 @@ export class RankingService {
    * ユーザーの表示名を更新
    */
   async updateDisplayName(newDisplayName: string): Promise<boolean> {
-    console.log('🔄 updateDisplayName called with:', newDisplayName);
     
     try {
       const userId = await userService.getAuthUserId();
-      console.log('👤 User ID:', userId);
       
       const docRef = firestore().collection(this.collectionName).doc(userId);
       
@@ -306,10 +290,8 @@ export class RankingService {
           displayName: newDisplayName.trim(),
           lastUpdated: Date.now(),
         });
-        console.log('✅ Display name updated successfully');
         return true;
       } else {
-        console.log('📄 User document does not exist yet');
         // ドキュメントが存在しない場合は何もしない
         // （初回スコア提出時に正しい表示名が設定される）
         return true;
@@ -361,33 +343,18 @@ export class RankingService {
     }
   }
 
-  /**
-   * 現在のスコアを取得
-   */
-  private getCurrentScore(
-    userData: UserScoreDocument, 
-    mode: GameMode, 
-    difficulty: DifficultyLevel
-  ): ChallengeScore {
-    // チャレンジモードのみ対応
-    return userData.challengeScores[difficulty];
-  }
-
-  /**
-   * ドキュメントからスコアを取得
-   */
+  /** チャレンジの難易度別スコアを取得 */
   private getScoreFromDocument(
-    userData: UserScoreDocument, 
-    mode: GameMode, 
-    difficulty: DifficultyLevel
+    userData: UserScoreDocument,
+    difficulty: DifficultyLevel,
   ): ChallengeScore {
-    return this.getCurrentScore(userData, mode, difficulty);
+    return userData.challengeScores[difficulty];
   }
 
   /**
    * Firestoreクエリ用のフィールドパスを取得
    */
-  private getScoreFieldPath(mode: GameMode, difficulty: DifficultyLevel): string {
+  private getScoreFieldPath(difficulty: DifficultyLevel): string {
     // チャレンジモードのみ対応
     return `challengeScores.${difficulty}.score`;
   }

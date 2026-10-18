@@ -47,7 +47,8 @@ type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 function App() {
-  const { loadSoundSetting, loadHapticsSetting } = useSettingsStore();
+  const loadSoundSetting = useSettingsStore(state => state.loadSoundSetting);
+  const loadHapticsSetting = useSettingsStore(state => state.loadHapticsSetting);
   const navigationRef = useNavigationContainerRef<RootStackParamList>();
   const currentRouteName = useRef<string | undefined>(undefined);
 

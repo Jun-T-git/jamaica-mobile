@@ -48,5 +48,5 @@ npx tsc --noEmit   # 型チェック
 
 ## 既知の技術的負債（着手時は要確認）
 
-- Android AdMob 本番 ID 未設定 / Firestore ルールと auth 実装の乖離 / config の二重定義 / テストカバレッジ低 / `designSystem.ts` は削除済み。
+- Android AdMob 本番 ID 未設定 / テストカバレッジ低 / `ProblemData.solutions` 未使用 / 旧ランキング `userScores` の残置 / 不正解音が仮の合成音。
 - 詳細は `ModernJamaica/docs/CONVENTIONS.md`。

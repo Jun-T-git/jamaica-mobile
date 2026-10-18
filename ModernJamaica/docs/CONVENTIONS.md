@@ -16,7 +16,7 @@
 ## 状態管理（Zustand）
 
 - 状態は `store/gameStore.ts`（ゲーム）、`store/settingsStore.ts`（設定）、`store/statsStore.ts`（自己記録）、`store/monetizationStore.ts`（購入・閲覧権利）に集約。
-- **prop drilling を避け、コンポーネントで Zustand フックを直接使う**。
+- **prop drilling を避け、コンポーネントで Zustand フックを直接使う**。selector で必要なフィールドだけを購読し、複数フィールドをまとめる場合は `useShallow` で参照を安定させる。
 - 新しいゲーム状態フィールド／アクションは既存ストアの型定義に追加し、[GAME-CORE.md](./GAME-CORE.md) / [ARCHITECTURE.md](./ARCHITECTURE.md) の該当箇所を追随更新（下の「ドキュメント更新規約」）。
 
 ## 設定の置き場所
@@ -82,7 +82,7 @@ canonical 文書は**薄く保つ**。関数シグネチャや具体数値を散
 0. **広告の ATT 対応はリリース時に App Store Connect の手動更新が要る**: `services/adService.ts` は起動時に ATT を求め IDFA を広告に使う（[decisions/0007](./decisions/0007-att-and-ad-targeting.md)）。App Store Connect のアプリのプライバシーは申告済み（デバイス ID → サードパーティ広告 → トラッキングあり）。提出時の IDFA 質問は `fastlane/Fastfile` の release レーンが「はい（広告配信）」で送る。**`PrivacyInfo.xcprivacy` の `NSPrivacyTracking` は false のまま**にすること（true にするとトラッキングドメインの列挙が必須になり、無いと審査提出時に ITMS-91064「バイナリが無効」になる。2026-09-23 に 1.2.0 で発生）。トラッキングの申告は App Store Connect のアプリのプライバシーで行う。ゲーム系広告ネットワークのメディエーションは未導入。
 1. **Android AdMob 本番 ID 未取得**: `services/adService.ts` の Android 広告 ID（インタースティシャル/リワード）は本番 ID が未取得のため `undefined`（無効なプレースホルダ ID を渡すと広告枠が壊れるため）。この間 Android 本番では広告を出さない（対象 ID が未設定で、全画面広告を利用できない）。iOS インタースティシャルは設定済み。リワード ID の状態は `config/monetization.ts` を参照。バナーは全プラットフォームで廃止済み。**本アプリは iOS のみをリリース対象とする方針のため、この負債は実質的に問題にならない**（Android を配信する場合のみ本番 ID の取得と `Platform.select` の `android` への設定が必要）。
 2. ~~Firestore ルールと実装の乖離~~ **解消**: Firebase 匿名認証を導入し、ランキングは認証 UID をドキュメント ID とする `userScoresV2` に移行（[decisions/0004-ranking-v2-anonymous-auth.md](./decisions/0004-ranking-v2-anonymous-auth.md)）。**運用上の前提**: Firebase コンソールで Anonymous 認証が有効であること、`firestore.rules` がデプロイ済みであること（`firebase deploy --only firestore:rules`）。未対応だとスコア送信だけが失敗する（ゲーム進行には影響しない。失敗分は端末に控えて次回再送）。
-3. **設定の重複**: `config/gameMode.ts` と `constants/index.ts` の `GAME_CONFIG` に同種の値（チャレンジ 60s / スキップ 2 等）が二重定義。`GAME_CONFIG` は主にテスト参照で、`TARGET.MIN/MAX` は現行生成器で未使用。config/ 系に一本化するのが望ましい。
+3. ~~設定の重複~~ **解消**: 未使用の `GAME_CONFIG` と `CONFIG` を削除。ゲーム設定は `config/`、スコア定数は `constants/scoreConfig.ts` を参照する。
 4. **ネイティブ連携は自動テストだけでは保証できない**: StoreKit・AdMob の実際の購入/広告 UI、復元、返金、通信障害は [MONETIZATION.md](./MONETIZATION.md) の手動検証を実施する。
 5. **`ProblemData.solutions` 未使用**: 型にあるが生成器は設定しない（将来用予約）。
 6. ~~既存の型エラー~~ **解消**: `tsc --noEmit` は green。

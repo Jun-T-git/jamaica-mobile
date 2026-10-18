@@ -16,14 +16,17 @@ function randomInt(min: number, max: number, rng: Rng): number {
  * （0を経由する解・負の数・割り切れない割り算は数えない）
  */
 export function countSolutions(numbers: number[]): Map<number, number> {
-  const counts = new Map<number, number>();
+  // 同じ残り数字に至る経路を再探索しない。キャッシュはこの呼出し内に限定する。
+  const memo = new Map<string, Map<number, number>>();
 
-  const search = (values: number[]) => {
+  const search = (values: number[]): Map<number, number> => {
     const n = values.length;
-    if (n === 1) {
-      counts.set(values[0], (counts.get(values[0]) || 0) + 1);
-      return;
-    }
+    if (n === 1) return new Map([[values[0], 1]]);
+
+    const key = [...values].sort((a, b) => a - b).join(',');
+    const cached = memo.get(key);
+    if (cached) return cached;
+    const counts = new Map<number, number>();
 
     for (let i = 0; i < n; i++) {
       for (let j = i + 1; j < n; j++) {
@@ -43,15 +46,23 @@ export function countSolutions(numbers: number[]): Map<number, number> {
 
         for (const result of results) {
           rest.push(result);
-          search(rest);
+          // 同じ結果の演算や重複数字も別経路として加算し、従来の解の数を保つ。
+          if (n === 2) {
+            counts.set(result, (counts.get(result) || 0) + 1);
+          } else {
+            search(rest).forEach((count, target) => {
+              counts.set(target, (counts.get(target) || 0) + count);
+            });
+          }
           rest.pop();
         }
       }
     }
+    memo.set(key, counts);
+    return counts;
   };
 
-  search(numbers);
-  return counts;
+  return search(numbers);
 }
 
 /**

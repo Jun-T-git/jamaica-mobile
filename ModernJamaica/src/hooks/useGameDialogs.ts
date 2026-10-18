@@ -8,13 +8,14 @@ import { useGameStore } from '../store/gameStore';
  */
 export const useGameDialogs = (
   gameMode: GameMode,
-  navigation: any,
-  _timerRef: any // もう使用しないが互換性のため残す
+  navigation: any
 ) => {
   const [showRestartDialog, setShowRestartDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
 
-  const { initGame, endGame, gameState } = useGameStore();
+  const initGame = useGameStore(state => state.initGame);
+  const endGame = useGameStore(state => state.endGame);
+  const difficulty = useGameStore(state => state.gameState.difficulty);
 
   const handleRestart = async () => {
     setShowRestartDialog(false);
@@ -22,7 +23,7 @@ export const useGameDialogs = (
     try {
       // タイマーはStore内で管理されるため、ここでの処理は不要
       // プレイ中の難易度を引き継ぐ（省略すると既定の「ふつう」に戻ってしまう）
-      await initGame(gameMode, gameState.difficulty);
+      await initGame(gameMode, difficulty);
     } catch (error) {
       console.error('Failed to restart game:', error);
       setShowRestartDialog(false);

@@ -30,10 +30,10 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   navigation,
 }) => {
   const hasRemovedAds = useMonetizationStore(state => state.hasRemovedAds);
-  const { loadStoredData } = useGameStore();
+  const loadStoredData = useGameStore(state => state.loadStoredData);
   const { height: windowHeight } = useWindowDimensions();
   const compact = windowHeight < 750;
-  const { loadDisplayName, loadSoundSetting, displayName } = useSettingsStore();
+  const loadDisplayName = useSettingsStore(state => state.loadDisplayName);
   const [showTutorial, setShowTutorial] = useState(false);
 
   // 初回起動時は遊び方を自動で表示
@@ -60,14 +60,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
     loadStoredData();
     // 表示名を読み込み（未設定の場合は自動生成）
     loadDisplayName();
-    // 音声設定を読み込み
-    loadSoundSetting();
-  }, [loadStoredData, loadDisplayName, loadSoundSetting]);
-
-  useEffect(() => {
-    // 表示名の状態をログに出力（デバッグ用）
-    console.log('🏠 ModeSelectionScreen: Current displayName:', displayName);
-  }, [displayName]);
+  }, [loadStoredData, loadDisplayName]);
 
   const handleModeSelect = (mode: GameMode) => {
     // ゲームモード選択ボタン効果音

@@ -72,4 +72,4 @@ cd ios && bundle install && bundle exec pod install && cd ..
 
 ## 既知の技術的負債（着手時に確認）
 
-Android AdMob 本番 ID 未設定 / `config` と `GAME_CONFIG` の二重定義 / テストカバレッジ低 / `ProblemData.solutions` 未使用 / 旧ランキング `userScores` の残置 / 不正解音が仮の合成音。詳細と背景は [docs/CONVENTIONS.md](./docs/CONVENTIONS.md)。
+Android AdMob 本番 ID 未設定 / テストカバレッジ低 / `ProblemData.solutions` 未使用 / 旧ランキング `userScores` の残置 / 不正解音が仮の合成音。詳細と背景は [docs/CONVENTIONS.md](./docs/CONVENTIONS.md)。

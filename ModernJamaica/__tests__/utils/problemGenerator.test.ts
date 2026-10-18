@@ -43,6 +43,29 @@ function isSolvable(numbers: number[], target: number): boolean {
 
 describe('problemGenerator', () => {
   describe('countSolutions', () => {
+    // 最適化前の探索結果。重複数字・同じ値になる演算の経路数を維持する。
+    it.each([
+      { numbers: [1, 1, 1, 1, 1], targets: 6, total: 5490, target: 1, count: 1560 },
+      { numbers: [2, 2, 2, 2, 2], targets: 17, total: 20940, target: 6, count: 2700 },
+      { numbers: [1, 1, 2, 2, 3], targets: 23, total: 14276, target: 20, count: 86 },
+      { numbers: [4, 4, 3, 2, 1], targets: 95, total: 18917, target: 99, count: 3 },
+      { numbers: [10, 9, 8, 7, 6], targets: 859, total: 16628, target: 99, count: 76 },
+    ])('$numbers: 到達値と解の重複度を保つ', ({ numbers, targets, total, target, count }) => {
+      const original = [...numbers];
+      const counts = countSolutions(numbers);
+      expect(counts.size).toBe(targets);
+      expect([...counts.values()].reduce((sum, n) => sum + n, 0)).toBe(total);
+      expect(counts.get(target)).toBe(count);
+      expect(numbers).toEqual(original);
+      expect(countSolutions([...numbers].reverse())).toEqual(counts);
+    });
+
+    it('呼出し間で結果Mapを共有しない', () => {
+      const first = countSolutions([1, 1, 1, 1, 1]);
+      first.clear();
+      expect(countSolutions([1, 1, 1, 1, 1]).get(1)).toBe(1560);
+    });
+
     it('作れる値と解の数を数え上げる', () => {
       const counts = countSolutions([4, 4, 3, 2, 1]);
 

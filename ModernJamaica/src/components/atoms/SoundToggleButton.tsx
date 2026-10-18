@@ -14,7 +14,8 @@ export const SoundToggleButton: React.FC<SoundToggleButtonProps> = ({
   size = 24, 
   style 
 }) => {
-  const { soundEnabled, toggleSound } = useSettingsStore();
+  const soundEnabled = useSettingsStore(state => state.soundEnabled);
+  const toggleSound = useSettingsStore(state => state.toggleSound);
   
   const handlePress = () => {
     // 音声設定ボタンは常に効果音を再生（ユーザーフィードバックのため）

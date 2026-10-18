@@ -11,7 +11,7 @@
 - **React Navigation 7.x**（stack navigator）
 - **react-native-svg** … ゲーム盤面のノード間エッジ描画
 - **react-native-firebase**（app + firestore）… ランキング
-- **@react-native-async-storage/async-storage** … ローカル永続化（ハイスコア・設定・ユーザー ID）
+- **@react-native-async-storage/async-storage** … ローカル永続化（ハイスコア・設定・自己記録など）
 - **react-native-google-mobile-ads** … 広告（AdMob）。**react-native-tracking-transparency** … iOS の ATT（トラッキング許可）ダイアログ
 - **react-native-sound** … 効果音
 
@@ -31,7 +31,7 @@ src/
 ├── utils/               # コアロジック（problemGenerator, scoreCalculator, timeBonus, playStreak, scoreTier, reviewPolicy, monetizationPolicy, solutionExample, SoundManager, gameUtils, storage）
 ├── services/            # 外部連携（rankingService, userService, adService, analyticsService, playerStatsService, reviewService, purchaseService, reviewAccessService）
 ├── config/              # モード/難易度/ダイアログ/基準スコア/外部リンク設定（gameMode, difficulty, dialogs, scoreTiers, links, ranking, monetization, index）
-├── constants/           # scoreConfig ほか（一部 legacy → CONVENTIONS.md の技術的負債参照）
+├── constants/           # scoreConfig とデザイントークンの参照窓口
 ├── design/              # デザインシステム（modernDesignSystem が正）
 ├── hooks/               # 画面ロジックのカスタムフック
 ├── types/               # 型定義（index, ranking, purchase）
@@ -74,6 +74,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 - **`store/settingsStore.ts`** — サウンド ON/OFF、振動、表示名（ニックネーム）。AsyncStorage 永続化と、表示名の Firebase 同期。
 - **`store/statsStore.ts`** — プレイ回数などの内部記録。`gameStore` の `initGame` / `endGame` から更新され、レビュー表示条件や分析に使用する。ホームとリザルトには累計・連続プレイ日数を表示しない。連続日数の計算は `utils/playStreak.ts`、永続化は `services/playerStatsService.ts`。
 - **`store/monetizationStore.ts`** — 検証済み購入権利・商品価格・解答例の閲覧期限・購入/動画処理中の状態。購入権利をローカルの自己申告フラグから復元しない。
+- UI は selector で必要な状態・アクションだけを購読する。複数フィールドの選択には `useShallow` を使い、盤面はメモ化と安定した props でタイマー更新による不要な再描画を抑える（`hooks/useSimpleGameScreen.ts` / `components/organisms/GameBoard.tsx`）。
 - アクションと状態フィールドの一覧はコード（`gameStore.ts` の型定義部）を正とする。ここで列挙しない。
 
 ## コアゲームロジック
@@ -90,7 +91,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 | サービス | ファイル | 役割 | バックエンド |
 |---|---|---|---|
 | ランキング | `services/rankingService.ts` | スコア送信（新記録時のみ・**チャレンジ専用**・失敗分は次回再送）／取得／順位（件数の集計クエリ） | Firestore `userScoresV2` コレクション |
-| ユーザー | `services/userService.ts` | 匿名認証（UID がランキングのドキュメント ID）・表示名管理・バリデーション | Firebase Auth（匿名）／AsyncStorage |
+| ユーザー | `services/userService.ts` | 匿名認証（UID がランキングのドキュメント ID）・初期表示名生成・バリデーション | Firebase Auth（匿名） |
 | 広告 | `services/adService.ts` | 購入・閲覧期限の確認、ATT と SDK 初期化、メニュー離脱時の頻度制限付き全画面広告、任意のリワード広告、配置別の広告収益イベント | AdMob（+ `react-native-tracking-transparency`） |
 | 買い切り購入 | `services/purchaseService.ts` | 商品情報取得の重複防止/タイムアウト・購入/復元と入口別計測・復帰時の権利再確認 | `ios/ModernJamaica/PurchaseModule.swift` / StoreKit 2 |
 | 解答例の閲覧期限 | `services/reviewAccessService.ts` | 報酬獲得時の期限付与と再起動後の復元 | AsyncStorage |
@@ -118,8 +119,8 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 
 ## 永続化キー
 
-- ハイスコア: `@jamaica_challenge_high_score` / `@jamaica_infinite_high_score`（`config/gameMode.ts`）
-- ユーザー ID: `@user_id`（`services/userService.ts`）
+- ハイスコア: モード×難易度別のキーを `utils/storage.ts` で管理し、全難易度を並列に読み込む。キーとスコア版の契約は [GAME-CORE.md](./GAME-CORE.md)。旧形式の読み込みは `loadHighScore` に残すが、計算式が異なる旧チャレンジスコアは移行しない。
+- ランキングの識別子: Firebase 匿名認証 UID。旧ローカル ID の `@user_id` は現在使わないが、既存データは削除しない。
 - 設定: サウンド・振動・表示名（`store/settingsStore.ts`）
 - 自己記録: `@jamaica_player_stats` / 初正解フラグ `@jamaica_first_solve_logged`（`services/playerStatsService.ts`）
 - レビュー依頼の前回時刻: `@jamaica_review_last_prompted_at`（`services/reviewService.ts`）
@@ -129,7 +130,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 
 ## ビルド構成
 
-- iOS: `ios/`（CocoaPods、Firebase 設定 plist は Dev/Prod 2 種）
+- iOS: `ios/`（CocoaPods）。効果音と Dev/Prod の Firebase 設定 plist は `ios/` 直下の資源を Xcode から参照する。
 - Android: `android/`
 - Firebase: `firebase.json` / `.firebaserc` / `firestore.rules`
 
