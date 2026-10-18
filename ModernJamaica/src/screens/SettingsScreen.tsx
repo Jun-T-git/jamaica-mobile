@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
+  Linking,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -11,8 +12,10 @@ import {
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Typography } from '../components/atoms/Typography';
-import { BannerAdView } from '../components/molecules/BannerAdView';
+import { PurchaseCard } from '../components/molecules/PurchaseCard';
+import { LINKS } from '../config/links';
 import { ModernDesign } from '../design/modernDesignSystem';
+import { analyticsService } from '../services/analyticsService';
 import { useSettingsStore } from '../store/settingsStore';
 import { soundManager, SoundType } from '../utils/SoundManager';
 
@@ -29,6 +32,9 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     loadDisplayName,
     soundEnabled,
     toggleSound,
+    hapticsEnabled,
+    toggleHaptics,
+    loadHapticsSetting,
   } = useSettingsStore();
   const [editingName, setEditingName] = useState(false);
   const [newDisplayName, setNewDisplayName] = useState('');
@@ -36,7 +42,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
   useEffect(() => {
     loadDisplayName();
-  }, [loadDisplayName]);
+    loadHapticsSetting();
+  }, [loadDisplayName, loadHapticsSetting]);
 
   useEffect(() => {
     setNewDisplayName(displayName);
@@ -83,11 +90,54 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
   const handleSoundToggle = () => {
     soundManager.play(SoundType.BUTTON);
+    analyticsService.logEvent('setting_change', {
+      setting: 'sound',
+      enabled: !soundEnabled,
+    });
     toggleSound();
   };
 
+  const handleHapticsToggle = () => {
+    soundManager.play(SoundType.BUTTON);
+    analyticsService.logEvent('setting_change', {
+      setting: 'haptics',
+      enabled: !hapticsEnabled,
+    });
+    toggleHaptics();
+  };
+
+  // 外部リンク（お問い合わせ・プライバシーポリシー）。開けなくてもアプリは止めない
+  const openLink = async (url: string, name: string) => {
+    soundManager.play(SoundType.BUTTON);
+    analyticsService.logEvent('link_open', { link: name });
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      console.warn(`Failed to open ${name}:`, error);
+      Alert.alert('エラー', 'ページを開けませんでした');
+    }
+  };
+
+  const renderSwitch = (enabled: boolean) => (
+    <View style={styles.switchContainer}>
+      <View
+        style={[
+          styles.switchTrack,
+          enabled ? styles.switchTrackOn : styles.switchTrackOff,
+        ]}
+      >
+        <View
+          style={[
+            styles.switchThumb,
+            enabled ? styles.switchThumbOn : styles.switchThumbOff,
+          ]}
+        />
+      </View>
+    </View>
+  );
+
   // 設定項目の種類を定義
-  type SettingItemType = 'editable' | 'readonly' | 'toggle';
+  type SettingItemType = 'editable' | 'readonly' | 'toggle' | 'link';
 
   const renderSettingRow = (
     icon: string,
@@ -119,9 +169,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 name={icon}
                 size={20}
                 color={
-                  type === 'editable'
-                    ? ModernDesign.colors.accent.neon
-                    : type === 'toggle'
+                  type === 'editable' || type === 'toggle' || type === 'link'
                     ? ModernDesign.colors.accent.neon
                     : ModernDesign.colors.text.tertiary
                 }
@@ -278,36 +326,58 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.settingsList}>
+          <PurchaseCard onPress={() => navigation.navigate('Purchase', { source: 'settings' })} />
           {renderNicknameRow()}
 
           {renderSettingRow(
             soundEnabled ? 'volume-up' : 'volume-off',
             '効果音',
             'ボタンのタップ音、ゲーム中のサウンドエフェクト、成功時の効果音などをオン・オフできます。',
-            <View style={styles.switchContainer}>
-              <View
-                style={[
-                  styles.switchTrack,
-                  soundEnabled ? styles.switchTrackOn : styles.switchTrackOff,
-                ]}
-              >
-                <View
-                  style={[
-                    styles.switchThumb,
-                    soundEnabled ? styles.switchThumbOn : styles.switchThumbOff,
-                  ]}
-                />
-              </View>
-            </View>,
+            renderSwitch(soundEnabled),
             handleSoundToggle,
             'toggle',
+          )}
+
+          {renderSettingRow(
+            'vibration',
+            '振動',
+            'タップや正解・不正解のときの振動をオン・オフできます。',
+            renderSwitch(hapticsEnabled),
+            handleHapticsToggle,
+            'toggle',
+          )}
+
+          {renderSettingRow(
+            'mail-outline',
+            'お問い合わせ・ご要望',
+            'ご意見、不具合の報告、ほしい機能などをお寄せください。フォームが開きます。',
+            <MaterialIcons
+              name="open-in-new"
+              size={18}
+              color={ModernDesign.colors.text.tertiary}
+            />,
+            () => openLink(LINKS.SUPPORT_FORM, 'support_form'),
+            'link',
+          )}
+
+          {renderSettingRow(
+            'privacy-tip',
+            'プライバシーポリシー',
+            undefined,
+            <MaterialIcons
+              name="open-in-new"
+              size={18}
+              color={ModernDesign.colors.text.tertiary}
+            />,
+            () => openLink(LINKS.PRIVACY_POLICY, 'privacy_policy'),
+            'link',
           )}
         </View>
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
 
-      <BannerAdView style={styles.bannerAd} />
+
     </SafeAreaView>
   );
 };
@@ -382,11 +452,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    minWidth: 0,
   },
   inlineTitleIcon: {
     marginRight: ModernDesign.spacing[3],
   },
   settingTitle: {
+    flexShrink: 1,
     color: ModernDesign.colors.text.primary,
     fontWeight: ModernDesign.typography.fontWeight.semibold,
     fontSize: ModernDesign.typography.fontSize.lg,
@@ -402,8 +474,11 @@ const styles = StyleSheet.create({
   settingRight: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 1,
+    maxWidth: '48%',
   },
   currentValue: {
+    flexShrink: 1,
     color: ModernDesign.colors.text.secondary,
     fontSize: ModernDesign.typography.fontSize.lg,
     marginRight: ModernDesign.spacing[3],
@@ -552,12 +627,6 @@ const styles = StyleSheet.create({
 
   // その他
   bottomSpacer: {
-    height: ModernDesign.spacing[24], // 広告＋下部セーフエリアぶんを確保
-  },
-  bannerAd: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    height: ModernDesign.spacing[4],
   },
 });

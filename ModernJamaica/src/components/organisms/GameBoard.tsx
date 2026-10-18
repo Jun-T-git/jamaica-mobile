@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import {
   Animated,
   Dimensions,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,10 +12,13 @@ import {
 import Svg, { Line } from 'react-native-svg';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ModernDesign } from '../../constants';
+import { treeNodeVisuals, treeOperatorColor } from '../../design/treeNodeVisuals';
 import { useGameStore } from '../../store/gameStore';
 import { GameMode, Operator } from '../../types';
 import { Dialog } from '../molecules/Dialog';
+import { ComboIndicator } from '../molecules/ComboIndicator';
 import { soundManager, SoundType } from '../../utils/SoundManager';
+import { hapticService } from '../../services/hapticService';
 
 interface GameBoardProps {
   gameInfo: {
@@ -31,24 +36,41 @@ interface GridNode {
   nodeId: string;
 }
 
-export const GameBoard: React.FC<GameBoardProps> = ({
+export const GameBoard = memo(function GameBoard({
   gameInfo,
   disabled = false,
-}) => {
+}: GameBoardProps) {
   const {
     nodes,
     connectNodes,
     undoLastMove,
     canUndo,
     skipProblem,
-    gameState,
-  } = useGameStore();
+    mode,
+    currentCombo,
+    comboExpiresAt,
+    skipCount,
+    wrongAnswerCount,
+  } = useGameStore(useShallow(state => ({
+    nodes: state.nodes,
+    connectNodes: state.connectNodes,
+    undoLastMove: state.undoLastMove,
+    canUndo: state.canUndo,
+    skipProblem: state.skipProblem,
+    mode: state.gameState.mode,
+    currentCombo: state.gameState.currentCombo,
+    comboExpiresAt: state.gameState.comboExpiresAt,
+    skipCount: state.gameState.skipCount,
+    wrongAnswerCount: state.wrongAnswerCount,
+  })));
 
   const [grid, setGrid] = useState<(GridNode | null)[][]>([]);
   const [nodePositions, setNodePositions] = useState<
     Record<string, { row: number; col: number }>
   >({});
   const [dimensions, setDimensions] = useState(() => Dimensions.get('window'));
+  const [boardHeight, setBoardHeight] = useState<number | null>(null);
+  const [fullContentHeight, setFullContentHeight] = useState<number | null>(null);
   const [firstNode, setFirstNode] = useState<GridNode | null>(null);
   const [selectedOperator, setSelectedOperator] = useState<Operator | null>(
     null,
@@ -56,11 +78,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const [animatedValue] = useState(new Animated.Value(0));
   const [showSkipDialog, setShowSkipDialog] = useState(false);
   const [skipMessage, setSkipMessage] = useState('');
+  const [shakeAnim] = useState(new Animated.Value(0));
+  const [showWrongAnswer, setShowWrongAnswer] = useState(false);
+  const lastWrongAnswerCount = useRef(wrongAnswerCount);
 
   // Update dimensions on screen resize
   useEffect(() => {
     const updateDimensions = () => {
       setDimensions(Dimensions.get('window'));
+      setFullContentHeight(null);
     };
     const subscription = Dimensions.addEventListener(
       'change',
@@ -69,7 +95,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     return () => subscription?.remove();
   }, []);
 
-  const { width: screenWidth } = dimensions;
+  const { width: screenWidth, height: screenHeight } = dimensions;
+  // ヘッダーとセーフエリアを除いた、盤面が実際に使える高さで判断する。
+  const compact = screenHeight < 750 || (
+    boardHeight !== null && fullContentHeight !== null &&
+    fullContentHeight > boardHeight + 1
+  );
   const containerPadding = screenWidth * 0.05;
   const availableWidth = screenWidth - containerPadding * 2;
   const cellSize = Math.floor(availableWidth * 0.095);
@@ -88,6 +119,31 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       animatedValue.setValue(0);
     }
   }, [firstNode, animatedValue]);
+
+  // 不正解: 盤面を揺らしてメッセージを表示
+  useEffect(() => {
+    if (wrongAnswerCount === lastWrongAnswerCount.current) return;
+    lastWrongAnswerCount.current = wrongAnswerCount;
+
+    setShowWrongAnswer(true);
+    shakeAnim.setValue(0);
+    Animated.sequence(
+      [1, -1, 0.6, -0.6, 0].map(toValue =>
+        Animated.timing(shakeAnim, {
+          toValue,
+          duration: 60,
+          useNativeDriver: true,
+        }),
+      ),
+    ).start();
+  }, [wrongAnswerCount, shakeAnim]);
+
+  // 戻す・スキップ・次の問題で盤面が変わったら不正解表示を消す
+  useEffect(() => {
+    if (nodes.filter(n => !n.isUsed).length !== 1) {
+      setShowWrongAnswer(false);
+    }
+  }, [nodes]);
 
   // Find valid position for calculated node
   const findValidPosition = (
@@ -256,6 +312,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
     // ノードタップ時は特別な効果音（TAP）を使用
     soundManager.play(SoundType.TAP);
+    hapticService.selection();
 
     if (!firstNode) {
       setFirstNode(node);
@@ -275,6 +332,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
     // 演算子ボタンタップ時は特別な効果音（TAP）を使用
     soundManager.play(SoundType.TAP);
+    hapticService.selection();
 
     if (selectedOperator === operator) {
       setSelectedOperator(null);
@@ -295,6 +353,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
     if (!node.isActive) {
       style.push(styles.inactiveCell);
+    } else if (showWrongAnswer) {
+      style.push(styles.wrongCell);
     } else if (firstNode?.nodeId === node.nodeId) {
       style.push(styles.selectedCell);
     } else if (firstNode && selectedOperator) {
@@ -310,22 +370,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     { type: Operator.MULTIPLY, label: '×', color: ModernDesign.colors.accent.gold },
     { type: Operator.DIVIDE, label: '÷', color: ModernDesign.colors.accent.purple },
   ];
-
-  // Get operator color based on operator type
-  const getOperatorColor = (operator?: Operator): string => {
-    switch (operator) {
-      case Operator.ADD:
-        return ModernDesign.colors.accent.mint;
-      case Operator.SUBTRACT:
-        return ModernDesign.colors.accent.coral;
-      case Operator.MULTIPLY:
-        return ModernDesign.colors.accent.gold;
-      case Operator.DIVIDE:
-        return ModernDesign.colors.accent.purple;
-      default:
-        return ModernDesign.colors.border.medium;
-    }
-  };
 
   // Calculate edges between parent and child nodes
   const getEdges = () => {
@@ -369,7 +413,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         }
 
         if (parentRow !== -1 && leftChildRow !== -1 && rightChildRow !== -1) {
-          const edgeColor = getOperatorColor(node.operator);
+          const edgeColor = treeOperatorColor(node.operator);
           
           edges.push({
             parentRow,
@@ -401,7 +445,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const GRID_COLS = 9;
   const GRID_ROWS = 5;
   const cellGap = screenWidth * 0.02;
-  const gridPadding = screenWidth * 0.03;
+  // 外側の列のノードがグリッドの枠をはみ出す分も確保する。
+  const gridPadding = screenWidth * 0.04;
 
   // Calculate grid dimensions
   const totalCellWidth = availableWidth - gridPadding * 2;
@@ -410,7 +455,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const actualCellSize = Math.min(cellTotalSize, cellSize);
 
   // Calculate vertical spacing - consistent spacing between all rows
-  const rowGap = actualCellSize * 1.0;
+  const rowGap = actualCellSize * (compact ? 0.55 : 1.0);
 
   // Grid container dimensions
   const gridContainerWidth =
@@ -436,20 +481,49 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
 
   return (
-    <View style={styles.container}>
-      <View style={styles.gameArea}>
+    <View
+      style={styles.container}
+      onLayout={event => setBoardHeight(event.nativeEvent.layout.height)}
+    >
+      <ScrollView
+        style={styles.gameScroll}
+        contentContainerStyle={[styles.gameArea, compact && styles.compactGameArea]}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        alwaysBounceVertical={false}
+        onContentSizeChange={(_width, height) => {
+          // コンパクト化後の高さで判定を戻すとレイアウトが往復してしまう。
+          if (!compact) setFullContentHeight(height);
+        }}
+      >
         {/* Target - Prominent but minimal */}
-        <View style={styles.targetContainer}>
+        <View style={[styles.targetContainer, compact && styles.compactTargetContainer]}>
           <Text style={styles.targetLabel}>つくる数</Text>
-          <Text style={styles.targetNumber}>{gameInfo.target}</Text>
+          <Text style={[styles.targetNumber, compact && styles.compactTargetNumber]}>{gameInfo.target}</Text>
+          {mode === GameMode.CHALLENGE && (
+            <ComboIndicator
+              combo={currentCombo}
+              expiresAt={comboExpiresAt}
+            />
+          )}
         </View>
 
         {/* Main Game Grid */}
-        <View style={styles.gridWrapper}>
-          <View
+        <View style={[styles.gridWrapper, { minHeight: gridContainerHeight + actualNodeSize }]}>
+          <Animated.View
             style={[
               styles.gridInner,
               { width: gridContainerWidth, height: gridContainerHeight },
+              {
+                transform: [
+                  {
+                    translateX: shakeAnim.interpolate({
+                      inputRange: [-1, 1],
+                      outputRange: [-10, 10],
+                    }),
+                  },
+                ],
+              },
             ]}
           >
             {/* SVG overlay for edges */}
@@ -508,8 +582,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                     disabled={!node.isActive || disabled}
                   >
                     <Text
+                      adjustsFontSizeToFit
+                      numberOfLines={1}
+                      minimumFontScale={0.5}
                       style={[
                         styles.cellText,
+                        { width: actualNodeSize - 12 },
                         !node.isActive && styles.inactiveCellText,
                         disabled && styles.disabledCellText,
                         firstNode?.nodeId === node.nodeId &&
@@ -522,12 +600,24 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 );
               }),
             )}
-          </View>
+          </Animated.View>
         </View>
 
         {/* Current State Indicator - Visual only */}
-        <View style={styles.stateIndicator}>
-          {firstNode && (
+        <View style={[styles.stateIndicator, compact && styles.compactStateIndicator]}>
+          {showWrongAnswer && (
+            <View style={styles.wrongAnswerDisplay}>
+              <MaterialIcons
+                name="undo"
+                size={18}
+                color={ModernDesign.colors.error}
+              />
+              <Text style={styles.wrongAnswerText}>
+                つくる数とちがいます。戻してやり直そう
+              </Text>
+            </View>
+          )}
+          {firstNode && !showWrongAnswer && (
             <Animated.View
               style={[
                 styles.selectionDisplay,
@@ -537,7 +627,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 },
               ]}
             >
-              <Text style={styles.selectedNumber}>{firstNode.value}</Text>
+              <Text style={styles.selectedNumber}>
+                {Math.round(firstNode.value * 100) / 100}
+              </Text>
               {selectedOperator && (
                 <Text style={styles.pendingOperation}>{selectedOperator}</Text>
               )}
@@ -546,13 +638,14 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         </View>
 
         {/* Operations - Bottom dock style */}
-        <View style={styles.operationDock}>
-          <View style={styles.operatorRow}>
+        <View style={[styles.operationDock, compact && styles.compactOperationDock]}>
+          <View style={[styles.operatorRow, compact && styles.compactOperatorRow]}>
             {operators.map(op => (
               <TouchableOpacity
                 key={op.type}
                 style={[
                   styles.operatorButton,
+                  compact && styles.compactOperatorButton,
                   selectedOperator === op.type && styles.activeOperator,
                   (!firstNode || disabled) && styles.disabledOperator,
                   selectedOperator === op.type && { backgroundColor: op.color },
@@ -581,6 +674,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               style={[
                 styles.iconButton,
                 (!canUndo() || disabled) && styles.disabledIconButton,
+                showWrongAnswer && styles.highlightedIconButton,
               ]}
               onPress={() => {
                 // Undoボタンタップ時は特別な効果音（TAP）を使用
@@ -600,48 +694,48 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               style={[
                 styles.iconButton,
                 styles.skipButton,
-                (disabled || (gameState?.mode === GameMode.CHALLENGE &&
-                  gameState?.skipCount === 0)) &&
+                (disabled || (mode === GameMode.CHALLENGE &&
+                  skipCount === 0)) &&
                   styles.disabledIconButton,
               ]}
               onPress={() => {
                 // スキップボタンタップ時は特別な効果音（TAP）を使用
                 soundManager.play(SoundType.TAP);
                 
-                if (gameState?.mode === GameMode.CHALLENGE) {
-                  if (gameState.skipCount <= 0) {
+                if (mode === GameMode.CHALLENGE) {
+                  if (skipCount <= 0) {
                     return;
                   }
-                  setSkipMessage(`問題をスキップしますか？\n（残り${gameState.skipCount}回）`);
+                  setSkipMessage(`問題をスキップしますか？\n（残り${skipCount}回）`);
                 } else {
                   setSkipMessage('問題をスキップしますか？');
                 }
                 setShowSkipDialog(true);
               }}
               disabled={
-                disabled || (gameState?.mode === GameMode.CHALLENGE && gameState?.skipCount === 0)
+                disabled || (mode === GameMode.CHALLENGE && skipCount === 0)
               }
             >
               <MaterialIcons
                 name="skip-next"
                 size={24}
                 color={
-                  gameState?.mode === GameMode.CHALLENGE && gameState?.skipCount === 0
+                  mode === GameMode.CHALLENGE && skipCount === 0
                     ? ModernDesign.colors.text.disabled
                     : ModernDesign.colors.text.primary
                 }
               />
-              {gameState?.mode === GameMode.CHALLENGE && gameState && (
+              {mode === GameMode.CHALLENGE && (
                 <View style={styles.skipBadge}>
                   <Text style={styles.skipBadgeText}>
-                    {gameState.skipCount}
+                    {skipCount}
                   </Text>
                 </View>
               )}
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </ScrollView>
 
       {/* Skip Confirmation Dialog */}
       <Dialog
@@ -670,17 +764,23 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ModernDesign.colors.background.primary,
   },
-  gameArea: {
+  gameScroll: {
     flex: 1,
+  },
+  gameArea: {
+    flexGrow: 1,
     paddingHorizontal: ModernDesign.spacing[4],
     paddingVertical: ModernDesign.spacing[3],
+  },
+  compactGameArea: {
+    paddingVertical: ModernDesign.spacing[2],
   },
   // Target - Clean and minimal
   targetContainer: {
@@ -690,6 +790,10 @@ const styles = StyleSheet.create({
     marginHorizontal: ModernDesign.spacing[2],
     borderRadius: ModernDesign.borderRadius.xl,
     marginBottom: ModernDesign.spacing[4],
+  },
+  compactTargetContainer: {
+    paddingVertical: ModernDesign.spacing[2],
+    marginBottom: ModernDesign.spacing[2],
   },
   targetLabel: {
     fontSize: ModernDesign.typography.fontSize.sm,
@@ -702,6 +806,9 @@ const styles = StyleSheet.create({
     fontSize: ModernDesign.typography.fontSize['5xl'],
     fontWeight: ModernDesign.typography.fontWeight.bold,
     color: ModernDesign.colors.accent.neon,
+  },
+  compactTargetNumber: {
+    fontSize: ModernDesign.typography.fontSize['4xl'],
   },
   // Grid
   gridWrapper: {
@@ -716,18 +823,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   cellContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 6,
+    ...treeNodeVisuals.frame,
   },
   filledCell: {
-    backgroundColor: ModernDesign.colors.background.tertiary,
-    borderColor: ModernDesign.colors.border.subtle,
+    ...treeNodeVisuals.fill,
   },
   inactiveCell: {
     backgroundColor: ModernDesign.colors.background.primary,
@@ -744,10 +843,12 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderStyle: 'dashed' as 'dashed',
   },
+  wrongCell: {
+    backgroundColor: ModernDesign.colors.background.tertiary,
+    borderColor: ModernDesign.colors.error,
+  },
   cellText: {
-    fontSize: ModernDesign.typography.fontSize.xl,
-    fontWeight: ModernDesign.typography.fontWeight.bold,
-    color: ModernDesign.colors.text.primary,
+    ...treeNodeVisuals.text,
   },
   inactiveCellText: {
     color: ModernDesign.colors.text.disabled,
@@ -765,6 +866,10 @@ const styles = StyleSheet.create({
     minHeight: ModernDesign.spacing[10],
     justifyContent: 'center',
     marginBottom: ModernDesign.spacing[5],
+  },
+  compactStateIndicator: {
+    minHeight: ModernDesign.spacing[6],
+    marginBottom: ModernDesign.spacing[2],
   },
   selectionDisplay: {
     flexDirection: 'row',
@@ -796,10 +901,16 @@ const styles = StyleSheet.create({
     borderColor: ModernDesign.colors.border.subtle,
     ...ModernDesign.shadows.lg,
   },
+  compactOperationDock: {
+    paddingVertical: ModernDesign.spacing[2],
+  },
   operatorRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     marginBottom: ModernDesign.spacing[4],
+  },
+  compactOperatorRow: {
+    marginBottom: ModernDesign.spacing[2],
   },
   operatorButton: {
     width: 56,
@@ -811,6 +922,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: ModernDesign.colors.border.medium,
     ...ModernDesign.shadows.base,
+  },
+  compactOperatorButton: {
+    width: 48,
+    height: 48,
   },
   activeOperator: {
     transform: [{ scale: 1.1 }],
@@ -846,6 +961,27 @@ const styles = StyleSheet.create({
   },
   disabledIconButton: {
     opacity: 0.3,
+  },
+  highlightedIconButton: {
+    borderWidth: 2,
+    borderColor: ModernDesign.colors.error,
+  },
+  wrongAnswerDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: ModernDesign.spacing[2],
+    paddingHorizontal: ModernDesign.spacing[4],
+    paddingVertical: ModernDesign.spacing[2],
+    borderRadius: ModernDesign.borderRadius.full,
+    borderWidth: 1,
+    borderColor: ModernDesign.colors.error,
+    backgroundColor: ModernDesign.colors.glass.background,
+  },
+  wrongAnswerText: {
+    flexShrink: 1,
+    fontSize: ModernDesign.typography.fontSize.sm,
+    fontWeight: ModernDesign.typography.fontWeight.semibold,
+    color: ModernDesign.colors.error,
   },
   skipButton: {
     position: 'relative',

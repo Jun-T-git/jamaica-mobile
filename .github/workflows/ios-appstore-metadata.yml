@@ -1,6 +1,7 @@
 name: iOS App Store Metadata
 
-# 手動トリガー。App Store のメタデータ(日本語)とスクリーンショットを App Store Connect へ反映する。
+# 手動トリガー。App Store の掲載文(ModernJamaica/fastlane/metadata/ja、タイトル・説明・キーワード・What's New 等)と
+# スクリーンショットを App Store Connect へ反映する（現行値を上書きする）。
 # バイナリ(ipa)は送らず、審査提出もしない（内容確認後に App Store Connect で手動提出）。
 #   gh workflow run ios-appstore-metadata.yml -f version=1.1.4
 on:
@@ -37,6 +38,25 @@ jobs:
       - name: Write App Store Connect API key
         run: |
           echo "${{ secrets.APP_STORE_CONNECT_KEY_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/AuthKey.p8"
+
+      # App Review の連絡先（審査提出に必須）。リポジトリは公開なので Secrets から書き出す。
+      # 未設定なら何もしない（App Store Connect の既存値のまま）。
+      - name: Write App Review contact from secrets
+        env:
+          FIRST_NAME: ${{ secrets.APP_REVIEW_CONTACT_FIRST_NAME }}
+          LAST_NAME: ${{ secrets.APP_REVIEW_CONTACT_LAST_NAME }}
+          EMAIL: ${{ secrets.APP_REVIEW_CONTACT_EMAIL }}
+          PHONE: ${{ secrets.APP_REVIEW_CONTACT_PHONE }}
+        run: |
+          if [ -z "$EMAIL" ]; then
+            echo "APP_REVIEW_CONTACT_* secrets が未設定のため連絡先は反映しない"
+            exit 0
+          fi
+          mkdir -p fastlane/metadata/review_information
+          printf '%s' "$FIRST_NAME" > fastlane/metadata/review_information/first_name.txt
+          printf '%s' "$LAST_NAME"  > fastlane/metadata/review_information/last_name.txt
+          printf '%s' "$EMAIL"      > fastlane/metadata/review_information/email_address.txt
+          printf '%s' "$PHONE"      > fastlane/metadata/review_information/phone_number.txt
 
       - name: Upload metadata & screenshots
         env:

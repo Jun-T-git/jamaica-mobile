@@ -36,8 +36,9 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
   return (
     <View style={[styles.container, style]}>
       <View style={styles.statsRow}>
-        {stats.map((stat, index) => (
-          <GameStat
+        <View style={styles.statsGroup}>
+          {stats.map((stat, index) => (
+            <GameStat
             key={`${stat.label}-${index}`}
             label={stat.label}
             value={stat.value}
@@ -47,8 +48,10 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
             iconBackgroundColor={stat.iconBackgroundColor}
             labelColor={stat.labelColor}
             valueColor={stat.valueColor}
-          />
-        ))}
+            style={styles.stat}
+            />
+          ))}
+        </View>
         
         <View style={styles.rightButtons}>
           <SoundToggleButton size={20} style={styles.soundButton} />
@@ -68,8 +71,8 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: ModernDesign.spacing[3],
+    paddingVertical: ModernDesign.spacing[2],
     backgroundColor: COLORS.CARD,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -79,15 +82,27 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     minHeight: 60, // 十分な高さを確保
     paddingVertical: 4, // 上下にパディングを追加
   },
+  statsGroup: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: ModernDesign.spacing[1],
+  },
+  stat: {
+    flex: 1,
+    minWidth: 0,
+  },
   rightButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: ModernDesign.spacing[2],
+    gap: ModernDesign.spacing[1],
+    marginLeft: ModernDesign.spacing[2],
+    flexShrink: 0,
   },
   soundButton: {
     backgroundColor: 'transparent',

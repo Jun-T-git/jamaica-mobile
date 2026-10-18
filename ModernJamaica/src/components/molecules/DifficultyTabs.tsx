@@ -84,8 +84,9 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
+    minWidth: 0,
     paddingVertical: ModernDesign.spacing[3],
-    paddingHorizontal: ModernDesign.spacing[4],
+    paddingHorizontal: ModernDesign.spacing[1],
     borderRadius: ModernDesign.borderRadius.lg,
     alignItems: 'center',
     justifyContent: 'center',

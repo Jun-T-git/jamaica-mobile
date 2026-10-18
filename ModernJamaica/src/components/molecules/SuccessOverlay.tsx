@@ -8,12 +8,18 @@ interface SuccessOverlayProps {
   visible: boolean;
   animationValue: Animated.Value;
   message?: string;
+  score?: number;   // この問題で獲得したスコア（チャレンジモード）
+  timeBonus?: number; // この正解で得た時間ボーナス（秒。チャレンジモード）
+  combo?: number;   // 現在のコンボ数
 }
 
 export const SuccessOverlay: React.FC<SuccessOverlayProps> = ({
   visible,
   animationValue,
   message = '正解！',
+  score,
+  timeBonus = 0,
+  combo = 0,
 }) => {
   if (!visible) return null;
 
@@ -53,6 +59,31 @@ export const SuccessOverlay: React.FC<SuccessOverlayProps> = ({
         >
           {message}
         </Typography>
+
+        {score !== undefined && score > 0 && (
+          <Typography
+            variant="h4"
+            style={styles.scoreText}
+            textAlign="center"
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.5}
+          >
+            +{score.toLocaleString()}点
+          </Typography>
+        )}
+
+        {timeBonus > 0 && (
+          <Typography variant="body2" style={styles.timeBonusText} textAlign="center">
+            +{timeBonus}秒
+          </Typography>
+        )}
+
+        {combo >= 2 && (
+          <Typography variant="body2" style={styles.comboText} textAlign="center">
+            {combo}コンボ！
+          </Typography>
+        )}
       </Animated.View>
     </Animated.View>
   );
@@ -70,6 +101,7 @@ const styles = StyleSheet.create({
     zIndex: 2000,
   },
   content: {
+    maxWidth: '90%',
     backgroundColor: ModernDesign.colors.background.tertiary,
     borderRadius: ModernDesign.borderRadius.xl,
     borderWidth: 1,
@@ -84,5 +116,20 @@ const styles = StyleSheet.create({
     color: ModernDesign.colors.success,
     fontWeight: ModernDesign.typography.fontWeight.semibold,
     marginTop: ModernDesign.spacing[3],
+  },
+  scoreText: {
+    color: ModernDesign.colors.accent.gold,
+    fontWeight: ModernDesign.typography.fontWeight.bold,
+    marginTop: ModernDesign.spacing[2],
+  },
+  timeBonusText: {
+    color: ModernDesign.colors.accent.neon,
+    fontWeight: ModernDesign.typography.fontWeight.bold,
+    marginTop: ModernDesign.spacing[1],
+  },
+  comboText: {
+    color: ModernDesign.colors.accent.coral,
+    fontWeight: ModernDesign.typography.fontWeight.bold,
+    marginTop: ModernDesign.spacing[1],
   },
 });

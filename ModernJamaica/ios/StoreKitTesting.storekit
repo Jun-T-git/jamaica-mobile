@@ -1,0 +1,35 @@
+{
+  "identifier": "D38C370A-61BD-4569-9ACD-25E72C6EABE2",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "500",
+      "familyShareable": false,
+      "internalID": "0ACAFF78-50AF-4801-B4A2-8D4B45A1373E",
+      "localizations": [
+        {
+          "description": "全画面広告を削除し、未解答問題のヒント・解答例を動画なし・時間制限なしで閲覧できます。",
+          "displayName": "広告削除・解答例見放題",
+          "locale": "ja_JP"
+        }
+      ],
+      "productID": "com.junt.modernjamaica.remove_ads",
+      "referenceName": "Remove Ads and Unlimited Review",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "0000000000",
+    "_developerTeamID": "0000000000",
+    "_failTransactionsEnabled": false,
+    "_lastSynchronizedDate": 0,
+    "_locale": "ja_JP",
+    "_storefront": "JPN",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 3,
+    "minor": 0
+  }
+}

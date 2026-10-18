@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:StoreKitTesting.storekit">
+   </FileRef>
+   <FileRef
       location = "group:ModernJamaica.xcodeproj">
    </FileRef>
    <FileRef

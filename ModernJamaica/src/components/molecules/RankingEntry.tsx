@@ -67,6 +67,9 @@ export const RankingEntry: React.FC<RankingEntryProps> = ({ entry }) => {
             styles.scoreText,
             entry.isCurrentUser && styles.currentUserScoreText,
           ]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.7}
         >
           {entry.score.toLocaleString()}
           <Text
@@ -132,6 +135,7 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flex: 1,
+    minWidth: 0,
   },
   goldRankContainer: {
     backgroundColor: ModernDesign.colors.accent.gold + '20',

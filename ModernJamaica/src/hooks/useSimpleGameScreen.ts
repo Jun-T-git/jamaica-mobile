@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useGameStore } from '../store/gameStore';
 import { useGameMenu } from './useGameMenu';
 import { useSuccessAnimation } from './useSuccessAnimation';
@@ -37,14 +38,19 @@ export const useSimpleGameScreen = (
     gameState,
     gameStatus,
     targetNumber,
-    highScores,
     completeCountdown,
     pauseGame,
     resumeGame,
-    skipProblem,
-    endGame,
     setNavigationCallback,
-  } = useGameStore();
+  } = useGameStore(useShallow(state => ({
+    gameState: state.gameState,
+    gameStatus: state.gameStatus,
+    targetNumber: state.targetNumber,
+    completeCountdown: state.completeCountdown,
+    pauseGame: state.pauseGame,
+    resumeGame: state.resumeGame,
+    setNavigationCallback: state.setNavigationCallback,
+  })));
 
   // UI管理
   const { showMenu, closeMenu, toggleMenu } = useGameMenu(gameStatus);
@@ -52,12 +58,12 @@ export const useSimpleGameScreen = (
   // 成功アニメーション（無限モードは自動で次の問題生成）
   const successAnim = useSuccessAnimation(
     gameStatus,
-    mode === GameMode.CHALLENGE ? 200 : 500,
+    mode === GameMode.CHALLENGE ? 600 : 500, // チャレンジは獲得スコアを読めるよう少し長めに表示
     // 無限モードでは自動で次の問題を生成しない（Store内で処理）
   );
 
   // ダイアログ管理
-  const dialogHandlers = useGameDialogs(mode, navigation, null);
+  const dialogHandlers = useGameDialogs(mode, navigation);
 
   // メニュー表示/非表示でゲームを一時停止/再開
   useEffect(() => {
@@ -119,12 +125,13 @@ export const useSimpleGameScreen = (
   ];
 
   // ゲーム情報
-  const gameInfo = {
+  const isCountingDown = gameStatus === GameStatus.COUNTDOWN;
+  const gameInfo = useMemo(() => ({
     target: targetNumber,
-    instruction: gameStatus === GameStatus.COUNTDOWN 
+    instruction: isCountingDown
       ? 'ゲーム開始まで待機中...' 
       : '最初の数字をタップしてください',
-  };
+  }), [targetNumber, isCountingDown]);
 
   return {
     // 状態
@@ -134,7 +141,6 @@ export const useSimpleGameScreen = (
     headerStats,
     gameInfo,
     successAnim,
-    highScore: highScores[mode][gameState.difficulty],
     
     // ダイアログ
     dialogs: {
@@ -147,8 +153,6 @@ export const useSimpleGameScreen = (
       onCountdownComplete: completeCountdown,
       onMenuToggle: toggleMenu,
       onMenuClose: closeMenu,
-      onSkip: skipProblem,
-      onEndGame: (isManual?: boolean) => endGame(isManual),
     },
   };
 };

@@ -4,7 +4,7 @@
 
 このディレクトリは、React Native アプリ **Modern Jamaica（ジャマイカの木）** の開発者向け常緑ドキュメント群です。AI（Claude Code）と人間の双方が、プロジェクトの哲学とコアを順守したまま自律的に開発するための土台です。
 
-> **リポジトリルートの `docs/`** は別物（GitHub Pages のプライバシーポリシーサイト）です。混同しないこと。
+> **リポジトリルートの `docs/`** は別物（Firebase Hosting で公開するプライバシーポリシーサイト）です。混同しないこと。
 
 ## 第一原則: コードが正（Source of Truth）
 
@@ -31,6 +31,7 @@
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | レイヤ構成・データフロー・モジュール境界・ナビゲーション |
 | [GAME-CORE.md](./GAME-CORE.md) | ゲームルールとコアアルゴリズムの契約（ノードモデル・結合・検証・問題生成・スコア） |
 | [DESIGN-SYSTEM.md](./DESIGN-SYSTEM.md) | デザイントークン・テーマ・アトミックデザイン |
+| [MONETIZATION.md](./MONETIZATION.md) | 買い切り・任意広告・表示方針・リリース設定と検証 |
 | [CONVENTIONS.md](./CONVENTIONS.md) | コード規約・状態管理・i18n・テスト・検証手順・既知の技術的負債 |
 
 ## 目次（frozen）

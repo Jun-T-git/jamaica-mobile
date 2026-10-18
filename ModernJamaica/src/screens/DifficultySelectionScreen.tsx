@@ -3,6 +3,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import {
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   TouchableOpacity,
@@ -159,7 +160,11 @@ const DifficultySelectionScreen: React.FC = () => {
         <View style={styles.headerSpacer} />
       </View>
 
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <Typography variant="h4" textAlign="center" style={styles.title}>
           難易度を選択
         </Typography>
@@ -180,7 +185,7 @@ const DifficultySelectionScreen: React.FC = () => {
             onPress={() => handleDifficultySelect(DifficultyLevel.HARD)}
           />
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -222,6 +227,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  contentContainer: {
+    flexGrow: 1,
     paddingHorizontal: 20,
     paddingTop: ModernDesign.spacing[8],
     paddingBottom: ModernDesign.spacing[6],
@@ -264,6 +272,7 @@ const styles = StyleSheet.create({
   },
   difficultyTextContainer: {
     flex: 1,
+    minWidth: 0,
     paddingVertical: 2,
   },
   difficultyTitle: {

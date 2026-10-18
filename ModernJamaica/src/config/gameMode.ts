@@ -19,17 +19,11 @@ export interface StorageConfig {
   key: string;        // LocalStorage保存キー
 }
 
-export interface AdConfig {
-  enabled: boolean;   // 広告表示の有効/無効
-  timing: 'immediate' | 'delayed';  // 広告表示タイミング
-}
-
 export interface GameModeConfig {
   time: TimeConfig;
   gameplay: GameplayConfig;
   display: DisplayConfig;
   storage: StorageConfig;
-  ad: AdConfig;
 }
 
 /**
@@ -53,10 +47,6 @@ export const GAME_MODE_CONFIG: Record<GameMode, GameModeConfig> = {
     storage: {
       key: '@jamaica_challenge_high_score',
     },
-    ad: {
-      enabled: true,
-      timing: 'immediate',
-    },
   },
   [GameMode.INFINITE]: {
     time: {
@@ -73,10 +63,6 @@ export const GAME_MODE_CONFIG: Record<GameMode, GameModeConfig> = {
     },
     storage: {
       key: '@jamaica_infinite_high_score',
-    },
-    ad: {
-      enabled: true,
-      timing: 'immediate',
     },
   },
 } as const;
