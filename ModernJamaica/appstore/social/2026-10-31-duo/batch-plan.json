@@ -1,0 +1,17 @@
+{
+  "items": [
+    {
+      "episode": "new-23",
+      "variant": "reveal",
+      "status": "ready",
+      "config": "problems/make-23-reveal.json"
+    },
+    {
+      "episode": "new-65",
+      "variant": "fail",
+      "status": "ready",
+      "config": "problems/make-65-fail.json"
+    }
+  ],
+  "automaticPublishing": false
+}

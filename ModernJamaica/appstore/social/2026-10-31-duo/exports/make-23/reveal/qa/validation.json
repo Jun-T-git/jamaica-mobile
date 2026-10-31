@@ -1,0 +1,27 @@
+{
+  "decode": "passed",
+  "resolution": [
+    1080,
+    1920
+  ],
+  "duration": 17.8,
+  "fps": 30.0,
+  "frames": 534,
+  "sourceSha256": "9fb5ac5bef0b58ed7cbe31e7b0190062f1a7eb7b6b0a9f2d1e0ef41c67518349",
+  "sha256": "0e6fcadd15f5373e01ce1a4dc74ba4019fffa7a09b1f8f75dc1beaf56361d898",
+  "integratedLUFS": -16.95,
+  "truePeakDBTP": -1.6,
+  "appFrameUncropped": false,
+  "nativeStatsOmitted": true,
+  "nativeTargetRetained": true,
+  "customPlaybackTarget": false,
+  "variant": "reveal",
+  "endCardStart": 14.3,
+  "endCardOpaque": true,
+  "cropping": true,
+  "developerBannerPixelFractionMax": 0,
+  "visualReview": "passed",
+  "published": false,
+  "visualReviewMethod": "Primary and independent review of smartphone-scale decoded frames, every cut boundary, selected operators, native target and full tree, and CTA; desktop player playback checks. Audio full decode and loudness analysis; subjective listening and platform overlay not verified.",
+  "independentReview": "passed"
+}

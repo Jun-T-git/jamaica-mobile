@@ -1,0 +1,20 @@
+[
+  {
+    "file": "exports/make-23/reveal/make-23-reveal.mp4",
+    "target": 23,
+    "variant": "reveal",
+    "seconds": 17.8,
+    "sha256": "0e6fcadd15f5373e01ce1a4dc74ba4019fffa7a09b1f8f75dc1beaf56361d898",
+    "visualReview": "passed",
+    "published": false
+  },
+  {
+    "file": "exports/make-65/fail/make-65-fail.mp4",
+    "target": 65,
+    "variant": "fail",
+    "seconds": 19.1,
+    "sha256": "a15fd47272bedecd75a8eb58a7d6e3232fc240ab767395dfa81c4685ba0e1ae6",
+    "visualReview": "passed",
+    "published": false
+  }
+]

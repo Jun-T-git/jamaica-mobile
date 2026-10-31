@@ -1,0 +1,157 @@
+{
+  "id": "make-65",
+  "episode": "new-65-2026-10-31",
+  "variant": "fail",
+  "numbers": [
+    1,
+    10,
+    9,
+    4,
+    5
+  ],
+  "target": 65,
+  "answerTree": [
+    "+",
+    [
+      "*",
+      [
+        "+",
+        1,
+        9
+      ],
+      [
+        "-",
+        10,
+        4
+      ]
+    ],
+    5
+  ],
+  "recording": "../sources/fail.mov",
+  "evidence": "../sources/make-65-fail-evidence.json",
+  "sourceSha256": "3d6b92d40ac806f9467fd24a50d2468ec3004d6be1dfec82568a097e0a26ae1d",
+  "normalizedCache": "../build/fail-cfr.mp4",
+  "normalizedSha256": "1db71c4bd35cfc51c5de24e8a5d4fd1fc7bb628978c53831b949d06c0f3c1eb0",
+  "unsolvedWindow": [
+    11,
+    18
+  ],
+  "questionStillTime": 13,
+  "cleanCompletedTime": null,
+  "cuts": [
+    [
+      12,
+      14
+    ],
+    [
+      19.2,
+      20.8
+    ],
+    [
+      24.5,
+      26.1
+    ],
+    [
+      30.3,
+      31.9
+    ],
+    [
+      35.7,
+      37.3
+    ],
+    [
+      68.5,
+      71.5
+    ],
+    [
+      71.5,
+      71.6
+    ]
+  ],
+  "operatorFreezes": [
+    {
+      "cut": 1,
+      "sourceTime": 19.733333333333334,
+      "seconds": 0.7,
+      "purpose": "Hold actual selected operator"
+    },
+    {
+      "cut": 2,
+      "sourceTime": 24.933333333333334,
+      "seconds": 0.7,
+      "purpose": "Hold actual selected operator"
+    },
+    {
+      "cut": 3,
+      "sourceTime": 30.9,
+      "seconds": 0.7,
+      "purpose": "Hold actual selected operator"
+    },
+    {
+      "cut": 4,
+      "sourceTime": 36.233333333333334,
+      "seconds": 0.7,
+      "purpose": "Hold actual selected operator"
+    },
+    {
+      "cut": 6,
+      "sourceTime": 71.5,
+      "seconds": 0.8,
+      "purpose": "Hold actual native zero"
+    }
+  ],
+  "effects": [
+    {
+      "file": "connect.mp3",
+      "source": 19.9,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 25.1,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 31,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 36.6,
+      "gain": 0.4
+    }
+  ],
+  "completedHold": 0,
+  "endCardDuration": 4,
+  "wrongTree": [
+    "-",
+    [
+      "*",
+      10,
+      9
+    ],
+    [
+      "*",
+      4,
+      [
+        "+",
+        1,
+        5
+      ]
+    ]
+  ],
+  "wrongSourceTime": 36.6,
+  "timeoutSourceTime": 71.5,
+  "noCorrectAnswerObserved": true,
+  "reviewedNoAnswerUntil": 71.7,
+  "fullFrameCuts": [],
+  "timerCuts": [
+    5,
+    6
+  ],
+  "timeoutCuts": [
+    6
+  ],
+  "resultCuts": []
+}

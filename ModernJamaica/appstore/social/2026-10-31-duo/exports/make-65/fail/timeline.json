@@ -1,0 +1,107 @@
+{
+  "segments": [
+    {
+      "sourceStart": 12,
+      "sourceEnd": 14,
+      "outputStart": 0,
+      "caption": "hook",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 19.2,
+      "sourceEnd": 20.8,
+      "outputStart": 2,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": 19.733333333333334,
+      "operatorFreezeSeconds": 0.7,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 24.5,
+      "sourceEnd": 26.1,
+      "outputStart": 4.3,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": 24.933333333333334,
+      "operatorFreezeSeconds": 0.7,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 30.3,
+      "sourceEnd": 31.9,
+      "outputStart": 6.6,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": 30.9,
+      "operatorFreezeSeconds": 0.7,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 35.7,
+      "sourceEnd": 37.3,
+      "outputStart": 8.9,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": 36.233333333333334,
+      "operatorFreezeSeconds": 0.7,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 68.5,
+      "sourceEnd": 71.5,
+      "outputStart": 11.2,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": true
+    },
+    {
+      "sourceStart": 71.5,
+      "sourceEnd": 71.6,
+      "outputStart": 14.2,
+      "caption": "timeout",
+      "speed": 1,
+      "operatorFreezeSource": 71.5,
+      "operatorFreezeSeconds": 0.8,
+      "viewportStyle": "standard",
+      "nativeTimerShown": true
+    }
+  ],
+  "variant": "fail",
+  "answerHold": 0,
+  "ctaStart": 15.1,
+  "duration": 19.1,
+  "effects": [
+    {
+      "file": "connect.mp3",
+      "source": 19.9,
+      "output": 3.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 25.1,
+      "output": 5.6
+    },
+    {
+      "file": "connect.mp3",
+      "source": 31,
+      "output": 8.0
+    },
+    {
+      "file": "connect.mp3",
+      "source": 36.6,
+      "output": 10.5
+    }
+  ]
+}

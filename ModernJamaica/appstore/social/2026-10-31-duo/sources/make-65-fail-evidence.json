@@ -1,0 +1,16 @@
+{
+  "target": 65,
+  "numbers": [
+    1,
+    10,
+    9,
+    4,
+    5
+  ],
+  "sourceSize": [
+    1206,
+    2622
+  ],
+  "capture": "Native app UI on existing isolated Jamaica Ad Capture simulator; ordinary random puzzle; no game code or puzzle-state changes",
+  "review": "Native target and ordered leaves visually verified, 2026-10-31 JST"
+}
