@@ -1,0 +1,246 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "target": 11,
+      "numbers": [
+        1,
+        1,
+        1,
+        2,
+        3
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-28-series/batch-plan.json",
+        "2026-10-28-series/sources/make-11-fail-evidence.json",
+        "production/problems/make-11-fail.json"
+      ]
+    },
+    {
+      "target": 14,
+      "numbers": [
+        2,
+        4,
+        4,
+        4,
+        4
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-27/02-make-14-updated/sources/capture-evidence.json",
+        "2026-10-28-series/batch-plan.json",
+        "production/problems/make-14.json"
+      ]
+    },
+    {
+      "target": 22,
+      "numbers": [
+        2,
+        2,
+        2,
+        3,
+        4
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-28-series/batch-plan.json",
+        "2026-10-28-series/sources/make-22-reveal-evidence.json",
+        "production/problems/make-22-reveal.json"
+      ]
+    },
+    {
+      "target": 23,
+      "numbers": [
+        2,
+        2,
+        3,
+        3,
+        6
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-31-duo/batch-plan.json",
+        "2026-10-31-duo/problems/make-23-reveal.json",
+        "2026-10-31-duo/sources/make-23-reveal-evidence.json"
+      ]
+    },
+    {
+      "target": 33,
+      "numbers": [
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-28-series/batch-plan.json",
+        "2026-10-28-series/sources/make-33-fail-evidence.json",
+        "production/problems/make-33-fail.json"
+      ]
+    },
+    {
+      "target": 42,
+      "numbers": [
+        1,
+        1,
+        2,
+        6,
+        6
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-28-series/batch-plan.json",
+        "2026-10-28-series/sources/make-42-fail-evidence.json",
+        "production/problems/make-42-fail.json"
+      ]
+    },
+    {
+      "target": 57,
+      "numbers": [
+        2,
+        2,
+        3,
+        3,
+        5
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-28-series/batch-plan.json",
+        "2026-10-28-series/sources/make-57-reveal-evidence.json",
+        "production/problems/make-57-reveal.json"
+      ]
+    },
+    {
+      "target": 61,
+      "numbers": [
+        1,
+        1,
+        9,
+        9,
+        10
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-28-series/batch-plan.json",
+        "2026-10-28-series/sources/make-61-fail-evidence.json",
+        "production/problems/make-61-fail.json"
+      ]
+    },
+    {
+      "target": 63,
+      "numbers": [
+        2,
+        4,
+        6,
+        8,
+        9
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-28-series/batch-plan.json",
+        "2026-10-28-series/sources/make-63-reveal-evidence.json",
+        "production/problems/make-63-reveal.json"
+      ]
+    },
+    {
+      "target": 65,
+      "numbers": [
+        1,
+        4,
+        5,
+        9,
+        10
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-31-duo/batch-plan.json",
+        "2026-10-31-duo/problems/make-65-fail.json",
+        "2026-10-31-duo/sources/make-65-fail-evidence.json"
+      ]
+    },
+    {
+      "target": 78,
+      "numbers": [
+        1,
+        7,
+        8,
+        8,
+        9
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-27/15-fail-timeout/sources/capture-evidence.json",
+        "production/problems/make-78-fail.json"
+      ]
+    },
+    {
+      "target": 81,
+      "numbers": [
+        1,
+        2,
+        4,
+        7,
+        10
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-28-series/batch-plan.json",
+        "2026-10-28-series/sources/make-81-reveal-evidence.json",
+        "production/problems/make-81-reveal.json"
+      ]
+    },
+    {
+      "target": 97,
+      "numbers": [
+        2,
+        2,
+        3,
+        7,
+        7
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-10-27/16-near-miss-timeout/sources/capture-evidence.json",
+        "2026-10-28-series/batch-plan.json",
+        "production/problems/make-97-fail.json"
+      ]
+    }
+  ],
+  "bindings": [
+    {
+      "path": "2026-10-28-series/batch-plan.json",
+      "record": "existingPublished/0",
+      "recordSha256": "4e69b7fdf36ca3acfdb58d31f5e3d2173a3c9a04dc6612a5886e8e4c1ef96ea1",
+      "target": 14,
+      "numbers": [
+        4,
+        4,
+        2,
+        4,
+        4
+      ],
+      "variant": "reveal",
+      "evidence": "production/problems/make-14.json",
+      "verifiedAt": "2026-10-31"
+    },
+    {
+      "path": "2026-10-28-series/batch-plan.json",
+      "record": "existingPublished/1",
+      "recordSha256": "c182ad0862dbb11b38acdea3c27b8a14f82001fbca1497b6de3639ae984b2f59",
+      "target": 97,
+      "numbers": [
+        2,
+        3,
+        7,
+        2,
+        7
+      ],
+      "variant": "fail",
+      "evidence": "production/problems/make-97-fail.json",
+      "verifiedAt": "2026-10-31"
+    }
+  ]
+}

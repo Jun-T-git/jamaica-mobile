@@ -1,0 +1,4 @@
+interface:
+  display_name: "ジャマイカの木 ショート動画制作"
+  short_description: "既存広告の正解版・失敗版を新しい問題で制作し、過去問題との重複も防ぐ"
+  default_prompt: "$jamaica-shorts を使って、既存の問題と重複しない新しい正解版と失敗版の動画を1本ずつ作ってください。"
