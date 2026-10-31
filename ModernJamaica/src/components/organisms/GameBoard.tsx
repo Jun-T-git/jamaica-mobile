@@ -13,6 +13,7 @@ import Svg, { Line } from 'react-native-svg';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ModernDesign } from '../../constants';
 import { treeNodeVisuals, treeOperatorColor } from '../../design/treeNodeVisuals';
+import { GAME_TREE_MAX_HEIGHT } from '../../design/treeBoardLayout';
 import { useGameStore } from '../../store/gameStore';
 import { GameMode, Operator } from '../../types';
 import { Dialog } from '../molecules/Dialog';
@@ -70,6 +71,7 @@ export const GameBoard = memo(function GameBoard({
   >({});
   const [dimensions, setDimensions] = useState(() => Dimensions.get('window'));
   const [boardHeight, setBoardHeight] = useState<number | null>(null);
+  const [gridAreaHeight, setGridAreaHeight] = useState(0);
   const [fullContentHeight, setFullContentHeight] = useState<number | null>(null);
   const [firstNode, setFirstNode] = useState<GridNode | null>(null);
   const [selectedOperator, setSelectedOperator] = useState<Operator | null>(
@@ -454,19 +456,32 @@ export const GameBoard = memo(function GameBoard({
     (totalCellWidth - cellGap * (GRID_COLS - 1)) / GRID_COLS;
   const actualCellSize = Math.min(cellTotalSize, cellSize);
 
-  // Calculate vertical spacing - consistent spacing between all rows
-  const rowGap = actualCellSize * (compact ? 0.55 : 1.0);
+  // 円の大きさを基準に重なりを防ぎ、高さ上限まで段間へ均等に配分する。
+  // 最小高さは計測結果と独立させ、onLayoutによる拡大ループを防ぐ。
+  const minRowStep = actualNodeSize * 1.15 + ModernDesign.spacing[3];
+  const minGridHeight = actualCellSize + minRowStep * (GRID_ROWS - 1);
+  const maxRowStep = Math.max(
+    minRowStep,
+    (GAME_TREE_MAX_HEIGHT - actualNodeSize) / (GRID_ROWS - 1),
+  );
+  const rowStep = Math.max(
+    minRowStep,
+    Math.min(
+      maxRowStep,
+      (gridAreaHeight - actualNodeSize - actualCellSize) / (GRID_ROWS - 1),
+    ),
+  );
 
   // Grid container dimensions
   const gridContainerWidth =
     actualCellSize * GRID_COLS + cellGap * (GRID_COLS - 1);
   const gridContainerHeight =
-    actualCellSize * GRID_ROWS + rowGap * (GRID_ROWS - 1);
+    actualCellSize + rowStep * (GRID_ROWS - 1);
 
   // Calculate node position
   const getNodePosition = (row: number, col: number) => {
     const x = col * (actualCellSize + cellGap);
-    const y = (GRID_ROWS - 1 - row) * (actualCellSize + rowGap);
+    const y = (GRID_ROWS - 1 - row) * rowStep;
     return { x, y };
   };
 
@@ -509,7 +524,11 @@ export const GameBoard = memo(function GameBoard({
         </View>
 
         {/* Main Game Grid */}
-        <View style={[styles.gridWrapper, { minHeight: gridContainerHeight + actualNodeSize }]}>
+        <View
+          testID="game-tree-area"
+          onLayout={event => setGridAreaHeight(event.nativeEvent.layout.height)}
+          style={[styles.gridWrapper, { minHeight: minGridHeight + actualNodeSize }]}
+        >
           <Animated.View
             style={[
               styles.gridInner,
