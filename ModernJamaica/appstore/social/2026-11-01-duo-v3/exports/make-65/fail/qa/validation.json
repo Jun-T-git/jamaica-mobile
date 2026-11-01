@@ -1,0 +1,27 @@
+{
+  "decode": "passed",
+  "resolution": [
+    1080,
+    1920
+  ],
+  "duration": 17.1,
+  "fps": 30.0,
+  "frames": 513,
+  "sourceSha256": "3d6b92d40ac806f9467fd24a50d2468ec3004d6be1dfec82568a097e0a26ae1d",
+  "sha256": "6ad9f4e298ef111d04bd42f53cbf543d9ec33438c164241ef404bae4ab813d1b",
+  "integratedLUFS": -17.08,
+  "truePeakDBTP": -1.98,
+  "appFrameUncropped": false,
+  "nativeStatsOmitted": true,
+  "nativeTargetRetained": true,
+  "customPlaybackTarget": false,
+  "variant": "fail",
+  "endCardStart": 15.1,
+  "endCardOpaque": true,
+  "presentation": {},
+  "cropping": true,
+  "developerBannerPixelFractionMax": 0,
+  "visualReview": "passed",
+  "published": false,
+  "visualReviewScope": "主担当と独立担当が最終MP4の抽出画面・360px幅・カット境界・原版との順序一致を確認。通し再生・音声試聴・投稿UI・利用者受け入れは未確認"
+}

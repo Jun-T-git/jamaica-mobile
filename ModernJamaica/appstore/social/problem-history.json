@@ -64,7 +64,9 @@
         "2026-10-31-duo/problems/make-23-reveal.json",
         "2026-10-31-duo/sources/make-23-reveal-evidence.json",
         "2026-11-01-duo-v2/batch-plan.json",
-        "2026-11-01-duo-v2/problems/make-23-reveal.json"
+        "2026-11-01-duo-v2/problems/make-23-reveal.json",
+        "2026-11-01-duo-v3/batch-plan.json",
+        "2026-11-01-duo-v3/problems/make-23-reveal.json"
       ]
     },
     {
@@ -162,7 +164,9 @@
         "2026-10-31-duo/problems/make-65-fail.json",
         "2026-10-31-duo/sources/make-65-fail-evidence.json",
         "2026-11-01-duo-v2/batch-plan.json",
-        "2026-11-01-duo-v2/problems/make-65-fail.json"
+        "2026-11-01-duo-v2/problems/make-65-fail.json",
+        "2026-11-01-duo-v3/batch-plan.json",
+        "2026-11-01-duo-v3/problems/make-65-fail.json"
       ]
     },
     {

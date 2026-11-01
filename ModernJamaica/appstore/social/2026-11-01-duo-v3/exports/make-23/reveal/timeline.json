@@ -1,0 +1,174 @@
+{
+  "segments": [
+    {
+      "sourceStart": 1,
+      "sourceEnd": 3,
+      "outputStart": 0,
+      "caption": "hook",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 4.8,
+      "sourceEnd": 5.2,
+      "outputStart": 2,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 10.3,
+      "sourceEnd": 10.9,
+      "outputStart": 2.4,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 14.6,
+      "sourceEnd": 16.2,
+      "outputStart": 3.0,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 19.3,
+      "sourceEnd": 19.7,
+      "outputStart": 4.6,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 22.7,
+      "sourceEnd": 23.3,
+      "outputStart": 5.0,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 26.7,
+      "sourceEnd": 28.3,
+      "outputStart": 5.6,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 30.9,
+      "sourceEnd": 31.3,
+      "outputStart": 7.2,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 34.6,
+      "sourceEnd": 35.2,
+      "outputStart": 7.6,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 39.3,
+      "sourceEnd": 40.9,
+      "outputStart": 8.2,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 43.7,
+      "sourceEnd": 44.1,
+      "outputStart": 9.8,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 48.5,
+      "sourceEnd": 49.1,
+      "outputStart": 10.2,
+      "caption": "plain",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    },
+    {
+      "sourceStart": 52,
+      "sourceEnd": 53.4,
+      "outputStart": 10.8,
+      "caption": "complete",
+      "speed": 1,
+      "operatorFreezeSource": null,
+      "operatorFreezeSeconds": 0,
+      "viewportStyle": "standard",
+      "nativeTimerShown": false
+    }
+  ],
+  "variant": "reveal",
+  "answerHold": 2.1,
+  "presentation": {},
+  "ctaStart": 14.3,
+  "duration": 16.3,
+  "effects": [
+    {
+      "file": "connect.mp3",
+      "source": 14.9,
+      "output": 3.3
+    },
+    {
+      "file": "connect.mp3",
+      "source": 27,
+      "output": 5.9
+    },
+    {
+      "file": "connect.mp3",
+      "source": 39.6,
+      "output": 8.5
+    },
+    {
+      "file": "success.mp3",
+      "source": 52.5,
+      "output": 11.3
+    }
+  ]
+}

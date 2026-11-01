@@ -1,0 +1,18 @@
+{
+  "automaticPublishing": false,
+  "revisionOf": "2026-10-31-duo",
+  "items": [
+    {
+      "episode": "reedit-23-v3",
+      "variant": "reveal",
+      "status": "ready",
+      "config": "problems/make-23-reveal.json"
+    },
+    {
+      "episode": "reedit-65-v3",
+      "variant": "fail",
+      "status": "ready",
+      "config": "problems/make-65-fail.json"
+    }
+  ]
+}
