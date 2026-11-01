@@ -227,8 +227,8 @@ audio=json.loads(re.findall(r'\{\s*"input_i".*?\}',(QA/'loudness.log').read_text
     'sourceSha256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'sha256':hashlib.sha256(DEST.read_bytes()).hexdigest(),
     'integratedLUFS':float(audio['input_i']),'truePeakDBTP':float(audio['input_tp']),
     'appFrameUncropped':False,'nativeStatsOmitted':True,'nativeTargetRetained':True,'customPlaybackTarget':False,'variant':CONFIG['variant'],'endCardStart':PLAY,'endCardOpaque':not MODERN,'presentation':PRESENTATION,'cropping':True,'developerBannerPixelFractionMax':blue_banner_max,'visualReview':'pending','published':False},ensure_ascii=False,indent=2)+'\n')
-(OUT/'post-copy.txt').write_text(f"5つの数字で{TARGET}を作れる？\n5つの数をすべて1回ずつ使う計算パズル\n難易度 {'★'*LEVEL}{'☆'*(5-LEVEL)}\n"+('みんなは解けた？\n' if FAIL else '')+'ジャマイカの木\nApp Storeで検索\n#ジャマイカの木 #算数パズル #脳トレ\n')
+(OUT/'post-copy.txt').write_text(f"5つの数字で{TARGET}を{'作れる？' if FAIL else '作れ！'}\n5つの数をすべて1回ずつ使う計算パズル\n難易度 {'★'*LEVEL}{'☆'*(5-LEVEL)}\n"+('みんなは解けた？\n' if FAIL else '')+'ジャマイカの木\nApp Storeで検索\n#ジャマイカの木 #算数パズル #脳トレ\n')
 if MODERN:
-    title=f'5つの数字で{TARGET}を作れる？' if not FAIL else f'{TARGET}にあと1…どこを直す？'
+    title=f'5つの数字で{TARGET}を'+('作れる？' if FAIL else '作れ！')
     (OUT/'post-copy.txt').write_text(title+'｜ジャマイカの木\n\n5つの数字を全部1回ずつ使う計算パズル。\n'+('あなたならどうつなぐ？\n' if FAIL else '次は自分でつないでみよう。\n')+'App Storeで「ジャマイカの木」を検索\n#ジャマイカの木 #算数パズル #脳トレ\n')
 print(DEST,flush=True)

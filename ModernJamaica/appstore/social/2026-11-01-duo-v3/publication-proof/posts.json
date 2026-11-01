@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-11-01T03:26:49.446174+00:00",
+  "verifiedAt": "2026-11-01T20:13:35+09:00",
   "timezone": "Asia/Tokyo",
   "channel": "TeraTech | アプリ開発",
   "channelId": "UCnKhAXBmPu-Vhu4YIx-vNGQ",
@@ -22,9 +22,9 @@
       "youtube": {
         "id": "N5tv1joJQBc",
         "url": "https://www.youtube.com/shorts/N5tv1joJQBc",
-        "title": "5つの数字で23を作れる？｜ジャマイカの木",
+        "title": "5つの数字で23を作れ！｜ジャマイカの木",
         "description": "3・2・3・2・6を全部1回ずつ使って、23を作れる？\n使えるのは ＋ − × ÷。数字をつなぐと、計算の木が育っていく。\n別の作り方もある？コメントで教えて。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
-        "status": "scheduled",
+        "status": "published",
         "scheduledAt": "2026-11-01T14:00:00+09:00",
         "observedSchedule": "2026年11月1日 14:00 (GMT+0900)",
         "madeForKids": false,
@@ -34,12 +34,23 @@
         "comments": "on",
         "copyright": "no issues detected",
         "initialChecks": "no issues reported after processing",
-        "published": false,
+        "published": true,
         "fixedComment": {
           "text": "別の作り方もある？",
           "posted": false,
           "reason": "予約中の非公開動画にはコメントを投稿できないとYouTubeに表示。問いかけは説明欄へ反映済み"
-        }
+        },
+        "publicationObservedAt": "2026-11-01T20:13:35+09:00",
+        "titleChanges": [
+          {
+            "observedAt": "2026-11-01T20:13:35+09:00",
+            "before": "5つの数字で23を作れる？｜ジャマイカの木",
+            "after": "5つの数字で23を作れ！｜ジャマイカの木",
+            "reason": "利用者の指摘に従い、正解系は「作れ！」、失敗系は「作れる？」の既存区分へ修正",
+            "saved": true,
+            "proof": "publication-proof/reveal-title-corrected.png"
+          }
+        ]
       },
       "proof": "publication-proof/reveal-scheduled.png"
     },
@@ -61,7 +72,7 @@
         "url": "https://www.youtube.com/shorts/Uzb_IJSdbAo",
         "title": "5つの数字で65を作れる？｜ジャマイカの木",
         "description": "1・10・9・4・5を全部1回ずつ使って、65を作れる？\n使えるのは ＋ − × ÷。\n65にする式、思いついた？コメントで教えて。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
-        "status": "scheduled",
+        "status": "published",
         "scheduledAt": "2026-11-01T19:00:00+09:00",
         "observedSchedule": "2026年11月1日 19:00 (GMT+0900)",
         "madeForKids": false,
@@ -71,12 +82,13 @@
         "comments": "on",
         "copyright": "no issues detected",
         "initialChecks": "no issues reported after processing",
-        "published": false,
+        "published": true,
         "fixedComment": {
           "text": "65にする式、思いついた？",
           "posted": false,
           "reason": "予約中の非公開動画にはコメントを投稿できないとYouTubeに表示。問いかけは説明欄へ反映済み"
-        }
+        },
+        "publicationObservedAt": "2026-11-01T20:13:35+09:00"
       },
       "proof": "publication-proof/fail-scheduled.png"
     }
@@ -85,7 +97,6 @@
   "profileChanged": false,
   "additionalSpend": false,
   "limitations": [
-    "予約保存済みで、実際の公開成功は未来のため未確認",
     "固定コメントは未投稿。公開後の自動追記は設定していない",
     "PC Shortsの23再生画面を確認。スマートフォン実機プレビューと主観的音声試聴は未確認",
     "公開後48時間・7日の効果観測は未実施。自動の観測・未公開検知は未接続"

@@ -16,3 +16,6 @@ YouTube公式の予約手順、AI申告例、有料プロモーションの定�
 - https://support.google.com/youtube/answer/1270709?hl=ja
 - https://support.google.com/youtube/answer/14328491?hl=ja
 - https://support.google.com/youtube/answer/154235?hl=ja
+
+
+2026-11-01 20:13 JSTの後続確認で2本とも公開状態を確認。正解23の投稿タイトルを利用者の指摘どおり「5つの数字で23を作れ！｜ジャマイカの木」へ修正して保存済み。失敗65は「作れる？」を維持。予約日時は当初設定の記録として保持し、実際の公開時刻を秒単位で確認したとはしない。変更履歴はposts.jsonに追記。
