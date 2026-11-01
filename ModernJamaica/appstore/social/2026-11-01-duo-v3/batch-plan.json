@@ -6,13 +6,23 @@
       "episode": "reedit-23-v3",
       "variant": "reveal",
       "status": "ready",
-      "config": "problems/make-23-reveal.json"
+      "config": "problems/make-23-reveal.json",
+      "youtube": {
+        "status": "scheduled",
+        "record": "publication-proof/posts.json",
+        "videoId": "N5tv1joJQBc"
+      }
     },
     {
       "episode": "reedit-65-v3",
       "variant": "fail",
       "status": "ready",
-      "config": "problems/make-65-fail.json"
+      "config": "problems/make-65-fail.json",
+      "youtube": {
+        "status": "scheduled",
+        "record": "publication-proof/posts.json",
+        "videoId": "Uzb_IJSdbAo"
+      }
     }
   ]
 }
