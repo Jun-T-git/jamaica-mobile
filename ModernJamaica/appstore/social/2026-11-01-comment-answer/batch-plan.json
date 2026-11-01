@@ -1,0 +1,12 @@
+{
+  "automaticPublishing": false,
+  "items": [
+    {
+      "episode": "comment-answer-50-2026-11-01",
+      "variant": "comment-answer",
+      "status": "ready",
+      "config": "problems/make-50-c3891ed0-comment-answer.json",
+      "publication": "not-requested"
+    }
+  ]
+}

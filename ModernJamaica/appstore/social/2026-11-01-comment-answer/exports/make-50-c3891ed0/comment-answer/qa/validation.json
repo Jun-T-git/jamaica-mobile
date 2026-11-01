@@ -1,0 +1,34 @@
+{
+  "decode": "passed",
+  "resolution": [
+    1080,
+    1920
+  ],
+  "duration": 13.2,
+  "fps": 30.0,
+  "frames": 396,
+  "sourceSha256": "2b52d7d9b16e4fc1a105cfb46e36a293c6a156eda2f7f08dcde6bc874cae8755",
+  "sha256": "2b9971d52959d38ee3a0abecdb7fbdff32bc9724fffd4528abf9d338ee24c5e8",
+  "integratedLUFS": -17.15,
+  "truePeakDBTP": -3.18,
+  "appFrameUncropped": false,
+  "nativeStatsOmitted": true,
+  "nativeTargetRetained": true,
+  "customPlaybackTarget": false,
+  "variant": "comment-answer",
+  "endCardStart": 11.2,
+  "endCardOpaque": true,
+  "presentation": {},
+  "cropping": true,
+  "developerBannerPixelFractionMax": 0,
+  "visualReview": {
+    "sourceFrames": "passed: original50/4,2,6,4,3 and only6+4=10 merge checked at full resolution; no final answer/popup in exported interval",
+    "finalExtractedFrames": "passed: every gameplay cut first/last, native last frame→comment2seconds→search2seconds; all5 leaves and incomplete10 remain visible",
+    "independentReview": "passed by week_visual_qa: SHA match, full decode,17 samples at360px, all5 leaves, incomplete10, readable comment prompt, no answer leak, fixed-comment arithmetic/digits consistent",
+    "fullPlayback": "not performed by editing or independent QA agent",
+    "audioListening": "subjective listening not performed; measured loudness -17.15LUFS/-3.18dBTP",
+    "nativePlayback": "root opened final MP4 in QuickTime, initiated playback from start and observed final search card; native timeline13.2 and playback off verified. This is separate from continuous subjective viewing."
+  },
+  "published": false,
+  "fixedCommentSha256": "5368e9160bb01bac0f97f38a19bbe8167cd96f2efe1ce165423ad8ce5ced650a"
+}

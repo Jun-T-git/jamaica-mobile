@@ -1,0 +1,29 @@
+[
+  {
+    "file": "exports/make-50-c3891ed0/comment-answer/make-50-c3891ed0-comment-answer.mp4",
+    "target": 50,
+    "numbers": [
+      4,
+      2,
+      6,
+      4,
+      3
+    ],
+    "variant": "comment-answer",
+    "seconds": 13.2,
+    "sha256": "2b9971d52959d38ee3a0abecdb7fbdff32bc9724fffd4528abf9d338ee24c5e8",
+    "resolution": [
+      1080,
+      1920
+    ],
+    "fps": 30,
+    "decode": "passed",
+    "independentVisualReview": "passed: 17 frame samples at360px and cut boundaries",
+    "nativePlayback": "QuickTime start and end verified",
+    "audioListening": "not-performed; loudness measured",
+    "fixedComment": "exports/make-50-c3891ed0/comment-answer/fixed-comment.txt",
+    "fixedCommentSha256": "5368e9160bb01bac0f97f38a19bbe8167cd96f2efe1ce165423ad8ce5ced650a",
+    "published": false,
+    "postCommentStatus": "draft-only"
+  }
+]

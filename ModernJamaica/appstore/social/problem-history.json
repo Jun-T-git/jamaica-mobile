@@ -228,6 +228,21 @@
       ]
     },
     {
+      "target": 50,
+      "numbers": [
+        2,
+        3,
+        4,
+        4,
+        6
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-01-comment-answer/problems/make-50-c3891ed0-comment-answer.json",
+        "2026-11-01-comment-answer/sources/make-50-comment-answer-retake-evidence.json"
+      ]
+    },
+    {
       "target": 57,
       "numbers": [
         2,

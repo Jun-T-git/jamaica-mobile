@@ -7,12 +7,13 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 import argparse
-from problem import load_problem,star_level,STAR_BANDS
+from problem import load_problem,star_level,STAR_BANDS,fixed_comment_text
 PARSER=argparse.ArgumentParser()
 PARSER.add_argument('--problem',required=True,type=Path)
 PARSER.add_argument('--output',required=True,type=Path)
 ARGS=PARSER.parse_args();CONFIG=load_problem(ARGS.problem)
 FAIL=CONFIG['variant']=='fail'
+COMMENT=CONFIG['variant']=='comment-answer'
 MODERN=CONFIG.get('presentation',{}).get('version')==2
 PRESENTATION=CONFIG.get('presentation',{})
 INTRO=PRESENTATION.get('introDuration',2)
@@ -29,7 +30,8 @@ BODY='/System/Library/Fonts/ヒラギノ角ゴシック W4.ttc'
 CUTS=CONFIG['cuts'];FREEZES={f['cut']:f['sourceTime'] for f in CONFIG['operatorFreezes']}
 FREEZE_LENGTHS={f['cut']:f['seconds'] for f in CONFIG['operatorFreezes']}
 HOLD,END=CONFIG['completedHold'],CONFIG['endCardDuration']
-PLAY=round((sum(b-a for a,b in CUTS)+sum(FREEZE_LENGTHS.values())+HOLD)*FPS)/FPS;DURATION=round((PLAY+END)*FPS)/FPS
+COMMENT_HOLD=CONFIG.get('commentHoldDuration',0) if COMMENT else 0
+PLAY=round((sum(b-a for a,b in CUTS)+sum(FREEZE_LENGTHS.values())+HOLD+COMMENT_HOLD)*FPS)/FPS;DURATION=round((PLAY+END)*FPS)/FPS
 DEST=OUT/f"{CONFIG['id']}-{CONFIG['variant']}.mp4"
 
 def run(args,log=None):
@@ -89,7 +91,7 @@ layout['difficulty']={'level':LEVEL,'bands':STAR_BANDS,'label':[675+(210-small.w
 GAME_CROP='split=2[goal][board];[goal]crop=1206:280:0:420[top];[board]crop=1206:1550:0:1000[bottom];[top][bottom]vstack=inputs=2,scale=860:1304:flags=lanczos,setsar=1'
 layout['gameViewport']={'sourceCrops':[[0,420,1206,280],[0,1000,1206,1550]],'omittedBlankStrip':[0,700,1206,300],'placement':[110,350,860,1304],'nativeTargetRetained':True,'treeAndControlsContinuous':True}
 
-for kind in ['hook','plain','complete','hold','cta']+(['timeout'] if FAIL else []):
+for kind in ['hook','plain','complete','hold','cta']+(['comment'] if COMMENT else [])+(['timeout'] if FAIL else []):
     im=header.copy()
     if kind=='hook' and MODERN:
         label(im,'5つ全部を1回ずつ',975,60,MINT)
@@ -111,6 +113,9 @@ for kind in ['hook','plain','complete','hold','cta']+(['timeout'] if FAIL else [
         ImageDraw.Draw(im).rounded_rectangle((130,1070,950,1248),radius=28,outline=MINT,width=5)
         layout['puzzleRule']={'text':f'5つの数を使って{TARGET}を作れ','runs':parts}
         layout['numberFrame']={'bounds':[130,1070,950,1248],'displayStart':0,'displayEnd':2}
+    elif kind=='comment':
+        label(im,'答えは固定コメントへ',665,54,MINT)
+        layout['commentPrompt']={'bounds':layout['答えは固定コメントへ'],'displayStart':PLAY-COMMENT_HOLD,'displayEnd':PLAY,'sameLastUnfinishedFrame':True}
     elif kind=='plain':
         pass
     elif kind in ['complete','timeout','hold']:
@@ -126,10 +131,10 @@ for kind in ['hook','plain','complete','hold','cta']+(['timeout'] if FAIL else [
         pixels=np.zeros((H,W,3),dtype=np.uint8)
         for channel,base in enumerate([23,24,34]):pixels[:,:,channel]=base+glow*[4,8,17][channel]
         im=Image.fromarray(pixels).convert('RGBA')
-        if FAIL:label(im,'みんなは解けた？',350,68,MINT)
+        if FAIL or COMMENT:label(im,'みんなは解けた？',350,68,MINT)
         im.alpha_composite(icon(280,60),(400,485))
         art=text_art('ジャマイカの木',72);im.alpha_composite(art,((W-art.width)//2,835));layout['ジャマイカの木']=[(W-art.width)//2,835,art.width,art.height]
-        art=text_art('あなたもアプリで挑戦' if FAIL else '数字をつなぐ計算パズル',39,MINT,False);im.alpha_composite(art,((W-art.width)//2,965));layout['あなたもアプリで挑戦' if FAIL else '数字をつなぐ計算パズル']=[(W-art.width)//2,965,art.width,art.height]
+        art=text_art('あなたもアプリで挑戦' if FAIL or COMMENT else '数字をつなぐ計算パズル',39,MINT,False);im.alpha_composite(art,((W-art.width)//2,965));layout['あなたもアプリで挑戦' if FAIL or COMMENT else '数字をつなぐ計算パズル']=[(W-art.width)//2,965,art.width,art.height]
         ImageDraw.Draw(im).rounded_rectangle((225,1090,855,1210),radius=30,fill='#293f5e',outline='#60a5fa',width=2)
         art=text_art('App Storeで検索',50,WHITE,False);im.alpha_composite(art,((W-art.width)//2,1125));layout['App Storeで検索']=[(W-art.width)//2,1125,art.width,art.height]
     im.save(BUILD/f'{kind}.png')
@@ -166,7 +171,7 @@ for i,(a,b) in enumerate(CUTS):
     print(f'Full-screen cut {i+1} rendered',flush=True)
 
 # Same complete screen after the last merge, held while showing the search copy.
-closing_time=PRESENTATION.get('ctaStillTime',CONFIG['questionStillTime'] if FAIL else CONFIG['cleanCompletedTime'])
+closing_time=CONFIG['commentStillTime'] if COMMENT else PRESENTATION.get('ctaStillTime',CONFIG['questionStillTime'] if FAIL else CONFIG['cleanCompletedTime'])
 complete=Image.new('RGB',(W,H),BG)
 if MODERN:
     # Closing composition only: one contiguous native tree crop, no redrawn nodes.
@@ -182,9 +187,9 @@ else:
     run(['-loglevel','error','-ss',closing_time,'-i',SRC,'-frames:v',1,'-vf',GAME_CROP,BUILD/'complete-game.png'])
     complete.paste(Image.open(BUILD/'complete-game.png'),(110,350))
 complete.save(BUILD/'complete-app.png')
-for name,seconds in ([('hold',HOLD)] if HOLD else [])+[('cta',END)]:
+for name,seconds in ([('hold',HOLD)] if HOLD else [])+([('comment',COMMENT_HOLD)] if COMMENT else [])+[('cta',END)]:
     clip=BUILD/f'{name}.mp4';clips.append(clip)
-    overlay=('hold' if MODERN else 'complete') if name=='hold' else 'cta'
+    overlay='comment' if name=='comment' else ('hold' if MODERN else 'complete') if name=='hold' else 'cta'
     run(['-loglevel','warning','-loop',1,'-framerate',FPS,'-i',BUILD/'complete-app.png','-loop',1,'-framerate',FPS,'-i',BUILD/f'{overlay}.png',
          '-filter_complex','[0:v][1:v]overlay=0:0,format=yuv420p[v]','-map','[v]','-frames:v',round(seconds*FPS),'-r',FPS,'-fps_mode','cfr','-an',
          '-c:v','libx264','-preset','fast','-crf',18,clip],f'{name}.log')
@@ -204,11 +209,14 @@ run(['-v','error','-i',DEST,'-f','null','-'],'decode.log')
 run(['-i',DEST,'-af','loudnorm=I=-17:TP=-1.5:LRA=7:print_format=json','-vn','-f','null','-'],'loudness.log')
 sheet=Image.new('RGB',(1800,1340),BG);d=ImageDraw.Draw(sheet)
 sample_times=[0,1.9,3.5,5.5,7.7,10.5,PLAY-2.5,PLAY-.4,PLAY+.5,DURATION-.1] if FAIL else [0,2.4,3.6,4.9,6.3,8.8,11.4,PLAY-1.3,PLAY+.2,DURATION-.2]
+if COMMENT:
+    prompt_start=PLAY-COMMENT_HOLD
+    sample_times=[0,INTRO-.1,*np.linspace(INTRO,prompt_start-.1,4),prompt_start+.2,PLAY-.3,PLAY+.3,DURATION-.1]
 for i,t in enumerate(sample_times):
     raw=run(['-loglevel','error','-ss',t,'-i',DEST,'-frames:v',1,'-f','image2pipe','-vcodec','png','-'])
     im=Image.open(io.BytesIO(raw)).convert('RGB');small=im.resize((360,640),Image.Resampling.LANCZOS)
     if i in [0,7,8]:
-        im.save(OUT/(['poster.png','timeout.png','ending.png'] if FAIL else ['poster.png','completed-tree.png','ending.png'])[[0,7,8].index(i)])
+        im.save(OUT/(['poster.png','timeout.png','ending.png'] if FAIL else ['poster.png','comment-prompt.png' if COMMENT else 'completed-tree.png','ending.png'])[[0,7,8].index(i)])
         small.save(QA/f'mobile-{i}.png')
     x=i%5*360;y=i//5*670;sheet.paste(small,(x,y+25));d.text((x+8,y+7),f'{t:.2f}s',fill='white')
 sheet.save(QA/'contact-sheet.jpg',quality=94)
@@ -221,7 +229,7 @@ assert blue_banner_max<.02, 'Developer refresh banner detected'
 
 assert count==round(DURATION*FPS)
 audio=json.loads(re.findall(r'\{\s*"input_i".*?\}',(QA/'loudness.log').read_text(),re.S)[-1])
-(OUT/'timeline.json').write_text(json.dumps({'segments':timeline,'variant':CONFIG['variant'],'answerHold':HOLD,'presentation':PRESENTATION,'ctaStart':PLAY,'duration':DURATION,'effects':events},ensure_ascii=False,indent=2)+'\n')
+(OUT/'timeline.json').write_text(json.dumps({'segments':timeline,'variant':CONFIG['variant'],'answerHold':HOLD,**({'commentHold':COMMENT_HOLD,'commentStart':PLAY-COMMENT_HOLD} if COMMENT else {}),'presentation':PRESENTATION,'ctaStart':PLAY,'duration':DURATION,'effects':events},ensure_ascii=False,indent=2)+'\n')
 (OUT/'layout.json').write_text(json.dumps({'appSourceBounds':[0,0,1206,2622],'fit':('Gameplay retains native target and continuous tree-controls; closing retains native goal and separate continuous tree crop without controls' if MODERN else 'Native target and continuous tree-controls region retained; only blank strip y700-1000 removed; no custom playback target'),'captionBounds':layout},ensure_ascii=False,indent=2)+'\n')
 (QA/'validation.json').write_text(json.dumps({'decode':'passed','resolution':meta['size'],'duration':meta['duration'],'fps':meta['fps'],'frames':count,
     'sourceSha256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'sha256':hashlib.sha256(DEST.read_bytes()).hexdigest(),
@@ -231,4 +239,7 @@ audio=json.loads(re.findall(r'\{\s*"input_i".*?\}',(QA/'loudness.log').read_text
 if MODERN:
     title=f'5つの数字で{TARGET}を'+('作れる？' if FAIL else '作れ！')
     (OUT/'post-copy.txt').write_text(title+'｜ジャマイカの木\n\n5つの数字を全部1回ずつ使う計算パズル。\n'+('あなたならどうつなぐ？\n' if FAIL else '次は自分でつないでみよう。\n')+'App Storeで「ジャマイカの木」を検索\n#ジャマイカの木 #算数パズル #脳トレ\n')
+if COMMENT:
+    (OUT/'fixed-comment.txt').write_text(fixed_comment_text(CONFIG))
+    (OUT/'post-copy.txt').write_text(f'5つの数字で{TARGET}を作れる？｜ジャマイカの木\n\n5つの数字を全部1回ずつ使う計算パズル。\n答えは固定コメントへ。\nApp Storeで「ジャマイカの木」を検索\n#ジャマイカの木 #算数パズル #脳トレ\n')
 print(DEST,flush=True)

@@ -19,13 +19,24 @@ def evaluate_tree(tree):
         if right==0:raise ValueError('Division by zero')
         value=left/right
     return value,ls+rs
+def tree_depth(tree):
+    return 0 if type(tree) is int else 1+max(tree_depth(tree[1]),tree_depth(tree[2]))
+
+def format_tree(tree):
+    if type(tree) is int:return str(tree)
+    symbols={'+':'+','-':'−','*':'×','/':'÷'}
+    return f'（{format_tree(tree[1])}{symbols[tree[0]]}{format_tree(tree[2])}）'
+
+def fixed_comment_text(c):
+    return f"答えの一例：{format_tree(c['answerTree'])}＝{c['target']}\n\n他の解き方を見つけた方はコメントで教えてください！\n"
+
 def validate_problem(c):
     if not re.fullmatch(r'[a-z0-9][a-z0-9-]*',c['id']):raise ValueError('Unsafe problem id')
     star_level(c['target'])
     if len(c['numbers'])!=5 or any(type(n) is not int or not 1<=n<=10 for n in c['numbers']):raise ValueError('Five native numbers in the app range 1–10 required')
     value,used=evaluate_tree(c['answerTree'])
     if value!=c['target'] or Counter(used)!=Counter(c['numbers']):raise ValueError('Solution must reach target using all five numbers exactly once')
-    if c['variant'] not in ['reveal','fail']:raise ValueError('Unknown variant')
+    if c['variant'] not in ['reveal','fail','comment-answer']:raise ValueError('Unknown variant')
     intro=c.get('presentation',{}).get('introDuration',2)
     presentation=c.get('presentation',{})
     if presentation.get('version',1) not in (1,2):raise ValueError('Unknown presentation version')
@@ -52,6 +63,27 @@ def validate_problem(c):
         if any(e['file']=='success.mp3' for e in c['effects']):raise ValueError('Fail variant cannot use success effect')
         closing=presentation.get('ctaStillTime',c['questionStillTime'])
         if type(closing) not in (int,float) or not math.isfinite(closing) or not 0<=closing<=c['reviewedNoAnswerUntil']:raise ValueError('Closing frame outside reviewed answer-free footage')
+    if c['variant']=='comment-answer':
+        if presentation.get('version',1)!=1 or intro!=2:raise ValueError('Comment-answer retains the v3 two-second question layout')
+        if c['completedHold']!=0 or c['endCardDuration']!=2:raise ValueError('Comment-answer uses no solved hold and a two-second search card')
+        if c.get('commentHoldDuration')!=2:raise ValueError('Comment prompt must hold for two seconds')
+        reviewed=c.get('reviewedNoAnswerUntil');still=c.get('commentStillTime')
+        if c.get('noCorrectAnswerObserved') is not True or type(reviewed) not in (int,float) or not math.isfinite(reviewed):raise ValueError('Comment-answer needs reviewed answer-free footage')
+        if any(b>reviewed for a,b in c['cuts']):raise ValueError('Comment-answer cut extends beyond reviewed answer-free footage')
+        if type(still) not in (int,float) or not math.isfinite(still) or abs(still-(c['cuts'][-1][1]-1/30))>1e-6:raise ValueError('Comment hold must preserve the last gameplay frame')
+        if not 0<=still<=reviewed:raise ValueError('Comment still outside reviewed footage')
+        forest=c.get('previewTrees',[])
+        if not isinstance(forest,list) or len(forest)<2:raise ValueError('Preview must remain unfinished')
+        leaves=[];merges=0
+        for tree in forest:
+            value,used=evaluate_tree(tree);leaves+=used;merges+=len(used)-1
+            if tree_depth(tree)>2:raise ValueError('Preview tree enters the comment caption area')
+            if isinstance(tree,list) and value==c['target']:raise ValueError('Preview cannot show a root matching the target')
+        if Counter(leaves)!=Counter(c['numbers']) or not 0<=merges<=2:raise ValueError('Preview must use the native digits and show at most two merges')
+        if c.get('cleanCompletedTime') is not None:raise ValueError('Comment-answer cannot use a completed frame')
+        if any(e['file']=='success.mp3' for e in c['effects']):raise ValueError('Comment-answer cannot use success audio')
+        if any(c.get(k) for k in ['timerCuts','timeoutCuts','resultCuts','fullFrameCuts']):raise ValueError('Comment-answer keeps the reviewed standard viewport')
+        if presentation.get('resultCaption') or 'ctaStillTime' in presentation:raise ValueError('Comment-answer uses its dedicated prompt and unfinished still')
     caption=presentation.get('resultCaption')
     if caption:
         start,end=caption['start'],caption['end']
@@ -74,6 +106,8 @@ def load_problem(path):
         c[name+'Path']=(path.parent/c[name]).resolve()
     evidence=json.loads(c['evidencePath'].read_text())
     if evidence['target']!=c['target'] or evidence['numbers']!=c['numbers']:raise ValueError('Native captured puzzle and caption config differ')
+    if c['variant']=='comment-answer':
+        if evidence.get('noCorrectAnswerObserved') is not True or evidence.get('reviewedNoAnswerUntil',-1)<c['reviewedNoAnswerUntil'] or evidence.get('previewTrees')!=c['previewTrees']:raise ValueError('Comment-answer review evidence does not match the unfinished footage')
     if evidence['sourceSize']!=[1206,2622]:raise ValueError('Review viewport for a different recording size')
     if hashlib.sha256(c['recordingPath'].read_bytes()).hexdigest()!=c['sourceSha256']:raise ValueError('Recording hash does not match reviewed footage')
     import imageio_ffmpeg
@@ -81,6 +115,7 @@ def load_problem(path):
     if list(meta['size'])!=evidence['sourceSize']:raise ValueError('Actual source resolution differs from evidence')
     if max(b for a,b in c['cuts'])>meta['duration']:raise ValueError('Cut extends past recording end')
     if c['variant']=='reveal' and not 0<=c['cleanCompletedTime']<meta['duration']:raise ValueError('Invalid completed frame time')
+    if c['variant']=='comment-answer' and not 0<=c['commentStillTime']<meta['duration']:raise ValueError('Comment still outside source duration')
     if 'ctaStillTime' in c.get('presentation',{}):
         t=c['presentation']['ctaStillTime']
         if type(t) not in (int,float) or not math.isfinite(t) or not 0<=t<meta['duration']:raise ValueError('Invalid closing frame time')

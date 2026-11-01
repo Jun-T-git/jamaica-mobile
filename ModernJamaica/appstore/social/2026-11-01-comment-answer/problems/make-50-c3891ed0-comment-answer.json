@@ -1,0 +1,83 @@
+{
+  "id": "make-50-c3891ed0",
+  "episode": "comment-answer-50-2026-11-01",
+  "variant": "comment-answer",
+  "numbers": [
+    4,
+    2,
+    6,
+    4,
+    3
+  ],
+  "target": 50,
+  "answerTree": [
+    "*",
+    [
+      "+",
+      6,
+      4
+    ],
+    [
+      "-",
+      [
+        "+",
+        4,
+        3
+      ],
+      2
+    ]
+  ],
+  "recording": "../sources/make-50-comment-answer-retake.mov",
+  "evidence": "../sources/make-50-comment-answer-retake-evidence.json",
+  "sourceSha256": "2b52d7d9b16e4fc1a105cfb46e36a293c6a156eda2f7f08dcde6bc874cae8755",
+  "normalizedCache": "../build/make-50-c3891ed0-cfr.mp4",
+  "normalizedSha256": "e52c68d7257e339a62baf3305f3346c9ebddd43315ef6d13f72bcbe2b1a97b10",
+  "unsolvedWindow": [
+    1,
+    13.9
+  ],
+  "questionStillTime": 2,
+  "cleanCompletedTime": null,
+  "cuts": [
+    [
+      1,
+      3
+    ],
+    [
+      3,
+      5
+    ],
+    [
+      14,
+      15.2
+    ],
+    [
+      19.4,
+      23.4
+    ]
+  ],
+  "operatorFreezes": [],
+  "effects": [
+    {
+      "file": "connect.mp3",
+      "source": 19.7,
+      "gain": 0.4
+    }
+  ],
+  "completedHold": 0,
+  "endCardDuration": 2,
+  "commentHoldDuration": 2,
+  "commentStillTime": 23.366666666666664,
+  "noCorrectAnswerObserved": true,
+  "reviewedNoAnswerUntil": 23.4,
+  "previewTrees": [
+    4,
+    2,
+    [
+      "+",
+      6,
+      4
+    ],
+    3
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "reviewer": "week-visual-qa",
+  "finalSha256": "2b9971d52959d38ee3a0abecdb7fbdff32bc9724fffd4528abf9d338ee24c5e8",
+  "result": "passed",
+  "method": "396frames full decode,17 samples at360px, all cut boundaries, fixed-comment text arithmetic and leaf counts",
+  "checked": [
+    "native target50 and all original digits4/2/6/4/3",
+    "only6+4=10 incomplete play",
+    "no answer equation or completed50 root or successpopup",
+    "comment prompt9.2–11.2 with no overlap",
+    "searchcard11.2–13.2",
+    "answer text uses all five digits once and equals50"
+  ],
+  "continuousViewing": false,
+  "audioListening": false
+}

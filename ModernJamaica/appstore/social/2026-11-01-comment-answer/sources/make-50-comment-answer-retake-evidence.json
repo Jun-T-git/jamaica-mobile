@@ -1,0 +1,59 @@
+{
+  "target": 50,
+  "numbers": [
+    4,
+    2,
+    6,
+    4,
+    3
+  ],
+  "sourceSize": [
+    1206,
+    2622
+  ],
+  "capture": "Native UI in isolated Jamaica Ad Capture simulator; ordinary random practice medium puzzle; no game code or puzzle-state changes",
+  "review": "2026-11-01 JST: normalized recording actual frames show all five leaves; 6+4=10 is the only native merge in the export. No correct50 root, complete formula, success popup, or next puzzle in reviewed interval. Visual review based on recorded frames rather than CUA snapshot.",
+  "noCorrectAnswerObserved": true,
+  "reviewedNoAnswerUntil": 23.4,
+  "previewTrees": [
+    4,
+    2,
+    [
+      "+",
+      6,
+      4
+    ],
+    3
+  ],
+  "operation": {
+    "tree": [
+      "+",
+      6,
+      4
+    ],
+    "result": 10,
+    "sourceResultTime": 19.7
+  },
+  "commentStillTime": 23.366666666666664,
+  "fixedCommentText": "（6＋4）×（4＋3−2）＝50\n\n他の解き方を見つけた方はコメントで教えてください！\n",
+  "fixedCommentValidation": {
+    "arithmetic": "(6+4)*(4+3-2)=10*5=50",
+    "originalNumbers": [
+      4,
+      2,
+      6,
+      4,
+      3
+    ],
+    "usedNumbers": [
+      6,
+      4,
+      4,
+      3,
+      2
+    ],
+    "usesAllFiveExactlyOnce": true,
+    "nativeFirstMergeConsistent": true,
+    "manuallyFormattedAfterRender": true
+  }
+}
