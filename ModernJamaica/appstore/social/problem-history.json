@@ -238,6 +238,10 @@
       ],
       "state": "observed",
       "sources": [
+        "2026-11-01-comment-answer-v2/batch-plan.json",
+        "2026-11-01-comment-answer-v2/problems/make-50-c3891ed0-comment-answer.json",
+        "2026-11-01-comment-answer-v2/sources/make-50-wrong-result-evidence.json",
+        "2026-11-01-comment-answer/batch-plan.json",
         "2026-11-01-comment-answer/problems/make-50-c3891ed0-comment-answer.json",
         "2026-11-01-comment-answer/sources/make-50-comment-answer-retake-evidence.json"
       ]

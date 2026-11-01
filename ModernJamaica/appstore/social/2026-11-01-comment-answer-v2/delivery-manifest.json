@@ -1,0 +1,31 @@
+[
+  {
+    "file": "exports/make-50-c3891ed0/comment-answer/make-50-c3891ed0-comment-answer.mp4",
+    "target": 50,
+    "numbers": [
+      4,
+      2,
+      6,
+      4,
+      3
+    ],
+    "variant": "comment-answer",
+    "commentResult": "wrong",
+    "wrongValue": 54,
+    "seconds": 17.3,
+    "sha256": "ce337519cd77d8a2957e9540bbf1e52a660cf5fb6c64ec3ddeeeb9eb96f359f8",
+    "resolution": [
+      1080,
+      1920
+    ],
+    "fps": 30,
+    "decode": "passed",
+    "independentVisualReview": "passed:36samples,all cut boundaries",
+    "nativePlayback": "Root verified QuickTime start, intermediate playback and natural completion at17.3s; not continuous subjective viewing",
+    "audioListening": "Not performed; loudness measured -16.99LUFS / -1.29dBTP, no digital clipping; true peak0.21dB above -1.5dBTP guideline",
+    "fixedComment": "exports/make-50-c3891ed0/comment-answer/fixed-comment.txt",
+    "fixedCommentSha256": "5368e9160bb01bac0f97f38a19bbe8167cd96f2efe1ce165423ad8ce5ced650a",
+    "published": false,
+    "postCommentStatus": "draft-only"
+  }
+]

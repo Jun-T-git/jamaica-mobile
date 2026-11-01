@@ -1,0 +1,16 @@
+{
+  "reviewer": "week-visual-qa",
+  "finalSha256": "ce337519cd77d8a2957e9540bbf1e52a660cf5fb6c64ec3ddeeeb9eb96f359f8",
+  "result": "passed",
+  "method": "519frames full decode,36 samples at360px and all cut boundaries",
+  "checked": [
+    "all original5digits and4operations",
+    "native wrong54 vs target50 and native error banner",
+    "whole tree and operators retained",
+    "comment prompt13.3-15.3 does not overlap tree",
+    "no correct answer or hint/answer UI leakage",
+    "fixed comment uses all5digits once and equals50"
+  ],
+  "continuousViewing": false,
+  "audioListening": false
+}

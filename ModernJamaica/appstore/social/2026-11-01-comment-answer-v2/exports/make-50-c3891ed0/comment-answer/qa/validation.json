@@ -1,0 +1,36 @@
+{
+  "decode": "passed",
+  "resolution": [
+    1080,
+    1920
+  ],
+  "duration": 17.3,
+  "fps": 30.0,
+  "frames": 519,
+  "sourceSha256": "e701c402503474f06a9a1dac969e11dfbfe246798a192fe978e91483763337fb",
+  "sha256": "ce337519cd77d8a2957e9540bbf1e52a660cf5fb6c64ec3ddeeeb9eb96f359f8",
+  "integratedLUFS": -16.99,
+  "truePeakDBTP": -1.29,
+  "appFrameUncropped": false,
+  "nativeStatsOmitted": true,
+  "nativeTargetRetained": true,
+  "customPlaybackTarget": false,
+  "variant": "comment-answer",
+  "endCardStart": 15.3,
+  "endCardOpaque": true,
+  "presentation": {},
+  "cropping": true,
+  "developerBannerPixelFractionMax": 0,
+  "visualReview": {
+    "sourceFrames": "passed: original50 and4,2,6,4,3, all4 operations, wrong54 and native error banner reviewed from CFR frames. No hints or answer opened.",
+    "finalExtractedFrames": "passed: all13 gameplay cuts first/last plus prompt first/last and CTA checked in boundaries.jpg; native target/error row, whole54 tree/all5 leaves/operators retained, prompt non-overlap",
+    "independentReview": "passed by week_visual_qa: SHA match,519frames full decode,36 samples;4 operations,54/error banner,all5 leaves,comment non-overlap and no hint/answer/solution/success leakage;fixed comment/title verified",
+    "fullPlayback": "not performed by editing or independent QA agent",
+    "audioListening": "Not performed; loudness measured -16.99LUFS / -1.29dBTP, no digital clipping; true peak0.21dB above -1.5dBTP guideline",
+    "nativePlayback": "Root verified QuickTime start, intermediate playback and natural completion at17.3s; not continuous subjective viewing"
+  },
+  "published": false,
+  "commentResult": "wrong",
+  "nativeWrongValue": 54,
+  "fixedCommentSha256": "5368e9160bb01bac0f97f38a19bbe8167cd96f2efe1ce165423ad8ce5ced650a"
+}

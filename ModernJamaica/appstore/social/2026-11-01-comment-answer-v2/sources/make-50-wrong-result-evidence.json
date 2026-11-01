@@ -1,0 +1,113 @@
+{
+  "target": 50,
+  "numbers": [
+    4,
+    2,
+    6,
+    4,
+    3
+  ],
+  "sourceSize": [
+    1206,
+    2622
+  ],
+  "capture": "Native review screen for the same50 puzzle, ordinary UI operations; no game code or puzzle-state changes; no hint or answer opened",
+  "review": "2026-11-01 JST: CFR original target50, ordered five leaves, four operations and wrong54 with native error banner reviewed at full resolution. No correct50 root, formula, success popup or answer revealed.",
+  "commentResult": "wrong",
+  "wrongTree": [
+    "*",
+    [
+      "+",
+      6,
+      3
+    ],
+    [
+      "-",
+      [
+        "+",
+        4,
+        4
+      ],
+      2
+    ]
+  ],
+  "wrongSourceTime": 44.7,
+  "noCorrectAnswerObserved": true,
+  "reviewedNoAnswerUntil": 44.9,
+  "nativeViewport": {
+    "sourceCrops": [
+      [
+        0,
+        630,
+        1206,
+        155
+      ],
+      [
+        0,
+        800,
+        1206,
+        1260
+      ]
+    ],
+    "y": 430
+  },
+  "viewportReview": "Native target50 and error banner occupy y630..785. Continuous board y800..2060 includes every root/branch/leaf/operator and undo; hints/answer row starts y2100 and is excluded. Common scale860/1206; y430 puts leaves inside existing mint frame. Comment y575 ends before wrong root54 top.",
+  "operations": [
+    {
+      "tree": [
+        "+",
+        4,
+        4
+      ],
+      "result": 8,
+      "sourceResultTime": 11.5
+    },
+    {
+      "tree": [
+        "-",
+        8,
+        2
+      ],
+      "result": 6,
+      "sourceResultTime": 20.6
+    },
+    {
+      "tree": [
+        "+",
+        6,
+        3
+      ],
+      "result": 9,
+      "sourceResultTime": 33.3
+    },
+    {
+      "tree": [
+        "*",
+        9,
+        6
+      ],
+      "result": 54,
+      "sourceResultTime": 44.7
+    }
+  ],
+  "fixedCommentText": "（6＋4）×（4＋3−2）＝50\n\n他の解き方を見つけた方はコメントで教えてください！\n",
+  "fixedCommentValidation": {
+    "arithmetic": "(6+4)*(4+3-2)=10*5=50",
+    "originalNumbers": [
+      4,
+      2,
+      6,
+      4,
+      3
+    ],
+    "usedNumbers": [
+      6,
+      4,
+      4,
+      3,
+      2
+    ],
+    "usesAllFiveExactlyOnce": true,
+    "manuallyFormattedAfterRender": true
+  }
+}

@@ -72,17 +72,45 @@ def validate_problem(c):
         if any(b>reviewed for a,b in c['cuts']):raise ValueError('Comment-answer cut extends beyond reviewed answer-free footage')
         if type(still) not in (int,float) or not math.isfinite(still) or abs(still-(c['cuts'][-1][1]-1/30))>1e-6:raise ValueError('Comment hold must preserve the last gameplay frame')
         if not 0<=still<=reviewed:raise ValueError('Comment still outside reviewed footage')
-        forest=c.get('previewTrees',[])
-        if not isinstance(forest,list) or len(forest)<2:raise ValueError('Preview must remain unfinished')
-        leaves=[];merges=0
-        for tree in forest:
-            value,used=evaluate_tree(tree);leaves+=used;merges+=len(used)-1
-            if tree_depth(tree)>2:raise ValueError('Preview tree enters the comment caption area')
-            if isinstance(tree,list) and value==c['target']:raise ValueError('Preview cannot show a root matching the target')
-        if Counter(leaves)!=Counter(c['numbers']) or not 0<=merges<=2:raise ValueError('Preview must use the native digits and show at most two merges')
+        result=c.get('commentResult','preview')
+        if result not in ['preview','wrong']:raise ValueError('Unknown comment result')
+        viewport=c.get('nativeViewport')
+        if viewport:
+            if result!='wrong':raise ValueError('Custom native viewport is for reviewed wrong-result footage only')
+            crops=viewport.get('sourceCrops')
+            if not isinstance(crops,list) or len(crops)!=2:raise ValueError('Native viewport needs target row and continuous board crops')
+            for crop in crops:
+                if not isinstance(crop,list) or len(crop)!=4 or any(type(n) is not int for n in crop):raise ValueError('Native crop bounds must be integer coordinates')
+                x,y,w,h=crop
+                if x!=0 or w!=1206 or not 0<=y<2622 or not 0<h<=2622-y:raise ValueError('Native crop outside reviewed1206x2622 capture')
+            if crops[0][1]+crops[0][3]>crops[1][1] or sum(x[3] for x in crops)>2120:raise ValueError('Native crops overlap or exceed output viewport')
+            placement_y=viewport.get('y',350)
+            if type(placement_y) is not int or not 350<=placement_y<=500 or placement_y+round(sum(x[3] for x in crops)*860/1206)>1680:raise ValueError('Native viewport placement exceeds the safe gameplay area')
+            if c.get('fullFrameCuts'):raise ValueError('Do not mix a custom native viewport with legacy full-frame cuts')
+        if result=='wrong':
+            wrong,used=evaluate_tree(c['wrongTree'])
+            if wrong==c['target'] or Counter(used)!=Counter(c['numbers']):raise ValueError('Comment wrong result must consume all five numbers and miss the target')
+            at=c.get('wrongSourceTime')
+            if type(at) not in (int,float) or not math.isfinite(at) or at>still or not any(a<=at<b for a,b in c['cuts']):raise ValueError('Comment wrong result must be shown before the final held frame')
+            full=c.get('fullFrameCuts',[])
+            depth=tree_depth(c['wrongTree'])
+            if not viewport and depth>=3 and any(i not in full for i,(a,b) in enumerate(c['cuts']) if b>at):raise ValueError('Deep wrong tree needs a complete native viewport from the wrong result through the final cut')
+            caption_y=c.get('commentCaptionY',575)
+            if type(caption_y) not in (int,float) or not math.isfinite(caption_y) or not (430 if viewport else 560)<=caption_y<=1720:raise ValueError('Invalid comment prompt position')
+            if not viewport and depth>=4 and caption_y<1710:raise ValueError('Four-level wrong tree requires the prompt below its complete viewport')
+        else:
+            forest=c.get('previewTrees',[])
+            if not isinstance(forest,list) or len(forest)<2:raise ValueError('Preview must remain unfinished')
+            leaves=[];merges=0
+            for tree in forest:
+                value,used=evaluate_tree(tree);leaves+=used;merges+=len(used)-1
+                if tree_depth(tree)>2:raise ValueError('Preview tree enters the comment caption area')
+                if isinstance(tree,list) and value==c['target']:raise ValueError('Preview cannot show a root matching the target')
+            if Counter(leaves)!=Counter(c['numbers']) or not 0<=merges<=2:raise ValueError('Preview must use the native digits and show at most two merges')
+            if c.get('fullFrameCuts') or 'commentCaptionY' in c:raise ValueError('Unfinished preview keeps its original viewport and prompt')
         if c.get('cleanCompletedTime') is not None:raise ValueError('Comment-answer cannot use a completed frame')
         if any(e['file']=='success.mp3' for e in c['effects']):raise ValueError('Comment-answer cannot use success audio')
-        if any(c.get(k) for k in ['timerCuts','timeoutCuts','resultCuts','fullFrameCuts']):raise ValueError('Comment-answer keeps the reviewed standard viewport')
+        if any(c.get(k) for k in ['timerCuts','timeoutCuts','resultCuts']):raise ValueError('Comment-answer does not use timeout or result-screen viewports')
         if presentation.get('resultCaption') or 'ctaStillTime' in presentation:raise ValueError('Comment-answer uses its dedicated prompt and unfinished still')
     caption=presentation.get('resultCaption')
     if caption:
@@ -107,7 +135,11 @@ def load_problem(path):
     evidence=json.loads(c['evidencePath'].read_text())
     if evidence['target']!=c['target'] or evidence['numbers']!=c['numbers']:raise ValueError('Native captured puzzle and caption config differ')
     if c['variant']=='comment-answer':
-        if evidence.get('noCorrectAnswerObserved') is not True or evidence.get('reviewedNoAnswerUntil',-1)<c['reviewedNoAnswerUntil'] or evidence.get('previewTrees')!=c['previewTrees']:raise ValueError('Comment-answer review evidence does not match the unfinished footage')
+        if evidence.get('noCorrectAnswerObserved') is not True or evidence.get('reviewedNoAnswerUntil',-1)<c['reviewedNoAnswerUntil']:raise ValueError('Comment-answer needs matching answer-free review evidence')
+        if c.get('commentResult','preview')=='wrong':
+            if evidence.get('commentResult')!='wrong' or evidence.get('wrongTree')!=c['wrongTree'] or evidence.get('wrongSourceTime')!=c['wrongSourceTime']:raise ValueError('Comment-answer wrong-result evidence does not match the footage')
+            if c.get('nativeViewport') and evidence.get('nativeViewport')!=c['nativeViewport']:raise ValueError('Native crop review evidence differs from config')
+        elif evidence.get('previewTrees')!=c['previewTrees']:raise ValueError('Comment-answer review evidence does not match the unfinished footage')
     if evidence['sourceSize']!=[1206,2622]:raise ValueError('Review viewport for a different recording size')
     if hashlib.sha256(c['recordingPath'].read_bytes()).hexdigest()!=c['sourceSha256']:raise ValueError('Recording hash does not match reviewed footage')
     import imageio_ffmpeg

@@ -97,4 +97,55 @@ class CommentAnswerValidation(unittest.TestCase):
         self.assertIn('他の解き方を見つけた方はコメントで教えてください！',text)
 
 
+class CommentWrongResultValidation(unittest.TestCase):
+    def wrong_config(self):
+        c=CommentAnswerValidation().config()
+        c.update(commentResult='wrong',wrongTree=['+',['*',3,3],['-',['*',2,6],2]],wrongSourceTime=27,fullFrameCuts=[2])
+        c.pop('previewTrees')
+        return c
+
+    def test_complete_wrong_result_uses_all_five_digits(self):
+        validate_problem(self.wrong_config())
+
+    def test_target_matching_or_missing_leaf_result_rejected(self):
+        for wrong in [self.wrong_config()['answerTree'],['+',['*',3,3],2]]:
+            c=self.wrong_config();c['wrongTree']=wrong
+            with self.assertRaises(ValueError):validate_problem(c)
+
+    def test_wrong_result_must_be_in_exported_interval_before_prompt(self):
+        for at in [18,29,float('nan')]:
+            c=self.wrong_config();c['wrongSourceTime']=at
+            with self.assertRaises(ValueError):validate_problem(c)
+
+    def test_deep_wrong_tree_cannot_be_clipped_by_standard_crop(self):
+        c=self.wrong_config();c['fullFrameCuts']=[]
+        with self.assertRaisesRegex(ValueError,'complete native viewport'):validate_problem(c)
+
+    def test_four_level_result_needs_prompt_below_tree_and_controls(self):
+        c=self.wrong_config();c['wrongTree']=['+',['+',['+',['+',3,2],3],2],6]
+        with self.assertRaisesRegex(ValueError,'Four-level'):validate_problem(c)
+        c['commentCaptionY']=1710
+        validate_problem(c)
+
+    def test_unknown_comment_result_rejected(self):
+        c=self.wrong_config();c['commentResult']='success'
+        with self.assertRaisesRegex(ValueError,'Unknown comment result'):validate_problem(c)
+
+    def test_review_screen_native_target_and_board_crops_validate(self):
+        c=self.wrong_config();c['fullFrameCuts']=[]
+        c['nativeViewport']={'sourceCrops':[[0,630,1206,155],[0,800,1206,1260]],'y':430}
+        c['commentCaptionY']=575
+        validate_problem(c)
+
+    def test_review_crop_cannot_overlap_or_leave_source_or_safe_output(self):
+        invalid=[{'sourceCrops':[[0,630,1206,200],[0,800,1206,1260]],'y':430},
+                 {'sourceCrops':[[0,630,1206,155],[0,800,1206,2000]],'y':430},
+                 {'sourceCrops':[[0,630,1206,155],[0,800,1206,1260]],'y':700},
+                 {'sourceCrops':[[0,630,1206,155],[0,800,1206,1260]],'y':430}]
+        for index,viewport in enumerate(invalid):
+            c=self.wrong_config();c['nativeViewport']=viewport
+            if index<3:c['fullFrameCuts']=[]
+            with self.assertRaises(ValueError):validate_problem(c)
+
+
 if __name__=='__main__':unittest.main()

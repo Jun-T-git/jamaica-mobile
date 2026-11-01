@@ -1,0 +1,169 @@
+{
+  "id": "make-50-c3891ed0",
+  "episode": "comment-answer-50-wrong-result-2026-11-01",
+  "variant": "comment-answer",
+  "commentResult": "wrong",
+  "numbers": [
+    4,
+    2,
+    6,
+    4,
+    3
+  ],
+  "target": 50,
+  "answerTree": [
+    "*",
+    [
+      "+",
+      6,
+      4
+    ],
+    [
+      "-",
+      [
+        "+",
+        4,
+        3
+      ],
+      2
+    ]
+  ],
+  "wrongTree": [
+    "*",
+    [
+      "+",
+      6,
+      3
+    ],
+    [
+      "-",
+      [
+        "+",
+        4,
+        4
+      ],
+      2
+    ]
+  ],
+  "wrongSourceTime": 44.7,
+  "recording": "../sources/make-50-wrong-result.mov",
+  "evidence": "../sources/make-50-wrong-result-evidence.json",
+  "sourceSha256": "e701c402503474f06a9a1dac969e11dfbfe246798a192fe978e91483763337fb",
+  "normalizedCache": "../build/make-50-c3891ed0-cfr.mp4",
+  "normalizedSha256": "60eaaa92dc5187ca27a4759c8fbf114638eb8c30adefa34b2e15ba17aad7ea29",
+  "unsolvedWindow": [
+    1,
+    5.9
+  ],
+  "questionStillTime": 2,
+  "cleanCompletedTime": null,
+  "cuts": [
+    [
+      1,
+      3
+    ],
+    [
+      6,
+      6.5
+    ],
+    [
+      6.6,
+      7.4
+    ],
+    [
+      11.2,
+      12.5
+    ],
+    [
+      15.1,
+      15.6
+    ],
+    [
+      16.3,
+      17.1
+    ],
+    [
+      20.4,
+      21.7
+    ],
+    [
+      27.1,
+      27.6
+    ],
+    [
+      28,
+      28.8
+    ],
+    [
+      33.1,
+      34.4
+    ],
+    [
+      37.1,
+      37.6
+    ],
+    [
+      38,
+      38.8
+    ],
+    [
+      44.6,
+      44.9
+    ]
+  ],
+  "operatorFreezes": [
+    {
+      "cut": 12,
+      "sourceTime": 44.8,
+      "seconds": 1.9,
+      "purpose": "Hold actual native wrong54 and error banner"
+    }
+  ],
+  "effects": [
+    {
+      "file": "connect.mp3",
+      "source": 11.5,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 20.6,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 33.3,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 44.7,
+      "gain": 0.4
+    }
+  ],
+  "completedHold": 0,
+  "endCardDuration": 2,
+  "commentHoldDuration": 2,
+  "commentStillTime": 44.86666666666667,
+  "commentCaptionY": 575,
+  "noCorrectAnswerObserved": true,
+  "reviewedNoAnswerUntil": 44.9,
+  "nativeViewport": {
+    "sourceCrops": [
+      [
+        0,
+        630,
+        1206,
+        155
+      ],
+      [
+        0,
+        800,
+        1206,
+        1260
+      ]
+    ],
+    "y": 430
+  },
+  "revisionOf": "2026-11-01-comment-answer"
+}

@@ -14,6 +14,7 @@ PARSER.add_argument('--output',required=True,type=Path)
 ARGS=PARSER.parse_args();CONFIG=load_problem(ARGS.problem)
 FAIL=CONFIG['variant']=='fail'
 COMMENT=CONFIG['variant']=='comment-answer'
+COMMENT_WRONG=COMMENT and CONFIG.get('commentResult')=='wrong'
 MODERN=CONFIG.get('presentation',{}).get('version')==2
 PRESENTATION=CONFIG.get('presentation',{})
 INTRO=PRESENTATION.get('introDuration',2)
@@ -88,8 +89,17 @@ layout['difficulty']={'level':LEVEL,'bands':STAR_BANDS,'label':[675+(210-small.w
 
 # Remove only a blank horizontal strip above the tree; retain native target and
 # the entire tree-to-controls region at a common scale with no internal edits.
+GAME_Y=350
 GAME_CROP='split=2[goal][board];[goal]crop=1206:280:0:420[top];[board]crop=1206:1550:0:1000[bottom];[top][bottom]vstack=inputs=2,scale=860:1304:flags=lanczos,setsar=1'
 layout['gameViewport']={'sourceCrops':[[0,420,1206,280],[0,1000,1206,1550]],'omittedBlankStrip':[0,700,1206,300],'placement':[110,350,860,1304],'nativeTargetRetained':True,'treeAndControlsContinuous':True}
+if COMMENT_WRONG and CONFIG.get('nativeViewport'):
+    goal,board=CONFIG['nativeViewport']['sourceCrops']
+    GAME_Y=CONFIG['nativeViewport'].get('y',350)
+    gx,gy,gw,gh=goal;bx,by,bw,bh=board
+    native_height=round((gh+bh)*860/1206)
+    GAME_CROP=f'split=2[goal][board];[goal]crop={gw}:{gh}:{gx}:{gy}[top];[board]crop={bw}:{bh}:{bx}:{by}[bottom];[top][bottom]vstack=inputs=2,scale=860:{native_height}:flags=lanczos,setsar=1'
+    layout['gameViewport']={'sourceCrops':[goal,board],'placement':[110,GAME_Y,860,native_height],'nativeTargetRetained':True,'treeAndControlsContinuous':True,'reviewScreen':True,'sameCropThroughoutGameplayAndPrompt':True}
+
 
 for kind in ['hook','plain','complete','hold','cta']+(['comment'] if COMMENT else [])+(['timeout'] if FAIL else []):
     im=header.copy()
@@ -114,7 +124,7 @@ for kind in ['hook','plain','complete','hold','cta']+(['comment'] if COMMENT els
         layout['puzzleRule']={'text':f'5つの数を使って{TARGET}を作れ','runs':parts}
         layout['numberFrame']={'bounds':[130,1070,950,1248],'displayStart':0,'displayEnd':2}
     elif kind=='comment':
-        label(im,'答えは固定コメントへ',665,54,MINT)
+        label(im,'答えは固定コメントへ',CONFIG.get('commentCaptionY',575) if COMMENT_WRONG else 665,48 if COMMENT_WRONG else 54,MINT)
         layout['commentPrompt']={'bounds':layout['答えは固定コメントへ'],'displayStart':PLAY-COMMENT_HOLD,'displayEnd':PLAY,'sameLastUnfinishedFrame':True}
     elif kind=='plain':
         pass
@@ -156,8 +166,8 @@ for i,(a,b) in enumerate(CUTS):
     clip=BUILD/f'cut-{i}.mp4';clips.append(clip)
     pad_seconds=(HOLD if i==len(CUTS)-1 else 0)+freeze+.1
     crop=GAME_CROP
-    game_x,game_y=110,350
-    if FAIL and i in CONFIG.get('fullFrameCuts',[]):
+    game_x,game_y=110,GAME_Y
+    if (FAIL or COMMENT_WRONG) and i in CONFIG.get('fullFrameCuts',[]):
         crop='crop=1206:2130:0:420,scale=760:1342:flags=lanczos,setsar=1';game_x=160
     if FAIL and i in CONFIG.get('resultCuts',[]):crop='crop=1206:2130:0:180,scale=860:1518:flags=lanczos,setsar=1'
     if FAIL and i in CONFIG.get('timeoutCuts',[]):kind='timeout'
@@ -166,7 +176,7 @@ for i,(a,b) in enumerate(CUTS):
     graph=f'[0:v]'+('split=2[mainin][timerin];[mainin]' if timer else '')+f'fps=30,setpts=PTS-STARTPTS,trim=duration={b-a},{crop},{timing}tpad=stop_mode=clone:stop_duration={pad_seconds}[game];[1:v][game]overlay={game_x}:{game_y}:shortest=1[base];[base][2:v]overlay=0:0'+('[timerbase];'+timer_filter if timer else ',format=yuv420p[v]')
     run(['-loglevel','warning','-ss',a,'-i',SRC,'-loop',1,'-framerate',FPS,'-i',BUILD/'canvas.png','-loop',1,'-framerate',FPS,'-i',BUILD/(('timer-timeout.png' if kind=='timeout' else 'timer.png') if timer else f'{kind}.png'),
          '-filter_complex',graph,'-map','[v]','-frames:v',frames,'-r',FPS,'-fps_mode','cfr','-an','-c:v','libx264','-preset','fast','-crf',18,clip],f'cut-{i}.log')
-    timeline.append({'sourceStart':a,'sourceEnd':b,'outputStart':round(offset,3),'caption':kind,'speed':1,'operatorFreezeSource':FREEZES.get(i),'operatorFreezeSeconds':freeze,'viewportStyle':'result' if FAIL and i in CONFIG.get('resultCuts',[]) else 'full' if FAIL and i in CONFIG.get('fullFrameCuts',[]) else 'standard','nativeTimerShown':timer})
+    timeline.append({'sourceStart':a,'sourceEnd':b,'outputStart':round(offset,3),'caption':kind,'speed':1,'operatorFreezeSource':FREEZES.get(i),'operatorFreezeSeconds':freeze,'viewportStyle':'result' if FAIL and i in CONFIG.get('resultCuts',[]) else 'full' if (FAIL or COMMENT_WRONG) and i in CONFIG.get('fullFrameCuts',[]) else 'standard','nativeTimerShown':timer})
     offset+=b-a+freeze
     print(f'Full-screen cut {i+1} rendered',flush=True)
 
@@ -184,8 +194,12 @@ if MODERN:
     complete.paste(Image.open(BUILD/'closing-tree.png'),(110,800))
     layout['closingViewport']={'sourceTreeCrop':[0,1000,1206,tree_height],'treePlacement':[110,800,860,scaled_tree_height],'goalPlacement':[110,350,860,200],'controlsOmitted':True,'nativeTreeContinuous':True}
 else:
-    run(['-loglevel','error','-ss',closing_time,'-i',SRC,'-frames:v',1,'-vf',GAME_CROP,BUILD/'complete-game.png'])
-    complete.paste(Image.open(BUILD/'complete-game.png'),(110,350))
+    closing_crop=GAME_CROP;closing_x=110
+    if COMMENT_WRONG and len(CUTS)-1 in CONFIG.get('fullFrameCuts',[]):
+        closing_crop='crop=1206:2130:0:420,scale=760:1342:flags=lanczos,setsar=1';closing_x=160
+        layout['commentClosingViewport']={'sourceCrop':[0,420,1206,2130],'placement':[160,350,760,1342],'sameAsLastGameplayCut':True}
+    run(['-loglevel','error','-ss',closing_time,'-i',SRC,'-frames:v',1,'-vf',closing_crop,BUILD/'complete-game.png'])
+    complete.paste(Image.open(BUILD/'complete-game.png'),(closing_x,GAME_Y))
 complete.save(BUILD/'complete-app.png')
 for name,seconds in ([('hold',HOLD)] if HOLD else [])+([('comment',COMMENT_HOLD)] if COMMENT else [])+[('cta',END)]:
     clip=BUILD/f'{name}.mp4';clips.append(clip)
@@ -229,8 +243,8 @@ assert blue_banner_max<.02, 'Developer refresh banner detected'
 
 assert count==round(DURATION*FPS)
 audio=json.loads(re.findall(r'\{\s*"input_i".*?\}',(QA/'loudness.log').read_text(),re.S)[-1])
-(OUT/'timeline.json').write_text(json.dumps({'segments':timeline,'variant':CONFIG['variant'],'answerHold':HOLD,**({'commentHold':COMMENT_HOLD,'commentStart':PLAY-COMMENT_HOLD} if COMMENT else {}),'presentation':PRESENTATION,'ctaStart':PLAY,'duration':DURATION,'effects':events},ensure_ascii=False,indent=2)+'\n')
-(OUT/'layout.json').write_text(json.dumps({'appSourceBounds':[0,0,1206,2622],'fit':('Gameplay retains native target and continuous tree-controls; closing retains native goal and separate continuous tree crop without controls' if MODERN else 'Native target and continuous tree-controls region retained; only blank strip y700-1000 removed; no custom playback target'),'captionBounds':layout},ensure_ascii=False,indent=2)+'\n')
+(OUT/'timeline.json').write_text(json.dumps({'segments':timeline,'variant':CONFIG['variant'],'answerHold':HOLD,**({'commentHold':COMMENT_HOLD,'commentStart':PLAY-COMMENT_HOLD,'commentResult':CONFIG.get('commentResult','preview')} if COMMENT else {}),'presentation':PRESENTATION,'ctaStart':PLAY,'duration':DURATION,'effects':events},ensure_ascii=False,indent=2)+'\n')
+(OUT/'layout.json').write_text(json.dumps({'appSourceBounds':[0,0,1206,2622],'fit':('Reviewed native target row and continuous native tree/operator crops at a common scale' if COMMENT_WRONG and CONFIG.get('nativeViewport') else 'Gameplay retains native target and continuous tree-controls; closing retains native goal and separate continuous tree crop without controls' if MODERN else 'Native target and continuous tree-controls region retained; only blank strip y700-1000 removed; no custom playback target'),'captionBounds':layout},ensure_ascii=False,indent=2)+'\n')
 (QA/'validation.json').write_text(json.dumps({'decode':'passed','resolution':meta['size'],'duration':meta['duration'],'fps':meta['fps'],'frames':count,
     'sourceSha256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'sha256':hashlib.sha256(DEST.read_bytes()).hexdigest(),
     'integratedLUFS':float(audio['input_i']),'truePeakDBTP':float(audio['input_tp']),

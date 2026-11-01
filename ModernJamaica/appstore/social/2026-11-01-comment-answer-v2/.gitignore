@@ -1,0 +1,9 @@
+build/
+__pycache__/
+*.mov
+*.mp4
+*.jpg
+*.png
+*.wav
+*.log
+*.zip

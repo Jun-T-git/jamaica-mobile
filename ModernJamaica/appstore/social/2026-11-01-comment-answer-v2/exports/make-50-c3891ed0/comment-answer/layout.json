@@ -1,0 +1,214 @@
+{
+  "appSourceBounds": [
+    0,
+    0,
+    1206,
+    2622
+  ],
+  "fit": "Reviewed native target row and continuous native tree/operator crops at a common scale",
+  "captionBounds": {
+    "brandHeader": {
+      "icon": [
+        110,
+        258,
+        80,
+        80
+      ],
+      "title": [
+        210,
+        275,
+        333,
+        46
+      ]
+    },
+    "difficulty": {
+      "level": 3,
+      "bands": [
+        [
+          10,
+          19
+        ],
+        [
+          20,
+          39
+        ],
+        [
+          40,
+          59
+        ],
+        [
+          60,
+          79
+        ],
+        [
+          80,
+          99
+        ]
+      ],
+      "label": [
+        739,
+        258,
+        82,
+        28
+      ],
+      "stars": [
+        [
+          675,
+          298,
+          34,
+          34
+        ],
+        [
+          718,
+          298,
+          34,
+          34
+        ],
+        [
+          761,
+          298,
+          34,
+          34
+        ],
+        [
+          804,
+          298,
+          34,
+          34
+        ],
+        [
+          847,
+          298,
+          34,
+          34
+        ]
+      ],
+      "displayStart": 0,
+      "displayEnd": 15.3
+    },
+    "gameViewport": {
+      "sourceCrops": [
+        [
+          0,
+          630,
+          1206,
+          155
+        ],
+        [
+          0,
+          800,
+          1206,
+          1260
+        ]
+      ],
+      "placement": [
+        110,
+        430,
+        860,
+        1009
+      ],
+      "nativeTargetRetained": true,
+      "treeAndControlsContinuous": true,
+      "reviewScreen": true,
+      "sameCropThroughoutGameplayAndPrompt": true
+    },
+    "この5つの数字で": [
+      367,
+      585,
+      345,
+      44
+    ],
+    "50を作れる？": [
+      291,
+      665,
+      498,
+      77
+    ],
+    "puzzleRule": {
+      "text": "5つの数を使って50を作れ",
+      "runs": [
+        {
+          "text": "5つの数を使って",
+          "color": "#f7f8fc",
+          "bounds": [
+            190,
+            984,
+            403,
+            51
+          ]
+        },
+        {
+          "text": "50",
+          "color": "#fde047",
+          "bounds": [
+            608,
+            969,
+            112,
+            64
+          ]
+        },
+        {
+          "text": "を作れ",
+          "color": "#f7f8fc",
+          "bounds": [
+            734,
+            984,
+            156,
+            51
+          ]
+        }
+      ]
+    },
+    "numberFrame": {
+      "bounds": [
+        130,
+        1070,
+        950,
+        1248
+      ],
+      "displayStart": 0,
+      "displayEnd": 2
+    },
+    "みんなは解けた？": [
+      276,
+      350,
+      527,
+      66
+    ],
+    "ジャマイカの木": [
+      291,
+      835,
+      498,
+      68
+    ],
+    "あなたもアプリで挑戦": [
+      347,
+      965,
+      386,
+      37
+    ],
+    "App Storeで検索": [
+      337,
+      1125,
+      406,
+      53
+    ],
+    "答えは固定コメントへ": [
+      301,
+      575,
+      478,
+      48
+    ],
+    "commentPrompt": {
+      "bounds": [
+        301,
+        575,
+        478,
+        48
+      ],
+      "displayStart": 13.3,
+      "displayEnd": 15.3,
+      "sameLastUnfinishedFrame": true
+    }
+  }
+}
