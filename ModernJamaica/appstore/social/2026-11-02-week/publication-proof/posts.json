@@ -239,10 +239,10 @@
     "name": "ジャマイカ予約動画の公開後コメント固定",
     "status": "ACTIVE",
     "timezone": "Asia/Tokyo",
-    "schedule": "2026-11-02〜08 各19:15 JST",
-    "rrule": "FREQ=DAILY;BYHOUR=19;BYMINUTE=15;BYSECOND=0;UNTIL=20261108T101500Z",
-    "scope": "この記録の7本のみ。未公開は公開へ変更せず見送り、投稿・固定を確認して記録。重複コメントを作らない。",
-    "notification": "通常・未公開・変化なしは静かに記録。要対応の失敗と7本完了時だけ通知。",
-    "unverified": "設定作成・更新済み。初回予定起動と実投稿は未実行。端末/ログイン依存、独立した未実行検知は未接続。"
+    "schedule": "2026-11-02..08 12:01/12:15/19:01/19:15 JST; new5 at noon, original7 at19",
+    "rrule": "FREQ=DAILY;BYHOUR=12,19;BYMINUTE=1,15;BYSECOND=0;UNTIL=20261108T101500Z",
+    "scope": "Original7 in this file plus5 in2026-11-02-comment-week/publication-proof/posts.json only; skip private and completed; no duplicate comments",
+    "notification": "failed_runs_only",
+    "unverified": "Schedule updated; first scheduled execution and future pins unverified, requires local device/login, independent missed-run detection not connected"
   }
 }

@@ -1,0 +1,34 @@
+{
+  "decode": "passed",
+  "resolution": [
+    1080,
+    1920
+  ],
+  "duration": 17.2,
+  "fps": 30.0,
+  "frames": 516,
+  "sourceSha256": "2595f49309812f42be21752aeb7429df034aa37dde995c7bdc60aaeaea457d78",
+  "sha256": "3d7e92287960c4ea60d3f729111f7a390b6e0d6b3dd71c89893fb936302273b5",
+  "integratedLUFS": -17.01,
+  "truePeakDBTP": -1.77,
+  "appFrameUncropped": false,
+  "nativeStatsOmitted": true,
+  "nativeTargetRetained": true,
+  "customPlaybackTarget": false,
+  "variant": "comment-answer",
+  "endCardStart": 15.2,
+  "endCardOpaque": true,
+  "presentation": {},
+  "cropping": true,
+  "developerBannerPixelFractionMax": 0,
+  "visualReview": {
+    "sourceFrames": "passed: native target/ordered five digits, selected operators and all four resulting operations verified; full wrong root and error banner shown without solution or timeout",
+    "editorFinalExtractedFrames": "passed: initial/operation/result/comment/search contact sheet at360px; five leaves/root/branches retained and prompt non-overlap",
+    "independentReview": "passed by week_visual_qa: final SHA, full decode,24 samples per original final video including all boundary/selected/result/comment/CTA stages;17 revised freeze additionally rechecked at3 points; fixed-comment arithmetic and titles checked",
+    "fullPlayback": "not performed by editor or independent QA agent",
+    "audioListening": "not performed by editor or independent QA agent; loudness measured"
+  },
+  "published": false,
+  "fixedCommentSha256": "348ec54b43a62aaf71df55d7f1d0ef38d5043e0933b3b438ae3a5284d21822dd",
+  "commentResult": "wrong"
+}

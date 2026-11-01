@@ -1,0 +1,65 @@
+{
+  "reviewer": "week_visual_qa",
+  "date": "2026-11-01",
+  "scope": [
+    "final MP4 SHA equality",
+    "full video decode",
+    "24 extracted samples per video,17 one-frame revision additionally rechecked at3 points",
+    "native target/original five leaves/four operators/results/full wrong tree/error banner",
+    "readable comment prompt with no overlap and no answer leakage",
+    "fixed-comment equation and five digits each once",
+    "title 作れる？"
+  ],
+  "limits": [
+    "Full playback not performed",
+    "Subjective audio listening not performed",
+    "Upload/schedule/pin state belongs to publication-proof/posts.json"
+  ],
+  "items": [
+    {
+      "id": "make-17-b2187dbc",
+      "sha256": "47e208a2a1dd63776e6f9bbbf25e5ef1f80eb3749c72f73dd90848dbe8877b26",
+      "status": "passed",
+      "nativeTarget": 17,
+      "sourceRecordingSha256": "1208822267e5ba9bdd8566a0edc1e6961642a20ac39b928894c1d6ea6380aadc",
+      "fixedCommentSha256": "7e47d4b5499aacb27f66ab73d6a96883fbf420a3477c4c431fd5812d0bae4ee2",
+      "notes": "9.8333-second actual selected frame improves6×pill; one-frame refinement checked"
+    },
+    {
+      "id": "make-23-435688ae",
+      "sha256": "3d7e92287960c4ea60d3f729111f7a390b6e0d6b3dd71c89893fb936302273b5",
+      "status": "passed",
+      "nativeTarget": 23,
+      "sourceRecordingSha256": "2595f49309812f42be21752aeb7429df034aa37dde995c7bdc60aaeaea457d78",
+      "fixedCommentSha256": "348ec54b43a62aaf71df55d7f1d0ef38d5043e0933b3b438ae3a5284d21822dd",
+      "notes": "Whole native wrong tree,5leaves,error banner,prompt and search confirmed"
+    },
+    {
+      "id": "make-37-ba02597f",
+      "sha256": "7af919f676b6ce6431dfe02f31b3e1b9e7f61cc0b3f379815227103fee4bd644",
+      "status": "passed",
+      "nativeTarget": 37,
+      "sourceRecordingSha256": "48ed0ff73f08cd988ad11a053fedc6e883fbf703dca5a947c6dd7dd5caf82f97",
+      "fixedCommentSha256": "3f7b54895b232f18b8897e80dbce64e693a1b5a8c6652b2f95d26a90e3b340ef",
+      "notes": "Whole native wrong tree,5leaves,error banner,prompt and search confirmed"
+    },
+    {
+      "id": "make-44-00fc72e0",
+      "sha256": "13e6d3cd897264695ada90f3d55802f2d96b392c396093f8c15588350b99f0ff",
+      "status": "passed",
+      "nativeTarget": 44,
+      "sourceRecordingSha256": "aac9158748f5679192a4537b300a7587e262fce16bb049c97b139006ed9961ab",
+      "fixedCommentSha256": "b2833585a0f7e6fe9f8c7a5f80048a601b257bfc7477f0f4f36dffdb9934a73a",
+      "notes": "Whole native wrong tree,5leaves,error banner,prompt and search confirmed"
+    },
+    {
+      "id": "make-48-8dba5bcc",
+      "sha256": "1724f710361ef4c63ad84481a108bf1bb8898c3290c972b31bf56c91f4e4cc0a",
+      "status": "passed",
+      "nativeTarget": 48,
+      "sourceRecordingSha256": "fd0161804eaf0673060719d3c87e134d7fc21129a20dac852c5fd679463644eb",
+      "fixedCommentSha256": "63cdc2899c9baecbc6de3fb322b6640adbc370829101dbce0944be5f3dddc800",
+      "notes": "Native56 branch passes behind7; selected8/dotted7/8×pill/operator establish connection"
+    }
+  ]
+}

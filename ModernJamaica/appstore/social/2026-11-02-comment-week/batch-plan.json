@@ -1,0 +1,108 @@
+{
+  "format": "comment-answer-wrong-result",
+  "timezone": "Asia/Tokyo",
+  "items": [
+    {
+      "id": "make-44-00fc72e0",
+      "episode": "comment-44-2026-11-02",
+      "target": 44,
+      "numbers": [
+        4,
+        6,
+        3,
+        1,
+        1
+      ],
+      "variant": "comment-answer",
+      "commentResult": "wrong",
+      "status": "ready",
+      "config": "problems/make-44-00fc72e0-comment-answer.json",
+      "video": "exports/make-44-00fc72e0/comment-answer/make-44-00fc72e0-comment-answer.mp4",
+      "fixedComment": "exports/make-44-00fc72e0/comment-answer/fixed-comment.txt",
+      "plannedPublishAt": "2026-11-02T12:00:00+09:00",
+      "publicationRecord": "publication-proof/posts.json"
+    },
+    {
+      "id": "make-17-b2187dbc",
+      "episode": "comment-17-2026-11-03",
+      "target": 17,
+      "numbers": [
+        1,
+        1,
+        6,
+        5,
+        1
+      ],
+      "variant": "comment-answer",
+      "commentResult": "wrong",
+      "status": "ready",
+      "config": "problems/make-17-b2187dbc-comment-answer.json",
+      "video": "exports/make-17-b2187dbc/comment-answer/make-17-b2187dbc-comment-answer.mp4",
+      "fixedComment": "exports/make-17-b2187dbc/comment-answer/fixed-comment.txt",
+      "plannedPublishAt": "2026-11-03T12:00:00+09:00",
+      "publicationRecord": "publication-proof/posts.json"
+    },
+    {
+      "id": "make-23-435688ae",
+      "episode": "comment-23-2026-11-04",
+      "target": 23,
+      "numbers": [
+        5,
+        6,
+        2,
+        6,
+        2
+      ],
+      "variant": "comment-answer",
+      "commentResult": "wrong",
+      "status": "ready",
+      "config": "problems/make-23-435688ae-comment-answer.json",
+      "video": "exports/make-23-435688ae/comment-answer/make-23-435688ae-comment-answer.mp4",
+      "fixedComment": "exports/make-23-435688ae/comment-answer/fixed-comment.txt",
+      "plannedPublishAt": "2026-11-04T12:00:00+09:00",
+      "publicationRecord": "publication-proof/posts.json"
+    },
+    {
+      "id": "make-48-8dba5bcc",
+      "episode": "comment-48-2026-11-05",
+      "target": 48,
+      "numbers": [
+        2,
+        3,
+        5,
+        1,
+        4
+      ],
+      "variant": "comment-answer",
+      "commentResult": "wrong",
+      "status": "ready",
+      "config": "problems/make-48-8dba5bcc-comment-answer.json",
+      "video": "exports/make-48-8dba5bcc/comment-answer/make-48-8dba5bcc-comment-answer.mp4",
+      "fixedComment": "exports/make-48-8dba5bcc/comment-answer/fixed-comment.txt",
+      "plannedPublishAt": "2026-11-05T12:00:00+09:00",
+      "publicationRecord": "publication-proof/posts.json"
+    },
+    {
+      "id": "make-37-ba02597f",
+      "episode": "comment-37-2026-11-06",
+      "target": 37,
+      "numbers": [
+        1,
+        2,
+        6,
+        5,
+        1
+      ],
+      "variant": "comment-answer",
+      "commentResult": "wrong",
+      "status": "ready",
+      "config": "problems/make-37-ba02597f-comment-answer.json",
+      "video": "exports/make-37-ba02597f/comment-answer/make-37-ba02597f-comment-answer.mp4",
+      "fixedComment": "exports/make-37-ba02597f/comment-answer/fixed-comment.txt",
+      "plannedPublishAt": "2026-11-06T12:00:00+09:00",
+      "publicationRecord": "publication-proof/posts.json"
+    }
+  ],
+  "publicationStateSource": "publication-proof/posts.json",
+  "note": "plannedPublishAt is the requested schedule only; actual saved/public/pinned status belongs to publication-proof/posts.json"
+}

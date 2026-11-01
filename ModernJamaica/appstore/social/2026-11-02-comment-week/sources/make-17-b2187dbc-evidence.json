@@ -1,0 +1,72 @@
+{
+  "target": 17,
+  "numbers": [
+    1,
+    1,
+    6,
+    5,
+    1
+  ],
+  "sourceSize": [
+    1206,
+    2622
+  ],
+  "capture": "Ordinary native practice medium game; no code or puzzle-state changes; no hint or answer opened",
+  "review": "2026-11-01 JST native original digits, selected operator frames, all four operations, complete wrong root and error banner checked; independent native timing check by week_visual_qa; independent QA chose9.8333 for clearer6×pill before root2 begins fading",
+  "commentResult": "wrong",
+  "wrongTree": [
+    "+",
+    [
+      "*",
+      6,
+      [
+        "+",
+        1,
+        1
+      ]
+    ],
+    [
+      "+",
+      5,
+      1
+    ]
+  ],
+  "wrongSourceTime": 19.8,
+  "noCorrectAnswerObserved": true,
+  "reviewedNoAnswerUntil": 22,
+  "operations": [
+    {
+      "sourceSelected": 4.466666666666667,
+      "sourceResult": 4.6
+    },
+    {
+      "sourceSelected": 9.833333333333334,
+      "sourceResult": 10
+    },
+    {
+      "sourceSelected": 15.833333333333334,
+      "sourceResult": 15.966666666666667
+    },
+    {
+      "sourceSelected": 19.666666666666668,
+      "sourceResult": 19.8
+    }
+  ],
+  "viewportReview": "Original standard target/tree/operator viewport until complete wrong-result cut; final wrong and comment hold use complete native full-frame crop. No timeout or next puzzle.",
+  "fixedCommentText": "6×（1＋1）＋5×1＝17\n\n他の解き方を見つけた方はコメントで教えてください！\n",
+  "fixedCommentValidation": {
+    "displayEquation": "6×（1＋1）＋5×1＝17",
+    "answerTreeValue": 17,
+    "usedNumbers": [
+      6,
+      1,
+      1,
+      5,
+      1
+    ],
+    "allFiveUsedExactlyOnce": true,
+    "displayEquationUsesSameFiveNumbers": true,
+    "formatting": "Japanese full-width plus/minus-parentheses with only grouping needed for order; manually verified equivalent to answerTree",
+    "videoWrongValue": 18
+  }
+}

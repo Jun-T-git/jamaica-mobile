@@ -25,7 +25,8 @@
     "audioListening": "Not performed; loudness measured -16.99LUFS / -1.29dBTP, no digital clipping; true peak0.21dB above -1.5dBTP guideline",
     "fixedComment": "exports/make-50-c3891ed0/comment-answer/fixed-comment.txt",
     "fixedCommentSha256": "5368e9160bb01bac0f97f38a19bbe8167cd96f2efe1ce165423ad8ce5ced650a",
-    "published": false,
-    "postCommentStatus": "draft-only"
+    "published": true,
+    "postCommentStatus": "posted-and-pinned",
+    "publicationRecord": "publication-proof/posts.json"
   }
 ]

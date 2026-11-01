@@ -1,0 +1,36 @@
+{
+  "channelId": "UCnKhAXBmPu-Vhu4YIx-vNGQ",
+  "timezone": "Asia/Tokyo",
+  "posts": [
+    {
+      "id": "make-50-c3891ed0",
+      "variant": "comment-answer",
+      "videoId": "b20eibdaemo",
+      "url": "https://youtube.com/shorts/b20eibdaemo",
+      "status": "published",
+      "publishedDate": "2026-11-01",
+      "confirmedAt": "2026-11-01T22:39:05.626916+09:00",
+      "title": "5つの数字で50を作れる？｜ジャマイカの木",
+      "sourceFile": "exports/make-50-c3891ed0/comment-answer/make-50-c3891ed0-comment-answer.mp4",
+      "sha256": "ce337519cd77d8a2957e9540bbf1e52a660cf5fb6c64ec3ddeeeb9eb96f359f8",
+      "checks": {
+        "copyright": "passed",
+        "communityGuidelines": "passed"
+      },
+      "audience": "not-made-for-kids",
+      "paidPromotion": false,
+      "alteredContentDisclosure": false,
+      "pinnedComment": {
+        "text": "（6＋4）×（4＋3−2）＝50\n\n他の解き方を見つけた方はコメントで教えてください！",
+        "posted": true,
+        "pinned": true,
+        "commentId": "UgzsjJEVJUVehAe-3X14AaABAg",
+        "url": "https://www.youtube.com/watch?v=b20eibdaemo&lc=UgzsjJEVJUVehAe-3X14AaABAg",
+        "confirmedAt": "2026-11-01T22:39:05.626916+09:00",
+        "proof": "pinned-comment.png"
+      },
+      "publicationProof": "published.png",
+      "description": "4・2・6・4・3を全部1回ずつ使って、50を作れる？\n使えるのは ＋ − × ÷。\n答えは固定コメントに載せています。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ"
+    }
+  ]
+}

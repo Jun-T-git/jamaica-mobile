@@ -1,0 +1,72 @@
+{
+  "target": 23,
+  "numbers": [
+    5,
+    6,
+    2,
+    6,
+    2
+  ],
+  "sourceSize": [
+    1206,
+    2622
+  ],
+  "capture": "Ordinary native practice medium game; no code or puzzle-state changes; no hint or answer opened",
+  "review": "2026-11-01 JST original target and five leaves, four selected operators, four native results and complete wrong/error banner reviewed from CFR real frames",
+  "commentResult": "wrong",
+  "wrongTree": [
+    "-",
+    [
+      "*",
+      6,
+      5
+    ],
+    [
+      "-",
+      [
+        "+",
+        6,
+        2
+      ],
+      2
+    ]
+  ],
+  "wrongSourceTime": 20.633333333333333,
+  "noCorrectAnswerObserved": true,
+  "reviewedNoAnswerUntil": 22.9,
+  "operations": [
+    {
+      "sourceSelected": 5.566666666666666,
+      "sourceResult": 5.7
+    },
+    {
+      "sourceSelected": 10.833333333333334,
+      "sourceResult": 10.933333333333334
+    },
+    {
+      "sourceSelected": 15.366666666666667,
+      "sourceResult": 15.433333333333334
+    },
+    {
+      "sourceSelected": 20.533333333333335,
+      "sourceResult": 20.633333333333333
+    }
+  ],
+  "viewportReview": "Original standard native target/tree/operator crop until final wrong-result cut. Complete native full-frame crop for final wrong tree and same held comment frame, without native timer or timeout.",
+  "fixedCommentText": "6×5−（6＋2÷2）＝23\n\n他の解き方を見つけた方はコメントで教えてください！\n",
+  "fixedCommentValidation": {
+    "displayEquation": "6×5−（6＋2÷2）＝23",
+    "answerTreeValue": 23,
+    "usedNumbers": [
+      6,
+      5,
+      6,
+      2,
+      2
+    ],
+    "allFiveUsedExactlyOnce": true,
+    "displayEquationUsesSameFiveNumbers": true,
+    "formatting": "Japanese full-width plus/minus-parentheses with only grouping needed for order; manually verified equivalent to answerTree",
+    "videoWrongValue": 24
+  }
+}

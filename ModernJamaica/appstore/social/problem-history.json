@@ -80,6 +80,22 @@
       ]
     },
     {
+      "target": 17,
+      "numbers": [
+        1,
+        1,
+        1,
+        5,
+        6
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-comment-week/batch-plan.json",
+        "2026-11-02-comment-week/problems/make-17-b2187dbc-comment-answer.json",
+        "2026-11-02-comment-week/sources/make-17-b2187dbc-evidence.json"
+      ]
+    },
+    {
       "target": 20,
       "numbers": [
         1,
@@ -148,6 +164,22 @@
       ]
     },
     {
+      "target": 23,
+      "numbers": [
+        2,
+        2,
+        5,
+        6,
+        6
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-comment-week/batch-plan.json",
+        "2026-11-02-comment-week/problems/make-23-435688ae-comment-answer.json",
+        "2026-11-02-comment-week/sources/make-23-435688ae-evidence.json"
+      ]
+    },
+    {
       "target": 24,
       "numbers": [
         1,
@@ -212,6 +244,22 @@
       ]
     },
     {
+      "target": 37,
+      "numbers": [
+        1,
+        1,
+        2,
+        5,
+        6
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-comment-week/batch-plan.json",
+        "2026-11-02-comment-week/problems/make-37-ba02597f-comment-answer.json",
+        "2026-11-02-comment-week/sources/make-37-ba02597f-evidence.json"
+      ]
+    },
+    {
       "target": 42,
       "numbers": [
         1,
@@ -225,6 +273,38 @@
         "2026-10-28-series/batch-plan.json",
         "2026-10-28-series/sources/make-42-fail-evidence.json",
         "production/problems/make-42-fail.json"
+      ]
+    },
+    {
+      "target": 44,
+      "numbers": [
+        1,
+        1,
+        3,
+        4,
+        6
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-comment-week/batch-plan.json",
+        "2026-11-02-comment-week/problems/make-44-00fc72e0-comment-answer.json",
+        "2026-11-02-comment-week/sources/make-44-00fc72e0-evidence.json"
+      ]
+    },
+    {
+      "target": 48,
+      "numbers": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-comment-week/batch-plan.json",
+        "2026-11-02-comment-week/problems/make-48-8dba5bcc-comment-answer.json",
+        "2026-11-02-comment-week/sources/make-48-8dba5bcc-evidence.json"
       ]
     },
     {

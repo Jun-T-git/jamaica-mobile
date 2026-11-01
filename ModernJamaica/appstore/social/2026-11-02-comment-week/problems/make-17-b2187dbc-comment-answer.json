@@ -1,0 +1,144 @@
+{
+  "id": "make-17-b2187dbc",
+  "episode": "comment-17-2026-11-03",
+  "variant": "comment-answer",
+  "commentResult": "wrong",
+  "numbers": [
+    1,
+    1,
+    6,
+    5,
+    1
+  ],
+  "target": 17,
+  "answerTree": [
+    "+",
+    [
+      "*",
+      6,
+      [
+        "+",
+        1,
+        1
+      ]
+    ],
+    [
+      "*",
+      5,
+      1
+    ]
+  ],
+  "wrongTree": [
+    "+",
+    [
+      "*",
+      6,
+      [
+        "+",
+        1,
+        1
+      ]
+    ],
+    [
+      "+",
+      5,
+      1
+    ]
+  ],
+  "wrongSourceTime": 19.8,
+  "recording": "../sources/make-17-b2187dbc.mov",
+  "evidence": "../sources/make-17-b2187dbc-evidence.json",
+  "sourceSha256": "1208822267e5ba9bdd8566a0edc1e6961642a20ac39b928894c1d6ea6380aadc",
+  "normalizedCache": "../build/make-17-b2187dbc-cfr.mp4",
+  "normalizedSha256": "7b3b1f3d1b515f6b258229b46cd115b89ef1f19ef63acf4d43cde11bb4a1c4f5",
+  "unsolvedWindow": [
+    1,
+    4
+  ],
+  "questionStillTime": 2,
+  "cleanCompletedTime": null,
+  "cuts": [
+    [
+      1,
+      3
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      4.2666666667,
+      5.8666666667
+    ],
+    [
+      9.6,
+      11.2
+    ],
+    [
+      15.6,
+      17.2
+    ],
+    [
+      19.4,
+      22
+    ]
+  ],
+  "operatorFreezes": [
+    {
+      "cut": 2,
+      "sourceTime": 4.466666666666667,
+      "seconds": 0.7,
+      "purpose": "Hold actual selected native operator before merge"
+    },
+    {
+      "cut": 3,
+      "sourceTime": 9.833333333333334,
+      "seconds": 0.7,
+      "purpose": "Hold actual selected native operator before merge"
+    },
+    {
+      "cut": 4,
+      "sourceTime": 15.833333333333334,
+      "seconds": 0.7,
+      "purpose": "Hold actual selected native operator before merge"
+    },
+    {
+      "cut": 5,
+      "sourceTime": 19.666666666666668,
+      "seconds": 0.7,
+      "purpose": "Hold actual selected native operator before merge"
+    }
+  ],
+  "effects": [
+    {
+      "file": "connect.mp3",
+      "source": 4.6,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 10,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 15.966666666666667,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 19.8,
+      "gain": 0.4
+    }
+  ],
+  "completedHold": 0,
+  "endCardDuration": 2,
+  "commentHoldDuration": 2,
+  "commentStillTime": 21.966666666666665,
+  "commentCaptionY": 575,
+  "noCorrectAnswerObserved": true,
+  "reviewedNoAnswerUntil": 22,
+  "fullFrameCuts": [
+    5
+  ]
+}

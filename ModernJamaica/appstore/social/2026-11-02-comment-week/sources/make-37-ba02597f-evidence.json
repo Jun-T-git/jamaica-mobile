@@ -1,0 +1,72 @@
+{
+  "target": 37,
+  "numbers": [
+    1,
+    2,
+    6,
+    5,
+    1
+  ],
+  "sourceSize": [
+    1206,
+    2622
+  ],
+  "capture": "Ordinary native practice medium game; no code or puzzle-state changes; no hint or answer opened",
+  "review": "2026-11-01 JST native original digits, selected operator frames, all four operations, complete wrong root and error banner checked; independent native timing check by week_visual_qa",
+  "commentResult": "wrong",
+  "wrongTree": [
+    "+",
+    [
+      "*",
+      6,
+      [
+        "+",
+        5,
+        1
+      ]
+    ],
+    [
+      "*",
+      2,
+      1
+    ]
+  ],
+  "wrongSourceTime": 23.2,
+  "noCorrectAnswerObserved": true,
+  "reviewedNoAnswerUntil": 25.5,
+  "operations": [
+    {
+      "sourceSelected": 5.266666666666667,
+      "sourceResult": 5.4
+    },
+    {
+      "sourceSelected": 10.033333333333333,
+      "sourceResult": 10.233333333333333
+    },
+    {
+      "sourceSelected": 16.166666666666668,
+      "sourceResult": 16.3
+    },
+    {
+      "sourceSelected": 23.1,
+      "sourceResult": 23.2
+    }
+  ],
+  "viewportReview": "Original standard target/tree/operator viewport until complete wrong-result cut; final wrong and comment hold use complete native full-frame crop. No timeout or next puzzle.",
+  "fixedCommentText": "6×（5＋1）＋2−1＝37\n\n他の解き方を見つけた方はコメントで教えてください！\n",
+  "fixedCommentValidation": {
+    "displayEquation": "6×（5＋1）＋2−1＝37",
+    "answerTreeValue": 37,
+    "usedNumbers": [
+      6,
+      5,
+      1,
+      2,
+      1
+    ],
+    "allFiveUsedExactlyOnce": true,
+    "displayEquationUsesSameFiveNumbers": true,
+    "formatting": "Japanese full-width plus/minus-parentheses with only grouping needed for order; manually verified equivalent to answerTree",
+    "videoWrongValue": 38
+  }
+}

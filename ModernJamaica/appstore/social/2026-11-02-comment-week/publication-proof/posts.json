@@ -1,0 +1,238 @@
+{
+  "channelId": "UCnKhAXBmPu-Vhu4YIx-vNGQ",
+  "timezone": "Asia/Tokyo",
+  "posts": [
+    {
+      "id": "make-44-00fc72e0",
+      "variant": "comment-answer",
+      "target": 44,
+      "numbers": [
+        4,
+        6,
+        3,
+        1,
+        1
+      ],
+      "videoId": "wPzWmWNu_BI",
+      "url": "https://youtube.com/shorts/wPzWmWNu_BI",
+      "scheduledAt": "2026-11-02T12:00:00+09:00",
+      "status": "scheduled",
+      "sha256": "13e6d3cd897264695ada90f3d55802f2d96b392c396093f8c15588350b99f0ff",
+      "sourceFile": "exports/make-44-00fc72e0/comment-answer/make-44-00fc72e0-comment-answer.mp4",
+      "fixedCommentFile": "exports/make-44-00fc72e0/comment-answer/fixed-comment.txt",
+      "pinnedComment": {
+        "text": "6×（4＋3）＋1＋1＝44\n\n他の解き方を見つけた方はコメントで教えてください！",
+        "posted": false,
+        "pinned": false,
+        "followupAutomationId": "automation",
+        "textSha256": "b2833585a0f7e6fe9f8c7a5f80048a601b257bfc7477f0f4f36dffdb9934a73a",
+        "arithmeticAndAllFiveVerified": true
+      },
+      "checks": {
+        "copyright": "passed",
+        "communityGuidelines": "notices-cleared-in-final-list; detailed checklist not reopened after scheduling"
+      },
+      "confirmedAt": "2026-11-01T22:48:00.339274+09:00",
+      "scheduleProof": "scheduled-11-02.png",
+      "audience": "not-made-for-kids",
+      "paidPromotion": false,
+      "alteredContentDisclosure": false,
+      "studioPreview": "started upload preview; not continuous subjective viewing or audio listening",
+      "title": "5つの数字で44を作れる？｜ジャマイカの木",
+      "description": "4・6・3・1・1を全部1回ずつ使って、44を作れる？\n使えるのは ＋ − × ÷。\n答えは固定コメントに載せています。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
+      "ageRestriction": false,
+      "finalListNotice": "none",
+      "finalListProcessingIndicator": "none",
+      "listProof": "scheduled-final-list.png",
+      "aiDisclosureRationale": "Native game footage, code-based editing and background accompaniment; official YouTube disclosure examples checked2026-11-01"
+    },
+    {
+      "id": "make-17-b2187dbc",
+      "variant": "comment-answer",
+      "target": 17,
+      "numbers": [
+        1,
+        1,
+        6,
+        5,
+        1
+      ],
+      "videoId": "FHU6Gz4MYy0",
+      "url": "https://youtube.com/shorts/FHU6Gz4MYy0",
+      "scheduledAt": "2026-11-03T12:00:00+09:00",
+      "status": "scheduled",
+      "sha256": "47e208a2a1dd63776e6f9bbbf25e5ef1f80eb3749c72f73dd90848dbe8877b26",
+      "sourceFile": "exports/make-17-b2187dbc/comment-answer/make-17-b2187dbc-comment-answer.mp4",
+      "fixedCommentFile": "exports/make-17-b2187dbc/comment-answer/fixed-comment.txt",
+      "pinnedComment": {
+        "text": "6×（1＋1）＋5×1＝17\n\n他の解き方を見つけた方はコメントで教えてください！",
+        "posted": false,
+        "pinned": false,
+        "followupAutomationId": "automation",
+        "textSha256": "7e47d4b5499aacb27f66ab73d6a96883fbf420a3477c4c431fd5812d0bae4ee2",
+        "arithmeticAndAllFiveVerified": true
+      },
+      "checks": {
+        "copyright": "passed",
+        "communityGuidelines": "notices-cleared-in-final-list; detailed checklist not reopened after scheduling"
+      },
+      "confirmedAt": "2026-11-01T22:53:36.546838+09:00",
+      "scheduleProof": "scheduled-11-03.png",
+      "audience": "not-made-for-kids",
+      "paidPromotion": false,
+      "alteredContentDisclosure": false,
+      "studioPreview": "started upload preview; not continuous subjective viewing or audio listening",
+      "title": "5つの数字で17を作れる？｜ジャマイカの木",
+      "description": "1・1・6・5・1を全部1回ずつ使って、17を作れる？\n使えるのは ＋ − × ÷。\n答えは固定コメントに載せています。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
+      "ageRestriction": false,
+      "finalListNotice": "none",
+      "finalListProcessingIndicator": "none",
+      "listProof": "scheduled-final-list.png",
+      "aiDisclosureRationale": "Native game footage, code-based editing and background accompaniment; official YouTube disclosure examples checked2026-11-01"
+    },
+    {
+      "id": "make-23-435688ae",
+      "variant": "comment-answer",
+      "target": 23,
+      "numbers": [
+        5,
+        6,
+        2,
+        6,
+        2
+      ],
+      "videoId": "94Jn4owuIL0",
+      "url": "https://youtube.com/shorts/94Jn4owuIL0",
+      "scheduledAt": "2026-11-04T12:00:00+09:00",
+      "status": "scheduled",
+      "sha256": "3d7e92287960c4ea60d3f729111f7a390b6e0d6b3dd71c89893fb936302273b5",
+      "sourceFile": "exports/make-23-435688ae/comment-answer/make-23-435688ae-comment-answer.mp4",
+      "fixedCommentFile": "exports/make-23-435688ae/comment-answer/fixed-comment.txt",
+      "pinnedComment": {
+        "text": "6×5−（6＋2÷2）＝23\n\n他の解き方を見つけた方はコメントで教えてください！",
+        "posted": false,
+        "pinned": false,
+        "followupAutomationId": "automation",
+        "textSha256": "348ec54b43a62aaf71df55d7f1d0ef38d5043e0933b3b438ae3a5284d21822dd",
+        "arithmeticAndAllFiveVerified": true
+      },
+      "checks": {
+        "copyright": "passed",
+        "communityGuidelines": "notices-cleared-in-final-list; detailed checklist not reopened after scheduling"
+      },
+      "confirmedAt": "2026-11-01T22:56:15.752099+09:00",
+      "scheduleProof": "scheduled-11-04.png",
+      "audience": "not-made-for-kids",
+      "paidPromotion": false,
+      "alteredContentDisclosure": false,
+      "studioPreview": "started upload preview; not continuous subjective viewing or audio listening",
+      "title": "5つの数字で23を作れる？｜ジャマイカの木",
+      "description": "5・6・2・6・2を全部1回ずつ使って、23を作れる？\n使えるのは ＋ − × ÷。\n答えは固定コメントに載せています。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
+      "ageRestriction": false,
+      "finalListNotice": "none",
+      "finalListProcessingIndicator": "none",
+      "listProof": "scheduled-final-list.png",
+      "aiDisclosureRationale": "Native game footage, code-based editing and background accompaniment; official YouTube disclosure examples checked2026-11-01"
+    },
+    {
+      "id": "make-48-8dba5bcc",
+      "variant": "comment-answer",
+      "target": 48,
+      "numbers": [
+        2,
+        3,
+        5,
+        1,
+        4
+      ],
+      "videoId": "QVZH058j_UQ",
+      "url": "https://youtube.com/shorts/QVZH058j_UQ",
+      "scheduledAt": "2026-11-05T12:00:00+09:00",
+      "status": "scheduled",
+      "sha256": "1724f710361ef4c63ad84481a108bf1bb8898c3290c972b31bf56c91f4e4cc0a",
+      "sourceFile": "exports/make-48-8dba5bcc/comment-answer/make-48-8dba5bcc-comment-answer.mp4",
+      "fixedCommentFile": "exports/make-48-8dba5bcc/comment-answer/fixed-comment.txt",
+      "pinnedComment": {
+        "text": "（5＋3）×（4＋2）×1＝48\n\n他の解き方を見つけた方はコメントで教えてください！",
+        "posted": false,
+        "pinned": false,
+        "followupAutomationId": "automation",
+        "textSha256": "63cdc2899c9baecbc6de3fb322b6640adbc370829101dbce0944be5f3dddc800",
+        "arithmeticAndAllFiveVerified": true
+      },
+      "checks": {
+        "copyright": "passed",
+        "communityGuidelines": "notices-cleared-in-final-list; detailed checklist not reopened after scheduling"
+      },
+      "confirmedAt": "2026-11-01T22:58:36.151063+09:00",
+      "scheduleProof": "scheduled-11-05.png",
+      "audience": "not-made-for-kids",
+      "paidPromotion": false,
+      "alteredContentDisclosure": false,
+      "studioPreview": "started upload preview; not continuous subjective viewing or audio listening",
+      "title": "5つの数字で48を作れる？｜ジャマイカの木",
+      "description": "2・3・5・1・4を全部1回ずつ使って、48を作れる？\n使えるのは ＋ − × ÷。\n答えは固定コメントに載せています。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
+      "ageRestriction": false,
+      "finalListNotice": "none",
+      "finalListProcessingIndicator": "none",
+      "listProof": "scheduled-final-list.png",
+      "aiDisclosureRationale": "Native game footage, code-based editing and background accompaniment; official YouTube disclosure examples checked2026-11-01"
+    },
+    {
+      "id": "make-37-ba02597f",
+      "variant": "comment-answer",
+      "target": 37,
+      "numbers": [
+        1,
+        2,
+        6,
+        5,
+        1
+      ],
+      "videoId": "aNhB2APZy74",
+      "url": "https://youtube.com/shorts/aNhB2APZy74",
+      "scheduledAt": "2026-11-06T12:00:00+09:00",
+      "status": "scheduled",
+      "sha256": "7af919f676b6ce6431dfe02f31b3e1b9e7f61cc0b3f379815227103fee4bd644",
+      "sourceFile": "exports/make-37-ba02597f/comment-answer/make-37-ba02597f-comment-answer.mp4",
+      "fixedCommentFile": "exports/make-37-ba02597f/comment-answer/fixed-comment.txt",
+      "pinnedComment": {
+        "text": "6×（5＋1）＋2−1＝37\n\n他の解き方を見つけた方はコメントで教えてください！",
+        "posted": false,
+        "pinned": false,
+        "followupAutomationId": "automation",
+        "textSha256": "3f7b54895b232f18b8897e80dbce64e693a1b5a8c6652b2f95d26a90e3b340ef",
+        "arithmeticAndAllFiveVerified": true
+      },
+      "checks": {
+        "copyright": "passed",
+        "communityGuidelines": "notices-cleared-in-final-list; detailed checklist not reopened after scheduling"
+      },
+      "confirmedAt": "2026-11-01T22:50:07.479183+09:00",
+      "scheduleProof": "scheduled-11-06.png",
+      "audience": "not-made-for-kids",
+      "paidPromotion": false,
+      "alteredContentDisclosure": false,
+      "studioPreview": "started upload preview; not continuous subjective viewing or audio listening",
+      "title": "5つの数字で37を作れる？｜ジャマイカの木",
+      "description": "1・2・6・5・1を全部1回ずつ使って、37を作れる？\n使えるのは ＋ − × ÷。\n答えは固定コメントに載せています。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
+      "ageRestriction": false,
+      "finalListNotice": "none",
+      "finalListProcessingIndicator": "none",
+      "listProof": "scheduled-final-list.png",
+      "aiDisclosureRationale": "Native game footage, code-based editing and background accompaniment; official YouTube disclosure examples checked2026-11-01"
+    }
+  ],
+  "fixedCommentFollowup": {
+    "automationId": "automation",
+    "status": "ACTIVE",
+    "scope": "5 comment-answer videos in this file only, together with original7 in2026-11-02-week",
+    "plannedPublication": "2026-11-02..06 each12:00JST",
+    "checks": "12:01 and12:15; original7 at19:01 and19:15",
+    "rrule": "FREQ=DAILY;BYHOUR=12,19;BYMINUTE=1,15;BYSECOND=0;UNTIL=20261108T101500Z",
+    "notificationPolicy": "failed_runs_only",
+    "firstScheduledExecutionVerified": false,
+    "requires": "local device running and signed-in browser",
+    "independentMissedRunDetection": false
+  }
+}

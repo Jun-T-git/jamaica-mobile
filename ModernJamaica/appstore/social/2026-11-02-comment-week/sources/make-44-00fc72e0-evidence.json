@@ -1,0 +1,76 @@
+{
+  "target": 44,
+  "numbers": [
+    4,
+    6,
+    3,
+    1,
+    1
+  ],
+  "sourceSize": [
+    1206,
+    2622
+  ],
+  "capture": "Ordinary native practice medium game; no code or puzzle-state changes; no hint or answer opened",
+  "review": "2026-11-01 JST CFR native target, ordered5digits, four operations and complete wrong43/error banner checked",
+  "commentResult": "wrong",
+  "wrongTree": [
+    "+",
+    [
+      "*",
+      6,
+      [
+        "+",
+        4,
+        3
+      ]
+    ],
+    [
+      "*",
+      1,
+      1
+    ]
+  ],
+  "wrongSourceTime": 34.8,
+  "noCorrectAnswerObserved": true,
+  "reviewedNoAnswerUntil": 37.1,
+  "operations": [
+    {
+      "sourceSelected": 20.3,
+      "sourceResult": 20.4,
+      "operator": "+"
+    },
+    {
+      "sourceSelected": 26.3,
+      "sourceResult": 26.3666666667,
+      "operator": "*"
+    },
+    {
+      "sourceSelected": 30.3,
+      "sourceResult": 30.3666666667,
+      "operator": "*"
+    },
+    {
+      "sourceSelected": 34.7333333333,
+      "sourceResult": 34.8,
+      "operator": "+"
+    }
+  ],
+  "viewportReview": "Original standard native target/continuous board crop before wrong result; final result and comment hold use existing full-frame crop to retain root43/all5 leaves/error banner/operators. Caption575 in blank space below target and above root.",
+  "fixedCommentText": "6×（4＋3）＋1＋1＝44\n\n他の解き方を見つけた方はコメントで教えてください！\n",
+  "fixedCommentValidation": {
+    "displayEquation": "6×（4＋3）＋1＋1＝44",
+    "answerTreeValue": 44,
+    "usedNumbers": [
+      6,
+      4,
+      3,
+      1,
+      1
+    ],
+    "allFiveUsedExactlyOnce": true,
+    "displayEquationUsesSameFiveNumbers": true,
+    "formatting": "Japanese full-width plus/minus-parentheses with only grouping needed for order; manually verified equivalent to answerTree",
+    "videoWrongValue": 43
+  }
+}
