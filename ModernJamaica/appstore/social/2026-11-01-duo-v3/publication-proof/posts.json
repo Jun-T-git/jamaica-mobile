@@ -36,9 +36,14 @@
         "initialChecks": "no issues reported after processing",
         "published": true,
         "fixedComment": {
-          "text": "別の作り方もある？",
-          "posted": false,
-          "reason": "予約中の非公開動画にはコメントを投稿できないとYouTubeに表示。問いかけは説明欄へ反映済み"
+          "text": "他の解き方を見つけた方はコメントで教えてください！",
+          "posted": true,
+          "pinned": true,
+          "commentId": "UgyGUA6aO76yXiFbWfR4AaABAg",
+          "url": "https://www.youtube.com/watch?v=N5tv1joJQBc&lc=UgyGUA6aO76yXiFbWfR4AaABAg",
+          "verifiedAt": "2026-11-01T21:41:09+09:00",
+          "proof": "publication-proof/pinned-23.png",
+          "verification": "同じ動画の自チャンネル投稿と「固定されています」の表示を確認。利用者の最新指定文言へ同じコメントを編集。"
         },
         "publicationObservedAt": "2026-11-01T20:13:35+09:00",
         "titleChanges": [
@@ -84,9 +89,14 @@
         "initialChecks": "no issues reported after processing",
         "published": true,
         "fixedComment": {
-          "text": "65にする式、思いついた？",
-          "posted": false,
-          "reason": "予約中の非公開動画にはコメントを投稿できないとYouTubeに表示。問いかけは説明欄へ反映済み"
+          "text": "解けた方はぜひコメントで教えてください！",
+          "posted": true,
+          "pinned": true,
+          "commentId": "Ugz-0Cu67zQygiiAH554AaABAg",
+          "url": "https://www.youtube.com/watch?v=Uzb_IJSdbAo&lc=Ugz-0Cu67zQygiiAH554AaABAg",
+          "verifiedAt": "2026-11-01T21:41:09+09:00",
+          "proof": "publication-proof/pinned-65.png",
+          "verification": "同じ動画の自チャンネル投稿と「固定されています」の表示を確認。利用者の最新指定文言へ同じコメントを編集。"
         },
         "publicationObservedAt": "2026-11-01T20:13:35+09:00"
       },
@@ -97,8 +107,8 @@
   "profileChanged": false,
   "additionalSpend": false,
   "limitations": [
-    "固定コメントは未投稿。公開後の自動追記は設定していない",
     "PC Shortsの23再生画面を確認。スマートフォン実機プレビューと主観的音声試聴は未確認",
     "公開後48時間・7日の効果観測は未実施。自動の観測・未公開検知は未接続"
-  ]
+  ],
+  "fixedCommentsVerifiedAt": "2026-11-01T21:41:09+09:00"
 }

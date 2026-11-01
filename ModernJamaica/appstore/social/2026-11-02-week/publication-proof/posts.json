@@ -14,7 +14,12 @@
         "copyright": "passed",
         "communityGuidelines": "notices-cleared-in-final-list; detailed panel not reopened"
       },
-      "pinnedComment": "not-posted",
+      "pinnedComment": {
+        "text": "他の解き方を見つけた方はコメントで教えてください！",
+        "posted": false,
+        "pinned": false,
+        "followupAutomationId": "automation"
+      },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で24を作れ！｜ジャマイカの木",
       "description": "4・3・1・4・4を全部1回ずつ使って、24を作れる？\n使えるのは ＋ − × ÷。数字をつなぐと、計算の木が育っていく。\n別の作り方もある？コメントで教えて。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
@@ -42,7 +47,12 @@
         "copyright": "passed",
         "communityGuidelines": "passed"
       },
-      "pinnedComment": "not-posted",
+      "pinnedComment": {
+        "text": "解けた方はぜひコメントで教えてください！",
+        "posted": false,
+        "pinned": false,
+        "followupAutomationId": "automation"
+      },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で12を作れる？｜ジャマイカの木",
       "description": "4・2・3・3・2を全部1回ずつ使って、12を作れる？\n使えるのは ＋ − × ÷。\n12にする式、思いついた？コメントで教えて。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
@@ -70,7 +80,12 @@
         "copyright": "passed",
         "communityGuidelines": "passed"
       },
-      "pinnedComment": "not-posted",
+      "pinnedComment": {
+        "text": "他の解き方を見つけた方はコメントで教えてください！",
+        "posted": false,
+        "pinned": false,
+        "followupAutomationId": "automation"
+      },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で27を作れ！｜ジャマイカの木",
       "description": "3・1・3・2・4を全部1回ずつ使って、27を作れる？\n使えるのは ＋ − × ÷。数字をつなぐと、計算の木が育っていく。\n別の作り方もある？コメントで教えて。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
@@ -98,7 +113,12 @@
         "copyright": "passed",
         "communityGuidelines": "notices-cleared-in-final-list; detailed panel not reopened"
       },
-      "pinnedComment": "not-posted",
+      "pinnedComment": {
+        "text": "解けた方はぜひコメントで教えてください！",
+        "posted": false,
+        "pinned": false,
+        "followupAutomationId": "automation"
+      },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で20を作れる？｜ジャマイカの木",
       "description": "4・3・2・3・1を全部1回ずつ使って、20を作れる？\n使えるのは ＋ − × ÷。\n20にする式、思いついた？コメントで教えて。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
@@ -126,7 +146,12 @@
         "copyright": "passed",
         "communityGuidelines": "passed"
       },
-      "pinnedComment": "not-posted",
+      "pinnedComment": {
+        "text": "他の解き方を見つけた方はコメントで教えてください！",
+        "posted": false,
+        "pinned": false,
+        "followupAutomationId": "automation"
+      },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で21を作れ！｜ジャマイカの木",
       "description": "1・2・3・3・1を全部1回ずつ使って、21を作れる？\n使えるのは ＋ − × ÷。数字をつなぐと、計算の木が育っていく。\n別の作り方もある？コメントで教えて。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
@@ -154,7 +179,12 @@
         "copyright": "passed",
         "communityGuidelines": "notices-cleared-in-final-list; detailed panel not reopened"
       },
-      "pinnedComment": "not-posted",
+      "pinnedComment": {
+        "text": "解けた方はぜひコメントで教えてください！",
+        "posted": false,
+        "pinned": false,
+        "followupAutomationId": "automation"
+      },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で15を作れる？｜ジャマイカの木",
       "description": "2・4・4・3・3を全部1回ずつ使って、15を作れる？\n使えるのは ＋ − × ÷。\n15にする式、思いついた？コメントで教えて。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
@@ -182,7 +212,12 @@
         "copyright": "passed",
         "communityGuidelines": "passed"
       },
-      "pinnedComment": "not-posted",
+      "pinnedComment": {
+        "text": "他の解き方を見つけた方はコメントで教えてください！",
+        "posted": false,
+        "pinned": false,
+        "followupAutomationId": "automation"
+      },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で24を作れ！｜ジャマイカの木",
       "description": "1・1・3・3・2を全部1回ずつ使って、24を作れる？\n使えるのは ＋ − × ÷。数字をつなぐと、計算の木が育っていく。\n別の作り方もある？コメントで教えて。\n\n計算パズル「ジャマイカの木」\niPhoneのApp Storeで「ジャマイカの木」を検索。\n\n#ジャマイカの木 #算数パズル #脳トレ",
@@ -198,5 +233,16 @@
       "scheduleProof": "scheduled-11-08.png",
       "listProof": "scheduled-week-list.png"
     }
-  ]
+  ],
+  "fixedCommentFollowup": {
+    "automationId": "automation",
+    "name": "ジャマイカ予約動画の公開後コメント固定",
+    "status": "ACTIVE",
+    "timezone": "Asia/Tokyo",
+    "schedule": "2026-11-02〜08 各19:15 JST",
+    "rrule": "FREQ=DAILY;BYHOUR=19;BYMINUTE=15;BYSECOND=0;UNTIL=20261108T101500Z",
+    "scope": "この記録の7本のみ。未公開は公開へ変更せず見送り、投稿・固定を確認して記録。重複コメントを作らない。",
+    "notification": "通常・未公開・変化なしは静かに記録。要対応の失敗と7本完了時だけ通知。",
+    "unverified": "設定作成・更新済み。初回予定起動と実投稿は未実行。端末/ログイン依存、独立した未実行検知は未接続。"
+  }
 }
