@@ -1,0 +1,55 @@
+{
+  "target": 24,
+  "numbers": [
+    4,
+    3,
+    1,
+    4,
+    4
+  ],
+  "sourceSize": [
+    1206,
+    2622
+  ],
+  "capture": "Native app UI in isolated Jamaica Ad Capture simulator; ordinary random Challenge easy 5-minute puzzle; no game code or puzzle-state changes",
+  "review": "Native target, ordered leaves, four operations and clean completed tree visually reviewed from normalized recording, 2026-11-01 JST",
+  "operations": [
+    {
+      "tree": [
+        "+",
+        4,
+        4
+      ],
+      "result": 8,
+      "sourceResultTime": 37.0
+    },
+    {
+      "tree": [
+        "+",
+        8,
+        4
+      ],
+      "result": 12,
+      "sourceResultTime": 45.6
+    },
+    {
+      "tree": [
+        "-",
+        3,
+        1
+      ],
+      "result": 2,
+      "sourceResultTime": 62.9
+    },
+    {
+      "tree": [
+        "*",
+        12,
+        2
+      ],
+      "result": 24,
+      "sourceResultTime": 79.7
+    }
+  ],
+  "cleanCompletedTime": 81.0
+}

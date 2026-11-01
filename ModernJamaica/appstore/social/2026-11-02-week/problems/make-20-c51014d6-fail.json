@@ -1,0 +1,147 @@
+{
+  "id": "make-20-c51014d6",
+  "episode": "new-20-2026-11-05",
+  "variant": "fail",
+  "numbers": [
+    4,
+    3,
+    2,
+    3,
+    1
+  ],
+  "target": 20,
+  "answerTree": [
+    "-",
+    [
+      "*",
+      [
+        "+",
+        4,
+        3
+      ],
+      3
+    ],
+    [
+      "-",
+      2,
+      1
+    ]
+  ],
+  "recording": "../sources/make-20-fail.mov",
+  "evidence": "../sources/make-20-fail-evidence.json",
+  "sourceSha256": "6ed4052a8385be36c70752d0bbf7f7cecbc6e9990ae41ef6a2837b1c920c03c0",
+  "normalizedCache": "../build/make-20-c51014d6-cfr.mp4",
+  "normalizedSha256": "7ca7b05659d4bed1ad04492f2f56c51aa60be11a4154ae5833d20f7003d52f4a",
+  "unsolvedWindow": [
+    1,
+    3.1
+  ],
+  "questionStillTime": 2,
+  "cleanCompletedTime": null,
+  "cuts": [
+    [
+      1,
+      3
+    ],
+    [
+      3.4,
+      4.6
+    ],
+    [
+      6.1,
+      7.7
+    ],
+    [
+      10.8,
+      12
+    ],
+    [
+      13.4,
+      15
+    ],
+    [
+      17.6,
+      18.8
+    ],
+    [
+      24.1,
+      25.7
+    ],
+    [
+      29,
+      30.2
+    ],
+    [
+      33.1,
+      34.7
+    ],
+    [
+      67.66666666666667,
+      70.66666666666667
+    ],
+    [
+      70.66666666666667,
+      70.76666666666667
+    ]
+  ],
+  "operatorFreezes": [
+    {
+      "cut": 10,
+      "sourceTime": 70.7,
+      "seconds": 0.8,
+      "purpose": "Hold actual native zero"
+    }
+  ],
+  "effects": [
+    {
+      "file": "connect.mp3",
+      "source": 6.5,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 13.7,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 24.4,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 33.4,
+      "gain": 0.4
+    }
+  ],
+  "completedHold": 0,
+  "endCardDuration": 2.0,
+  "wrongTree": [
+    "-",
+    [
+      "*",
+      [
+        "+",
+        4,
+        3
+      ],
+      3
+    ],
+    [
+      "*",
+      2,
+      1
+    ]
+  ],
+  "wrongSourceTime": 33.4,
+  "timeoutSourceTime": 70.7,
+  "noCorrectAnswerObserved": true,
+  "reviewedNoAnswerUntil": 70.76666666666667,
+  "fullFrameCuts": [],
+  "timerCuts": [
+    9,
+    10
+  ],
+  "timeoutCuts": [],
+  "resultCuts": []
+}

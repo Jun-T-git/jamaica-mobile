@@ -1,0 +1,37 @@
+{
+  "target": 20,
+  "numbers": [
+    4,
+    3,
+    2,
+    3,
+    1
+  ],
+  "sourceSize": [
+    1206,
+    2622
+  ],
+  "capture": "Native app UI in isolated Jamaica Ad Capture simulator; ordinary random Challenge easy puzzle; no game code or puzzle-state changes",
+  "review": "Native target, ordered leaves, operators and results visually reviewed from normalized recording, 2026-11-01 JST; complete wrong19, native3→2→1→0, no correct solution revealed; exact-frame recheck excludes end-screen transition from 70.7667 onwards",
+  "cleanCompletedTime": null,
+  "wrongTree": [
+    "-",
+    [
+      "*",
+      [
+        "+",
+        4,
+        3
+      ],
+      3
+    ],
+    [
+      "*",
+      2,
+      1
+    ]
+  ],
+  "wrongSourceTime": 33.4,
+  "timeoutSourceTime": 70.7,
+  "reviewedNoAnswerUntil": 70.76666666666667
+}

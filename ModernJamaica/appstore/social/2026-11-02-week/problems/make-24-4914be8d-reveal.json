@@ -1,0 +1,127 @@
+{
+  "id": "make-24-4914be8d",
+  "episode": "new-24-2026-11-02",
+  "variant": "reveal",
+  "numbers": [
+    4,
+    3,
+    1,
+    4,
+    4
+  ],
+  "target": 24,
+  "answerTree": [
+    "*",
+    [
+      "+",
+      [
+        "+",
+        4,
+        4
+      ],
+      4
+    ],
+    [
+      "-",
+      3,
+      1
+    ]
+  ],
+  "recording": "../sources/make-24-reveal.mov",
+  "evidence": "../sources/make-24-reveal-evidence.json",
+  "sourceSha256": "e77248a73752de8481a4e64457b733bb487617098855f7fbbab6cff34de61a69",
+  "normalizedCache": "../build/make-24-4914be8d-cfr.mp4",
+  "normalizedSha256": "4a0a7f59e475c98c023ddabc0143e7fe575f6e898d864991a853036fbe406b0c",
+  "unsolvedWindow": [
+    3,
+    28.5
+  ],
+  "questionStillTime": 5,
+  "cleanCompletedTime": 81.0,
+  "cuts": [
+    [
+      4,
+      6
+    ],
+    [
+      28.8,
+      29.2
+    ],
+    [
+      36.7,
+      37.7
+    ],
+    [
+      41.3,
+      41.7
+    ],
+    [
+      45.1,
+      46.7
+    ],
+    [
+      52.3,
+      52.7
+    ],
+    [
+      62.6,
+      64.2
+    ],
+    [
+      67.3,
+      67.7
+    ],
+    [
+      72.4,
+      73.2
+    ],
+    [
+      79.4,
+      81.1
+    ]
+  ],
+  "operatorFreezes": [
+    {
+      "cut": 2,
+      "sourceTime": 36.9,
+      "seconds": 0.6,
+      "purpose": "Hold actual selected operator"
+    },
+    {
+      "cut": 4,
+      "sourceTime": 45.4,
+      "seconds": 0.6,
+      "purpose": "Hold actual selected operator"
+    },
+    {
+      "cut": 6,
+      "sourceTime": 62.8,
+      "seconds": 0.6,
+      "purpose": "Hold actual selected operator"
+    }
+  ],
+  "effects": [
+    {
+      "file": "connect.mp3",
+      "source": 37.0,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 45.6,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 62.9,
+      "gain": 0.4
+    },
+    {
+      "file": "success.mp3",
+      "source": 79.8,
+      "gain": 0.5
+    }
+  ],
+  "completedHold": 2.1,
+  "endCardDuration": 2.0
+}

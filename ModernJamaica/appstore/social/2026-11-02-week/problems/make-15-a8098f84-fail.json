@@ -1,0 +1,155 @@
+{
+  "id": "make-15-a8098f84",
+  "episode": "new-15-2026-11-07",
+  "variant": "fail",
+  "numbers": [
+    2,
+    4,
+    4,
+    3,
+    3
+  ],
+  "target": 15,
+  "answerTree": [
+    "-",
+    [
+      "*",
+      [
+        "+",
+        4,
+        4
+      ],
+      2
+    ],
+    [
+      "/",
+      3,
+      3
+    ]
+  ],
+  "wrongTree": [
+    "-",
+    [
+      "*",
+      [
+        "+",
+        4,
+        4
+      ],
+      2
+    ],
+    [
+      "-",
+      3,
+      3
+    ]
+  ],
+  "recording": "../sources/make-15-fail.mov",
+  "evidence": "../sources/make-15-fail-evidence.json",
+  "sourceSha256": "127698b23a9ddc4305cd7787bfcd092ce83d15749a59171c9e7d7693c48973e5",
+  "normalizedCache": "../build/make-15-a8098f84-cfr.mp4",
+  "normalizedSha256": "92ab536619fa13b4354296ad93f31644eb08d6734b0dc3f14b942c9d6376f04a",
+  "unsolvedWindow": [
+    1,
+    3.1
+  ],
+  "questionStillTime": 2,
+  "cleanCompletedTime": null,
+  "cuts": [
+    [
+      1,
+      3
+    ],
+    [
+      4.2,
+      5.4
+    ],
+    [
+      8.1,
+      9.7
+    ],
+    [
+      12.4,
+      13.6
+    ],
+    [
+      15,
+      16.6
+    ],
+    [
+      20,
+      21.2
+    ],
+    [
+      22.9,
+      24.5
+    ],
+    [
+      28,
+      29.2
+    ],
+    [
+      32.1,
+      33.7
+    ],
+    [
+      63.6,
+      66.6
+    ],
+    [
+      66.6,
+      66.7
+    ]
+  ],
+  "operatorFreezes": [
+    {
+      "cut": 10,
+      "sourceTime": 66.63333333333334,
+      "seconds": 0.8,
+      "purpose": "Hold actual native zero"
+    }
+  ],
+  "effects": [
+    {
+      "file": "connect.mp3",
+      "source": 8.3,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 15.2,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 23.2,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 32.3,
+      "gain": 0.4
+    }
+  ],
+  "completedHold": 0,
+  "endCardDuration": 2.0,
+  "wrongSourceTime": 32.3,
+  "timeoutSourceTime": 66.63333333333334,
+  "noCorrectAnswerObserved": true,
+  "reviewedNoAnswerUntil": 66.7,
+  "fullFrameCuts": [],
+  "timerCuts": [
+    9,
+    10
+  ],
+  "timeoutCuts": [],
+  "resultCuts": [],
+  "postprocess": {
+    "script": "../exports/make-15-a8098f84/fail/postprocess.py",
+    "arguments": [
+      "--refresh-input"
+    ],
+    "purpose": "Restore only the native static timer label covered by blue development overlay",
+    "finalSha256": "c01f38cd48c5dba1941f84293bef7600a40532307e7bd9509dd3112a52b9f1f1"
+  }
+}

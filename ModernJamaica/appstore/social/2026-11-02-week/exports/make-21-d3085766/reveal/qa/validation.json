@@ -1,0 +1,32 @@
+{
+  "decode": "passed",
+  "resolution": [
+    1080,
+    1920
+  ],
+  "duration": 17.1,
+  "fps": 30.0,
+  "frames": 513,
+  "sourceSha256": "11a3780ec0fba67def764224c0a45f410b09679b82945ef3441994a9ec0cd2f6",
+  "sha256": "2c355e6dfe11128e58111409d32689e50b634aa8d6c66b08bf059303e34251ed",
+  "integratedLUFS": -16.93,
+  "truePeakDBTP": -1.62,
+  "appFrameUncropped": false,
+  "nativeStatsOmitted": true,
+  "nativeTargetRetained": true,
+  "customPlaybackTarget": false,
+  "variant": "reveal",
+  "endCardStart": 15.1,
+  "endCardOpaque": true,
+  "presentation": {},
+  "cropping": true,
+  "developerBannerPixelFractionMax": 0,
+  "visualReview": {
+    "sourceFrames": "passed: native target, original leaves, operators, success popup and clean completed tree checked",
+    "finalExtractedFrames": "passed: native21 and all5 leaves fully visible; no popup residue on completed hold",
+    "fullPlayback": "not performed by editor",
+    "audioListening": "not performed by editor; loudness measured",
+    "cutBoundaries": "passed: every cut first/last frame plus final hold/zero/CTA checked in boundaries.jpg"
+  },
+  "published": false
+}

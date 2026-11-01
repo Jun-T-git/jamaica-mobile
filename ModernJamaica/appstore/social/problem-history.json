@@ -18,6 +18,36 @@
       ]
     },
     {
+      "target": 12,
+      "numbers": [
+        2,
+        2,
+        3,
+        3,
+        4
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-week/batch-plan.json",
+        "2026-11-02-week/problems/make-12-f2ff0e98-fail.json",
+        "2026-11-02-week/sources/make-12-fail-evidence.json"
+      ]
+    },
+    {
+      "target": 13,
+      "numbers": [
+        1,
+        2,
+        3,
+        4,
+        4
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-week/sources/make-13-fail-evidence.json"
+      ]
+    },
+    {
       "target": 14,
       "numbers": [
         2,
@@ -31,6 +61,54 @@
         "2026-10-27/02-make-14-updated/sources/capture-evidence.json",
         "2026-10-28-series/batch-plan.json",
         "production/problems/make-14.json"
+      ]
+    },
+    {
+      "target": 15,
+      "numbers": [
+        2,
+        3,
+        3,
+        4,
+        4
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-week/batch-plan.json",
+        "2026-11-02-week/problems/make-15-a8098f84-fail.json",
+        "2026-11-02-week/sources/make-15-fail-evidence.json"
+      ]
+    },
+    {
+      "target": 20,
+      "numbers": [
+        1,
+        2,
+        3,
+        3,
+        4
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-week/batch-plan.json",
+        "2026-11-02-week/problems/make-20-c51014d6-fail.json",
+        "2026-11-02-week/sources/make-20-fail-evidence.json"
+      ]
+    },
+    {
+      "target": 21,
+      "numbers": [
+        1,
+        1,
+        2,
+        3,
+        3
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-week/batch-plan.json",
+        "2026-11-02-week/problems/make-21-d3085766-reveal.json",
+        "2026-11-02-week/sources/make-21-reveal-evidence.json"
       ]
     },
     {
@@ -67,6 +145,54 @@
         "2026-11-01-duo-v2/problems/make-23-reveal.json",
         "2026-11-01-duo-v3/batch-plan.json",
         "2026-11-01-duo-v3/problems/make-23-reveal.json"
+      ]
+    },
+    {
+      "target": 24,
+      "numbers": [
+        1,
+        1,
+        2,
+        3,
+        3
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-week/batch-plan.json",
+        "2026-11-02-week/problems/make-24-5f107684-reveal.json",
+        "2026-11-02-week/sources/make-24b-reveal-evidence.json"
+      ]
+    },
+    {
+      "target": 24,
+      "numbers": [
+        1,
+        3,
+        4,
+        4,
+        4
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-week/batch-plan.json",
+        "2026-11-02-week/problems/make-24-4914be8d-reveal.json",
+        "2026-11-02-week/sources/make-24-reveal-evidence.json"
+      ]
+    },
+    {
+      "target": 27,
+      "numbers": [
+        1,
+        2,
+        3,
+        3,
+        4
+      ],
+      "state": "observed",
+      "sources": [
+        "2026-11-02-week/batch-plan.json",
+        "2026-11-02-week/problems/make-27-f19df18b-reveal.json",
+        "2026-11-02-week/sources/make-27-reveal-evidence.json"
       ]
     },
     {

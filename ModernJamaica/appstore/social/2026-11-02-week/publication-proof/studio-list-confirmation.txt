@@ -1,0 +1,365 @@
+Browser tab: 58504499, Title: "チャンネルのコンテンツ - YouTube Studio", URL: "https://studio.youtube.com/channel/UCnKhAXBmPu-Vhu4YIx-vNGQ/videos/short?filter=%5B%5D&sort=%7B%22columnType%22%3A%22date%22%2C%22sortOrder%22%3A%22DESCENDING%22%7D".
+0 AXWebArea チャンネルのコンテンツ - YouTube Studio, URL: studio.youtube.com/channel/UCnKhAXBmPu-Vhu4YIx-vNGQ/videos/short?filter=%5B%5D&sort=%7B%22columnType%22%3A%22date%22%2C%22sortOrder%22%3A%22DESCENDING%22%7D
+	1 container html-body
+		2 container
+			3 text チャンネルのコンテンツ
+			4 container main-container
+				5 container
+					6 button メニューを折りたたむ
+					7 link Description: YouTube Studio ダッシュボード, Value: studio.youtube.com/channel/UCnKhAXBmPu-Vhu4YIx-vNGQ, ID: home-button
+					8 button ナビゲーションをスキップ
+						9 text ナビゲーションをスキップ
+					10 container search-layer
+						11 text field (settable) query-input
+					12 button ヘルプ
+					13 button 通知
+					14 button Ask Studio
+						15 text Ask Studio
+					16 button 作成
+						17 text 作成
+					18 container アカウント
+						19 pop up button Description: Account, ID: avatar-btn
+				20 container
+					21 container left-nav
+						64 container
+							67 image TeraTech | アプリ開発
+							68 container entity-label-container
+								69 text チャンネル
+								70 text TeraTech | アプリ開発
+						29 menu main-menu
+							86 text •
+							31 ダッシュボード, ID: menu-item-0
+								32 container menu-paper-icon-item-0
+									33 text ダッシュボード
+							87 text •
+							35 コンテンツ, ID: menu-item-1
+								36 container menu-paper-icon-item-1
+									37 text コンテンツ
+							88 text •
+							39 アナリティクス, ID: menu-item-2
+								40 container menu-paper-icon-item-2
+									41 text アナリティクス
+							89 text •
+							43 コミュニティ, ID: menu-item-3
+								44 container menu-paper-icon-item-3
+									45 text コミュニティ
+							90 text •
+							47 言語, ID: menu-item-4
+								48 container menu-paper-icon-item-4
+									49 text 言語
+							91 text •
+							51 コンテンツ検出, ID: menu-item-5
+								52 container menu-paper-icon-item-5
+									53 text コンテンツ検出
+							92 text •
+							55 収益化, ID: menu-item-6
+								56 container menu-paper-icon-item-6
+									57 text 収益化
+							93 text •
+							79 カスタマイズ, ID: menu-item-7
+								80 container menu-paper-icon-item-7
+									84 text カスタマイズ
+							94 text •
+							82 オーディオ ライブラリ, ID: menu-item-8
+								83 container menu-paper-icon-item-8
+									85 text オーディオ ライブラリ
+						58 content list
+							59 button 設定, ID: settings-item
+								60 text 設定
+							61 button フィードバックを送信, ID: send-feedback-item
+								62 text フィードバックを送信
+					63 container main
+						95 container video-list
+							96 heading チャンネルのコンテンツ, Value: 1
+								97 text チャンネルのコンテンツ
+							98 tab group
+								99 container tabsContent
+									100 tab (selectable, settable, boolean) 動画, ID: video-list-uploads-tab, Value: 0
+動画
+									101 tab (selected, settable, boolean) ショート , Value: 1, ID: video-list-shorts-tab
+										138 text ショート
+									102 tab (selectable, settable, boolean) ライブ配信, ID: video-list-live-tab, Value: 0
+ライブ配信
+									103 tab (selectable, settable, boolean) 投稿, ID: content-list-post-tab, Value: 0
+投稿
+									104 tab (selectable, settable, boolean) 再生リスト, ID: playlist-list-tab, Value: 0
+再生リスト
+									105 tab (selectable, settable, boolean) ポッドキャスト, ID: podcast-list-tab, Value: 0
+ポッドキャスト
+									106 tab (selectable, settable, boolean) コース, ID: courses-list-tab, Value: 0
+コース
+									107 tab (selectable, settable, boolean) プロモーション, ID: content-list-promotions-tab, Value: 0
+プロモーション
+									108 tab (selectable, settable, boolean) コラボレーション, ID: video-list-collabs-tab, Value: 0
+コラボレーション
+									109 tab (selectable, settable, boolean) アイデア, ID: inspiration-tab, Value: 0
+アイデア
+							110 table 動画リスト
+								111 container header
+									112 container stuck-to-left-header
+										113 container filter-bar
+											114 text field (settable) text-input
+									115 row table-header
+										116 cell
+											117 container Description: すべて選択, ID: selection-checkbox
+												118 checkbox Description: すべて選択, Value: 0, ID: checkbox
+										119 cell
+											120 heading Description: ショート動画, Value: 3, ID: short-header-name
+												121 text ショート動画
+										122 cell
+											123 heading Description: 通知, Value: 3, ID: notices-header-name
+												124 text 通知
+										125 cell
+											126 heading Description: 公開設定, Value: 3, ID: visibility-header-name
+												127 text 公開設定
+										128 cell
+											129 heading 日付 で並べ替え, Value: 3
+												130 button Description: 日付 で並べ替え, ID: date-header-name
+													131 text 日付
+										132 cell
+											133 heading 視聴回数 で並べ替え, Value: 3
+												134 button Description: 視聴回数 で並べ替え, ID: views-header-name
+										135 cell
+											136 heading Description: コメント, Value: 3, ID: comments-header-name
+												137 text コメント
+								139 row
+									140 container row-container
+										141 cell
+											142 container 5つの数字で24を作れ！｜ジャマイカの木 を選択
+												143 checkbox Description: 5つの数字で24を作れ！｜ジャマイカの木 を選択, Value: 0, ID: checkbox
+										144 cell
+											145 container
+												146 link Description: 動画のサムネイル: 5つの数字で24を作れ！｜ジャマイカの木 0:18, Value: studio.youtube.com/video/GW1ifSa8cpM/edit, ID: thumbnail-anchor
+												147 link Description: 5つの数字で24を作れ！｜ジャマイカの木, Value: studio.youtube.com/video/GW1ifSa8cpM/edit, ID: video-title
+												148 text 1・1・3・3・2を全部1回ずつ使って、24を作れる？ 使えるのは ＋ − × ÷。数字をつなぐと、計算の木が育っていく。 別の作り方もある？コメントで教えて。 計算パズル「ジャマイカの木」 iPhoneのApp Storeで「ジャマイカの木」を検索。 #ジャマイカの木 #算数パズル #脳トレ
+										149 cell
+											150 text —
+										151 cell
+											152 text 公開予約
+										153 cell
+											154 text 2026/11/08
+											155 text 公開予約
+										156 cell
+											157 text 0
+										158 cell
+											159 link Description: 動画にコメントが 0 件あります。動画のコメントページ, Value: studio.youtube.com/video/GW1ifSa8cpM/comments
+								160 row
+									161 container row-container
+										162 cell
+											163 container 5つの数字で15を作れる？｜ジャマイカの木 を選択
+												164 checkbox Description: 5つの数字で15を作れる？｜ジャマイカの木 を選択, Value: 0, ID: checkbox
+										165 cell
+											166 container
+												167 link Description: 動画のサムネイル: 5つの数字で15を作れる？｜ジャマイカの木 0:20, Value: studio.youtube.com/video/FmFTCFqdvU0/edit, ID: thumbnail-anchor
+												168 link Description: 5つの数字で15を作れる？｜ジャマイカの木, Value: studio.youtube.com/video/FmFTCFqdvU0/edit, ID: video-title
+												169 text 2・4・4・3・3を全部1回ずつ使って、15を作れる？ 使えるのは ＋ − × ÷。 15にする式、思いついた？コメントで教えて。 計算パズル「ジャマイカの木」 iPhoneのApp Storeで「ジャマイカの木」を検索。 #ジャマイカの木 #算数パズル #脳トレ
+										170 cell
+											171 text —
+										172 cell
+											173 text 公開予約
+										174 cell
+											175 text 2026/11/07
+											176 text 公開予約
+										177 cell
+											178 text 0
+										179 cell
+											180 link Description: 動画にコメントが 0 件あります。動画のコメントページ, Value: studio.youtube.com/video/FmFTCFqdvU0/comments
+								181 row
+									182 container row-container
+										183 cell
+											184 container 5つの数字で21を作れ！｜ジャマイカの木 を選択
+												185 checkbox Description: 5つの数字で21を作れ！｜ジャマイカの木 を選択, Value: 0, ID: checkbox
+										186 cell
+											187 container
+												188 link Description: 動画のサムネイル: 5つの数字で21を作れ！｜ジャマイカの木 0:18, Value: studio.youtube.com/video/t9PLaEkUTw4/edit, ID: thumbnail-anchor
+												189 link Description: 5つの数字で21を作れ！｜ジャマイカの木, Value: studio.youtube.com/video/t9PLaEkUTw4/edit, ID: video-title
+												190 text 1・2・3・3・1を全部1回ずつ使って、21を作れる？ 使えるのは ＋ − × ÷。数字をつなぐと、計算の木が育っていく。 別の作り方もある？コメントで教えて。 計算パズル「ジャマイカの木」 iPhoneのApp Storeで「ジャマイカの木」を検索。 #ジャマイカの木 #算数パズル #脳トレ
+										191 cell
+											192 text —
+										193 cell
+											194 text 公開予約
+										195 cell
+											196 text 2026/11/06
+											197 text 公開予約
+										198 cell
+											199 text 0
+										200 cell
+											201 link Description: 動画にコメントが 0 件あります。動画のコメントページ, Value: studio.youtube.com/video/t9PLaEkUTw4/comments
+								202 row
+									203 container row-container
+										204 cell
+											205 container 5つの数字で20を作れる？｜ジャマイカの木 を選択
+												206 checkbox Description: 5つの数字で20を作れる？｜ジャマイカの木 を選択, Value: 0, ID: checkbox
+										207 cell
+											208 container
+												209 link Description: 動画のサムネイル: 5つの数字で20を作れる？｜ジャマイカの木 0:20, Value: studio.youtube.com/video/3XhTO_53gas/edit, ID: thumbnail-anchor
+												210 link Description: 5つの数字で20を作れる？｜ジャマイカの木, Value: studio.youtube.com/video/3XhTO_53gas/edit, ID: video-title
+												211 text 4・3・2・3・1を全部1回ずつ使って、20を作れる？ 使えるのは ＋ − × ÷。 20にする式、思いついた？コメントで教えて。 計算パズル「ジャマイカの木」 iPhoneのApp Storeで「ジャマイカの木」を検索。 #ジャマイカの木 #算数パズル #脳トレ
+										212 cell
+											213 text —
+										214 cell
+											215 text 公開予約
+										216 cell
+											217 text 2026/11/05
+											218 text 公開予約
+										219 cell
+											220 text 0
+										221 cell
+											222 link Description: 動画にコメントが 0 件あります。動画のコメントページ, Value: studio.youtube.com/video/3XhTO_53gas/comments
+								223 row
+									224 container row-container
+										225 cell
+											226 container 5つの数字で27を作れ！｜ジャマイカの木 を選択
+												227 checkbox Description: 5つの数字で27を作れ！｜ジャマイカの木 を選択, Value: 0, ID: checkbox
+										228 cell
+											229 container
+												230 link Description: 動画のサムネイル: 5つの数字で27を作れ！｜ジャマイカの木 0:17, Value: studio.youtube.com/video/jC-sQ8rZe70/edit, ID: thumbnail-anchor
+												231 link Description: 5つの数字で27を作れ！｜ジャマイカの木, Value: studio.youtube.com/video/jC-sQ8rZe70/edit, ID: video-title
+												232 text 3・1・3・2・4を全部1回ずつ使って、27を作れる？ 使えるのは ＋ − × ÷。数字をつなぐと、計算の木が育っていく。 別の作り方もある？コメントで教えて。 計算パズル「ジャマイカの木」 iPhoneのApp Storeで「ジャマイカの木」を検索。 #ジャマイカの木 #算数パズル #脳トレ
+										233 cell
+											234 text —
+										235 cell
+											236 text 公開予約
+										237 cell
+											238 text 2026/11/04
+											239 text 公開予約
+										240 cell
+											241 text 0
+										242 cell
+											243 link Description: 動画にコメントが 0 件あります。動画のコメントページ, Value: studio.youtube.com/video/jC-sQ8rZe70/comments
+								244 row
+									245 container row-container
+										246 cell
+											247 container 5つの数字で12を作れる？｜ジャマイカの木 を選択
+												248 checkbox Description: 5つの数字で12を作れる？｜ジャマイカの木 を選択, Value: 0, ID: checkbox
+										249 cell
+											250 container
+												251 link Description: 動画のサムネイル: 5つの数字で12を作れる？｜ジャマイカの木 0:20, Value: studio.youtube.com/video/EhhznMRLirI/edit, ID: thumbnail-anchor
+												252 link Description: 5つの数字で12を作れる？｜ジャマイカの木, Value: studio.youtube.com/video/EhhznMRLirI/edit, ID: video-title
+												253 text 4・2・3・3・2を全部1回ずつ使って、12を作れる？ 使えるのは ＋ − × ÷。 12にする式、思いついた？コメントで教えて。 計算パズル「ジャマイカの木」 iPhoneのApp Storeで「ジャマイカの木」を検索。 #ジャマイカの木 #算数パズル #脳トレ
+										254 cell
+											255 text —
+										256 cell
+											257 text 公開予約
+										258 cell
+											259 text 2026/11/03
+											260 text 公開予約
+										261 cell
+											262 text 0
+										263 cell
+											264 link Description: 動画にコメントが 0 件あります。動画のコメントページ, Value: studio.youtube.com/video/EhhznMRLirI/comments
+								265 row
+									266 container row-container
+										267 cell
+											268 container 5つの数字で24を作れ！｜ジャマイカの木 を選択
+												269 checkbox Description: 5つの数字で24を作れ！｜ジャマイカの木 を選択, Value: 0, ID: checkbox
+										270 cell
+											271 container
+												272 link Description: 動画のサムネイル: 5つの数字で24を作れ！｜ジャマイカの木 0:17, Value: studio.youtube.com/video/UizNqcegWhM/edit, ID: thumbnail-anchor
+												273 link Description: 5つの数字で24を作れ！｜ジャマイカの木, Value: studio.youtube.com/video/UizNqcegWhM/edit, ID: video-title
+												274 text 4・3・1・4・4を全部1回ずつ使って、24を作れる？ 使えるのは ＋ − × ÷。数字をつなぐと、計算の木が育っていく。 別の作り方もある？コメントで教えて。 計算パズル「ジャマイカの木」 iPhoneのApp Storeで「ジャマイカの木」を検索。 #ジャマイカの木 #算数パズル #脳トレ
+										275 cell
+											276 text —
+										277 cell
+											278 text 公開予約
+										279 cell
+											280 text 2026/11/02
+											281 text 公開予約
+										282 cell
+											283 text 0
+										284 cell
+											285 link Description: 動画にコメントが 0 件あります。動画のコメントページ, Value: studio.youtube.com/video/UizNqcegWhM/comments
+								286 row
+									287 container row-container
+										288 cell
+											289 container 5つの数字で65を作れる？｜ジャマイカの木 を選択
+												290 checkbox Description: 5つの数字で65を作れる？｜ジャマイカの木 を選択, Value: 0, ID: checkbox
+										291 cell
+											292 container
+												293 link Description: 動画のサムネイル: 5つの数字で65を作れる？｜ジャマイカの木 0:18, Value: studio.youtube.com/video/Uzb_IJSdbAo/edit, ID: thumbnail-anchor
+												294 link Description: 5つの数字で65を作れる？｜ジャマイカの木, Value: studio.youtube.com/video/Uzb_IJSdbAo/edit, ID: video-title
+												295 text 1・10・9・4・5を全部1回ずつ使って、65を作れる？ 使えるのは ＋ − × ÷。 65にする式、思いついた？コメントで教えて。 計算パズル「ジャマイカの木」 iPhoneのApp Storeで「ジャマイカの木」を検索。 #ジャマイカの木 #算数パズル #脳トレ
+										296 cell
+											297 text —
+										298 cell
+											299 text 公開
+										300 cell
+											301 text 2026/11/01
+											302 text 公開日
+										303 cell
+											304 text 780
+										305 cell
+											306 link Description: 動画にコメントが 0 件あります。動画のコメントページ, Value: studio.youtube.com/video/Uzb_IJSdbAo/comments
+								307 row
+									308 container row-container
+										309 cell
+											310 container 5つの数字で23を作れ！｜ジャマイカの木 を選択
+												311 checkbox Description: 5つの数字で23を作れ！｜ジャマイカの木 を選択, Value: 0, ID: checkbox
+										312 cell
+											313 container
+												314 link Description: 動画のサムネイル: 5つの数字で23を作れ！｜ジャマイカの木 0:17, Value: studio.youtube.com/video/N5tv1joJQBc/edit, ID: thumbnail-anchor
+												315 link Description: 5つの数字で23を作れ！｜ジャマイカの木, Value: studio.youtube.com/video/N5tv1joJQBc/edit, ID: video-title
+												316 text 3・2・3・2・6を全部1回ずつ使って、23を作れる？ 使えるのは ＋ − × ÷。数字をつなぐと、計算の木が育っていく。 別の作り方もある？コメントで教えて。 計算パズル「ジャマイカの木」 iPhoneのApp Storeで「ジャマイカの木」を検索。 #ジャマイカの木 #算数パズル #脳トレ
+										317 cell
+											318 text —
+										319 cell
+											320 text 公開
+										321 cell
+											322 text 2026/11/01
+											323 text 公開日
+										324 cell
+											325 text 328
+										326 cell
+											327 link Description: 動画にコメントが 0 件あります。動画のコメントページ, Value: studio.youtube.com/video/N5tv1joJQBc/comments
+								328 row
+									329 container row-container
+										330 cell
+											331 container この人、2皿運べます。特技を活かす食堂経営｜異世界レストラン を選択
+												332 checkbox Description: この人、2皿運べます。特技を活かす食堂経営｜異世界レストラン を選択, Value: 0, ID: checkbox
+										333 cell
+											334 container
+												335 link Description: 動画のサムネイル: この人、2皿運べます。特技を活かす食堂経営｜異世界レストラン 0:23, Value: studio.youtube.com/video/gjxdr-lEQ3U/edit, ID: thumbnail-anchor
+												336 link Description: この人、2皿運べます。特技を活かす食堂経営｜異世界レストラン, Value: studio.youtube.com/video/gjxdr-lEQ3U/edit, ID: video-title
+												337 text 「両手運び」なら配膳優先。肉料理が得意なら、肉料理を任せよう。 レベルアップで新たな特技を覚えることも。レアな特技に出会えるかも。仲間の特技を活かして、お店をまわそう。 食堂経営ゲーム『異世界レストラン』 iPhone向け・基本プレイ無料（アプリ内課金あり）。 App Storeで「異世界レストラン」を検索。 #異世界レストラン #経営ゲーム #Shorts
+										338 cell
+											339 text —
+										340 cell
+											341 text 公開
+										342 cell
+											343 text 2026/10/31
+											344 text 公開日
+										345 cell
+											346 text 161
+										347 cell
+											348 link Description: 動画にコメントが 0 件あります。動画のコメントページ, Value: studio.youtube.com/video/gjxdr-lEQ3U/comments
+								349 row
+									350 container row-container
+										351 cell
+											352 container 敵の群れを、まとめて撃ち抜く。｜ツギハギサバイバー を選択
+												353 checkbox Description: 敵の群れを、まとめて撃ち抜く。｜ツギハギサバイバー を選択, Value: 0, ID: checkbox
+										354 cell
+											355 container
+												356 link Description: 動画のサムネイル: 敵の群れを、まとめて撃ち抜く。｜ツギハギサバイバー 0:11, Value: studio.youtube.com/video/Gvl3H7EN_AE/edit, ID: thumbnail-anchor
+												357 link Description: 敵の群れを、まとめて撃ち抜く。｜ツギハギサバイバー, Value: studio.youtube.com/video/Gvl3H7EN_AE/edit, ID: video-title
+												358 text 氷の弾で、敵の列をまとめて撃ち抜く。 パーツの組み合わせで、攻撃が変わる。 パズル×爽快シューティング『ツギハギサバイバー』 iPhone向け・基本プレイ無料。 App Storeで「ツギハギサバイバー」を検索。 アプリ一覧はプロフィールのリンクから。 #ツギハギサバイバー #スマホゲーム #シューティング #Shorts
+										359 cell
+											360 text —
+										361 cell
+											362 text 公開
+										363 cell
+											364 text 2026/10/31
+											365 text 公開日
+										366 cell
+											367 text 100
+										368 cell
+											369 link Description: 動画にコメントが 0 件あります。動画のコメントページ, Value: studio.youtube.com/video/Gvl3H7EN_AE/comments
+								370 row
+									371 container row-container
+										372 cell
+											373 container 5つの数字で61を作れる？【難易度★★★★☆】 を選択
+												374 checkbox Description: 5つの数字で61を作れる？【難易度★★★★☆】 を選択, Value: 0, ID: checkbox
+										375 cell
+											376 container
+												377 link Description: 動画のサムネイル: 5つの数字で61を作れる？【難易度★★★★☆】 0:19, Value: studio.youtube.com/video/OmNOu1BR_bM/edit, ID: thumbnail-anchor
+												378 link Description: 5つの数字で61を作れる？【難易度★★★★☆】, Value: studio.youtube.com/video/OmNOu1BR_bM/edit, ID: video-title
+												379 text 1 9 10 9 1 5つの数字を全部1回ずつ使って61を作れ 使えるのは ＋ − × ÷ みんなは時間内に解けた？ 作れた式をコメントで教えて 別の解き方も募集中 あなたもアプリで挑戦 計算パズル「ジャマイカの木」 iPhoneのApp Storeで検索 #ジャマイカの木 #算数チャレンジ #計算パズル #脳トレ

@@ -1,0 +1,37 @@
+{
+  "target": 12,
+  "numbers": [
+    4,
+    2,
+    3,
+    3,
+    2
+  ],
+  "sourceSize": [
+    1206,
+    2622
+  ],
+  "capture": "Native app UI in isolated Jamaica Ad Capture simulator; ordinary random Challenge easy puzzle; no game code or puzzle-state changes",
+  "review": "Native target, ordered leaves, all four addition operations, wrong14, countdown and native0 visually reviewed from normalized recording, 2026-11-01 JST; no correct solution revealed",
+  "wrongTree": [
+    "+",
+    [
+      "+",
+      [
+        "+",
+        [
+          "+",
+          4,
+          2
+        ],
+        3
+      ],
+      3
+    ],
+    2
+  ],
+  "wrongSourceTime": 30.7,
+  "timeoutSourceTime": 110.2,
+  "reviewedNoAnswerUntil": 110.3,
+  "viewportNote": "Four-level wrong tree exceeds standard crop. Existing fullFrameCuts retain entire native tree after wrong answer. Omit large timeout caption to avoid intermediate-node overlap; retain actual 3,2,1,0 timer and hold zero."
+}

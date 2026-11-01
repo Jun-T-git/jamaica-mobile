@@ -1,0 +1,15 @@
+{
+  "id": "make-13-07705d1a",
+  "target": 13,
+  "numbers": [
+    3,
+    2,
+    1,
+    4,
+    4
+  ],
+  "recording": "make-13-fail.mov",
+  "sha256": "6566dda0c40902bf0bf6c661465bfb81f85d342568c7df4c3e11d115e0ef66c7",
+  "outcome": "rejected",
+  "reason": "3+2=5、5+1=6の途中で時間切れ。全5数字を使った誤答の木が完成しなかったため不採用。投稿なし。"
+}

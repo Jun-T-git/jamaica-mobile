@@ -1,0 +1,92 @@
+{
+  "automaticPublishing": false,
+  "timezone": "Asia/Tokyo",
+  "authorization": "利用者が11/2〜8の1日1本の予約投稿と時刻の選定を2026-11-01のチャットで指示",
+  "timingRationale": "Studio過去28日間のアクセス時間帯レポートはデータ不足。今回19:00 JSTを試行枠として選定。最適時刻との実証はない。",
+  "items": [
+    {
+      "episode": "new-24-2026-11-02",
+      "variant": "reveal",
+      "config": "problems/make-24-4914be8d-reveal.json",
+      "plannedPublishAt": "2026-11-02T19:00:00+09:00",
+      "youtube": {
+        "status": "scheduled",
+        "record": "publication-proof/posts.json",
+        "videoId": "UizNqcegWhM"
+      },
+      "status": "ready"
+    },
+    {
+      "episode": "new-12-2026-11-03",
+      "variant": "fail",
+      "config": "problems/make-12-f2ff0e98-fail.json",
+      "plannedPublishAt": "2026-11-03T19:00:00+09:00",
+      "youtube": {
+        "status": "scheduled",
+        "record": "publication-proof/posts.json",
+        "videoId": "EhhznMRLirI"
+      },
+      "status": "ready"
+    },
+    {
+      "episode": "new-27-2026-11-04",
+      "variant": "reveal",
+      "config": "problems/make-27-f19df18b-reveal.json",
+      "plannedPublishAt": "2026-11-04T19:00:00+09:00",
+      "youtube": {
+        "status": "scheduled",
+        "record": "publication-proof/posts.json",
+        "videoId": "jC-sQ8rZe70"
+      },
+      "status": "ready"
+    },
+    {
+      "episode": "new-20-2026-11-05",
+      "variant": "fail",
+      "config": "problems/make-20-c51014d6-fail.json",
+      "plannedPublishAt": "2026-11-05T19:00:00+09:00",
+      "youtube": {
+        "status": "scheduled",
+        "record": "publication-proof/posts.json",
+        "videoId": "3XhTO_53gas"
+      },
+      "status": "ready"
+    },
+    {
+      "episode": "new-21-2026-11-06",
+      "variant": "reveal",
+      "config": "problems/make-21-d3085766-reveal.json",
+      "plannedPublishAt": "2026-11-06T19:00:00+09:00",
+      "youtube": {
+        "status": "scheduled",
+        "record": "publication-proof/posts.json",
+        "videoId": "t9PLaEkUTw4"
+      },
+      "status": "ready"
+    },
+    {
+      "episode": "new-15-2026-11-07",
+      "variant": "fail",
+      "config": "problems/make-15-a8098f84-fail.json",
+      "plannedPublishAt": "2026-11-07T19:00:00+09:00",
+      "youtube": {
+        "status": "scheduled",
+        "record": "publication-proof/posts.json",
+        "videoId": "FmFTCFqdvU0"
+      },
+      "status": "ready"
+    },
+    {
+      "episode": "new-24-2026-11-08",
+      "variant": "reveal",
+      "config": "problems/make-24-5f107684-reveal.json",
+      "plannedPublishAt": "2026-11-08T19:00:00+09:00",
+      "youtube": {
+        "status": "scheduled",
+        "record": "publication-proof/posts.json",
+        "videoId": "GW1ifSa8cpM"
+      },
+      "status": "ready"
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "id": "make-24-5f107684",
+  "episode": "new-24-2026-11-08",
+  "variant": "reveal",
+  "numbers": [
+    1,
+    1,
+    3,
+    3,
+    2
+  ],
+  "target": 24,
+  "answerTree": [
+    "*",
+    [
+      "+",
+      1,
+      3
+    ],
+    [
+      "+",
+      [
+        "+",
+        1,
+        3
+      ],
+      2
+    ]
+  ],
+  "recording": "../sources/make-24b-reveal.mov",
+  "evidence": "../sources/make-24b-reveal-evidence.json",
+  "sourceSha256": "aadc2685bb7860f01f9ced0f28fb82ff9f65ee0fdc73a1a60ae403b2dac08a15",
+  "normalizedCache": "../build/make-24-5f107684-cfr.mp4",
+  "normalizedSha256": "72379f1b8f5bd3be9933de6104fecac0165730cb45285aff5b0a8251c3f65ac3",
+  "unsolvedWindow": [
+    1,
+    3.5
+  ],
+  "questionStillTime": 2,
+  "cleanCompletedTime": 29.166666666666668,
+  "cuts": [
+    [
+      1,
+      3
+    ],
+    [
+      4.2,
+      5.2
+    ],
+    [
+      5.7,
+      7.3
+    ],
+    [
+      9.6,
+      10.8
+    ],
+    [
+      13,
+      14.6
+    ],
+    [
+      16.5,
+      17.7
+    ],
+    [
+      20.7,
+      22.3
+    ],
+    [
+      24.4,
+      25.6
+    ],
+    [
+      27.5,
+      29.2
+    ]
+  ],
+  "operatorFreezes": [],
+  "effects": [
+    {
+      "file": "connect.mp3",
+      "source": 6,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 13.2,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 21,
+      "gain": 0.4
+    },
+    {
+      "file": "success.mp3",
+      "source": 27.9,
+      "gain": 0.5
+    }
+  ],
+  "completedHold": 2.1,
+  "endCardDuration": 2.0
+}

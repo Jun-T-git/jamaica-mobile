@@ -1,0 +1,120 @@
+{
+  "id": "make-27-f19df18b",
+  "episode": "new-27-2026-11-04",
+  "variant": "reveal",
+  "numbers": [
+    3,
+    1,
+    3,
+    2,
+    4
+  ],
+  "target": 27,
+  "answerTree": [
+    "*",
+    [
+      "*",
+      3,
+      3
+    ],
+    [
+      "+",
+      [
+        "-",
+        4,
+        2
+      ],
+      1
+    ]
+  ],
+  "recording": "../sources/make-27-reveal.mov",
+  "evidence": "../sources/make-27-reveal-evidence.json",
+  "sourceSha256": "5dc25a6b4410ee8bd9a82a7a9bf94db57894b75fdf222831420cc72e68057398",
+  "normalizedCache": "../build/make-27-f19df18b-cfr.mp4",
+  "normalizedSha256": "709a28536e7d92e6b62ff0ea3308d1e7071853e8bded5afbbd5d6acf06eaea7d",
+  "unsolvedWindow": [
+    1,
+    10
+  ],
+  "questionStillTime": 2,
+  "cleanCompletedTime": 66.8,
+  "cuts": [
+    [
+      2,
+      4
+    ],
+    [
+      11.6,
+      12
+    ],
+    [
+      16,
+      16.6
+    ],
+    [
+      20.3,
+      21.9
+    ],
+    [
+      25.8,
+      26.2
+    ],
+    [
+      30,
+      30.6
+    ],
+    [
+      33.5,
+      35.1
+    ],
+    [
+      41.5,
+      41.9
+    ],
+    [
+      48,
+      48.6
+    ],
+    [
+      50.7,
+      52.3
+    ],
+    [
+      58,
+      58.4
+    ],
+    [
+      62,
+      62.6
+    ],
+    [
+      65.3,
+      66.9
+    ]
+  ],
+  "operatorFreezes": [],
+  "effects": [
+    {
+      "file": "connect.mp3",
+      "source": 20.6,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 33.8,
+      "gain": 0.4
+    },
+    {
+      "file": "connect.mp3",
+      "source": 51.0,
+      "gain": 0.4
+    },
+    {
+      "file": "success.mp3",
+      "source": 65.7,
+      "gain": 0.5
+    }
+  ],
+  "completedHold": 2.1,
+  "endCardDuration": 2.0
+}

@@ -1,0 +1,149 @@
+[
+  {
+    "file": "exports/make-24-4914be8d/reveal/make-24-4914be8d-reveal.mp4",
+    "config": "problems/make-24-4914be8d-reveal.json",
+    "target": 24,
+    "numbers": [
+      4,
+      3,
+      1,
+      4,
+      4
+    ],
+    "variant": "reveal",
+    "seconds": 16.2,
+    "sha256": "1ee83f4799c19cb683cccb903d68e0981c1dd2551fe6fd41cb8e592b1f35d35a",
+    "plannedPublishAt": "2026-11-02T19:00:00+09:00",
+    "visualReview": "passed",
+    "independentReview": "independent-qa.json",
+    "integratedLUFS": -16.98,
+    "truePeakDBTP": -1.53,
+    "reviewScope": "全デコード・演算・全5数字・カット境界・360px抽出画面。主観的な連続視聴/音声試聴は未確認。投稿UIの再生・初期チェックはpublication-proof/posts.jsonを参照。"
+  },
+  {
+    "file": "exports/make-12-f2ff0e98/fail/make-12-f2ff0e98-fail.mp4",
+    "config": "problems/make-12-f2ff0e98-fail.json",
+    "target": 12,
+    "numbers": [
+      4,
+      2,
+      3,
+      3,
+      2
+    ],
+    "variant": "fail",
+    "seconds": 19.5,
+    "sha256": "6f029f4b55dabf855cf3ce50e0d596675fc8d36375f281a1ed4c0e0d64f73ad7",
+    "plannedPublishAt": "2026-11-03T19:00:00+09:00",
+    "visualReview": "passed",
+    "independentReview": "independent-qa.json",
+    "integratedLUFS": -17.04,
+    "truePeakDBTP": -2.13,
+    "reviewScope": "全デコード・演算・全5数字・カット境界・360px抽出画面。主観的な連続視聴/音声試聴は未確認。投稿UIの再生・初期チェックはpublication-proof/posts.jsonを参照。"
+  },
+  {
+    "file": "exports/make-27-f19df18b/reveal/make-27-f19df18b-reveal.mp4",
+    "config": "problems/make-27-f19df18b-reveal.json",
+    "target": 27,
+    "numbers": [
+      3,
+      1,
+      3,
+      2,
+      4
+    ],
+    "variant": "reveal",
+    "seconds": 16.5,
+    "sha256": "3f2e5b1ca1527fb3d8608f92457f54ca07b4434b9d0b018e37515dc0ac403f6d",
+    "plannedPublishAt": "2026-11-04T19:00:00+09:00",
+    "visualReview": "passed",
+    "independentReview": "independent-qa.json",
+    "integratedLUFS": -16.96,
+    "truePeakDBTP": -2.13,
+    "reviewScope": "全デコード・演算・全5数字・カット境界・360px抽出画面。主観的な連続視聴/音声試聴は未確認。投稿UIの再生・初期チェックはpublication-proof/posts.jsonを参照。"
+  },
+  {
+    "file": "exports/make-20-c51014d6/fail/make-20-c51014d6-fail.mp4",
+    "config": "problems/make-20-c51014d6-fail.json",
+    "target": 20,
+    "numbers": [
+      4,
+      3,
+      2,
+      3,
+      1
+    ],
+    "variant": "fail",
+    "seconds": 19.1,
+    "sha256": "4ffe314314ec300cf79aca08caf66e1b05bd56639c9bcb278260d84c987412ab",
+    "plannedPublishAt": "2026-11-05T19:00:00+09:00",
+    "visualReview": "passed",
+    "independentReview": "independent-qa.json",
+    "integratedLUFS": -17.06,
+    "truePeakDBTP": -1.29,
+    "reviewScope": "全デコード・演算・全5数字・カット境界・360px抽出画面。主観的な連続視聴/音声試聴は未確認。投稿UIの再生・初期チェックはpublication-proof/posts.jsonを参照。"
+  },
+  {
+    "file": "exports/make-21-d3085766/reveal/make-21-d3085766-reveal.mp4",
+    "config": "problems/make-21-d3085766-reveal.json",
+    "target": 21,
+    "numbers": [
+      1,
+      2,
+      3,
+      3,
+      1
+    ],
+    "variant": "reveal",
+    "seconds": 17.1,
+    "sha256": "2c355e6dfe11128e58111409d32689e50b634aa8d6c66b08bf059303e34251ed",
+    "plannedPublishAt": "2026-11-06T19:00:00+09:00",
+    "visualReview": "passed",
+    "independentReview": "independent-qa.json",
+    "integratedLUFS": -16.93,
+    "truePeakDBTP": -1.62,
+    "reviewScope": "全デコード・演算・全5数字・カット境界・360px抽出画面。主観的な連続視聴/音声試聴は未確認。投稿UIの再生・初期チェックはpublication-proof/posts.jsonを参照。"
+  },
+  {
+    "file": "exports/make-15-a8098f84/fail/make-15-a8098f84-fail.mp4",
+    "config": "problems/make-15-a8098f84-fail.json",
+    "target": 15,
+    "numbers": [
+      2,
+      4,
+      4,
+      3,
+      3
+    ],
+    "variant": "fail",
+    "seconds": 19.1,
+    "sha256": "c01f38cd48c5dba1941f84293bef7600a40532307e7bd9509dd3112a52b9f1f1",
+    "plannedPublishAt": "2026-11-07T19:00:00+09:00",
+    "visualReview": "passed",
+    "independentReview": "independent-qa.json",
+    "integratedLUFS": -17.05,
+    "truePeakDBTP": -1.49,
+    "reviewScope": "全デコード・演算・全5数字・カット境界・360px抽出画面。主観的な連続視聴/音声試聴は未確認。投稿UIの再生・初期チェックはpublication-proof/posts.jsonを参照。"
+  },
+  {
+    "file": "exports/make-24-5f107684/reveal/make-24-5f107684-reveal.mp4",
+    "config": "problems/make-24-5f107684-reveal.json",
+    "target": 24,
+    "numbers": [
+      1,
+      1,
+      3,
+      3,
+      2
+    ],
+    "variant": "reveal",
+    "seconds": 17.2,
+    "sha256": "d9b96348645829f4973f4bb9fa0f26107794dfa8044334d0b3446dd7c10754e0",
+    "plannedPublishAt": "2026-11-08T19:00:00+09:00",
+    "visualReview": "passed",
+    "independentReview": "independent-qa.json",
+    "integratedLUFS": -16.87,
+    "truePeakDBTP": -1.43,
+    "reviewScope": "全デコード・演算・全5数字・カット境界・360px抽出画面。主観的な連続視聴/音声試聴は未確認。投稿UIの再生・初期チェックはpublication-proof/posts.jsonを参照。"
+  }
+]

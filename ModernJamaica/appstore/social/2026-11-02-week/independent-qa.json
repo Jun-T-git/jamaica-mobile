@@ -1,0 +1,92 @@
+{
+  "reviewer": "week-visual-qa",
+  "method": "最終MP4の全デコード・全カット前後・360px幅の抽出画像による独立確認",
+  "continuousViewing": false,
+  "audioListening": false,
+  "items": [
+    {
+      "id": "make-24-4914be8d",
+      "variant": "reveal",
+      "sampledFrames": 28,
+      "result": "passed",
+      "checked": [
+        "演算と元の5数字・目標・根・枝・色",
+        "全カット境界",
+        "結果とCTA・タイトルのvariant区別",
+        "popup残像・次問・終了画面・正解漏れの除外"
+      ]
+    },
+    {
+      "id": "make-12-f2ff0e98",
+      "variant": "fail",
+      "sampledFrames": 32,
+      "result": "passed",
+      "checked": [
+        "演算と元の5数字・目標・根・枝・色",
+        "全カット境界",
+        "結果とCTA・タイトルのvariant区別",
+        "popup残像・次問・終了画面・正解漏れの除外"
+      ]
+    },
+    {
+      "id": "make-27-f19df18b",
+      "variant": "reveal",
+      "sampledFrames": 30,
+      "result": "passed",
+      "checked": [
+        "演算と元の5数字・目標・根・枝・色",
+        "全カット境界",
+        "結果とCTA・タイトルのvariant区別",
+        "popup残像・次問・終了画面・正解漏れの除外"
+      ]
+    },
+    {
+      "id": "make-20-c51014d6",
+      "variant": "fail",
+      "sampledFrames": 33,
+      "result": "passed",
+      "checked": [
+        "演算と元の5数字・目標・根・枝・色",
+        "全カット境界",
+        "結果とCTA・タイトルのvariant区別",
+        "popup残像・次問・終了画面・正解漏れの除外"
+      ]
+    },
+    {
+      "id": "make-21-d3085766",
+      "variant": "reveal",
+      "sampledFrames": 26,
+      "result": "passed",
+      "checked": [
+        "演算と元の5数字・目標・根・枝・色",
+        "全カット境界",
+        "結果とCTA・タイトルのvariant区別",
+        "popup残像・次問・終了画面・正解漏れの除外"
+      ]
+    },
+    {
+      "id": "make-15-a8098f84",
+      "variant": "fail",
+      "sampledFrames": 32,
+      "result": "passed",
+      "checked": [
+        "演算と元の5数字・目標・根・枝・色",
+        "全カット境界",
+        "結果とCTA・タイトルのvariant区別",
+        "popup残像・次問・終了画面・正解漏れの除外"
+      ]
+    },
+    {
+      "id": "make-24-5f107684",
+      "variant": "reveal",
+      "sampledFrames": 28,
+      "result": "passed",
+      "checked": [
+        "演算と元の5数字・目標・根・枝・色",
+        "全カット境界",
+        "結果とCTA・タイトルのvariant区別",
+        "popup残像・次問・終了画面・正解漏れの除外"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "decode": "passed",
+  "resolution": [
+    1080,
+    1920
+  ],
+  "duration": 16.2,
+  "fps": 30.0,
+  "frames": 486,
+  "sourceSha256": "e77248a73752de8481a4e64457b733bb487617098855f7fbbab6cff34de61a69",
+  "sha256": "1ee83f4799c19cb683cccb903d68e0981c1dd2551fe6fd41cb8e592b1f35d35a",
+  "integratedLUFS": -16.98,
+  "truePeakDBTP": -1.53,
+  "appFrameUncropped": false,
+  "nativeStatsOmitted": true,
+  "nativeTargetRetained": true,
+  "customPlaybackTarget": false,
+  "variant": "reveal",
+  "endCardStart": 14.2,
+  "endCardOpaque": true,
+  "presentation": {},
+  "cropping": true,
+  "developerBannerPixelFractionMax": 0,
+  "visualReview": {
+    "sourceFrames": "passed: native target, ordered leaves, operators, results, popup and clean tree checked",
+    "finalExtractedFrames": "passed: 10-frame contact, first/complete/ending visible; no overlap or next puzzle",
+    "fullPlayback": "not performed by editor",
+    "audioListening": "not performed by editor; loudness measured",
+    "cutBoundaries": "passed: first/last frame of every gameplay cut and completed hold/CTA checked in boundaries.jpg"
+  },
+  "published": false
+}

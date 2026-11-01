@@ -1,0 +1,207 @@
+{
+  "appSourceBounds": [
+    0,
+    0,
+    1206,
+    2622
+  ],
+  "fit": "Native target and continuous tree-controls region retained; only blank strip y700-1000 removed; no custom playback target",
+  "captionBounds": {
+    "brandHeader": {
+      "icon": [
+        110,
+        258,
+        80,
+        80
+      ],
+      "title": [
+        210,
+        275,
+        333,
+        46
+      ]
+    },
+    "difficulty": {
+      "level": 1,
+      "bands": [
+        [
+          10,
+          19
+        ],
+        [
+          20,
+          39
+        ],
+        [
+          40,
+          59
+        ],
+        [
+          60,
+          79
+        ],
+        [
+          80,
+          99
+        ]
+      ],
+      "label": [
+        739,
+        258,
+        82,
+        28
+      ],
+      "stars": [
+        [
+          675,
+          298,
+          34,
+          34
+        ],
+        [
+          718,
+          298,
+          34,
+          34
+        ],
+        [
+          761,
+          298,
+          34,
+          34
+        ],
+        [
+          804,
+          298,
+          34,
+          34
+        ],
+        [
+          847,
+          298,
+          34,
+          34
+        ]
+      ],
+      "displayStart": 0,
+      "displayEnd": 17.5
+    },
+    "gameViewport": {
+      "sourceCrops": [
+        [
+          0,
+          420,
+          1206,
+          280
+        ],
+        [
+          0,
+          1000,
+          1206,
+          1550
+        ]
+      ],
+      "omittedBlankStrip": [
+        0,
+        700,
+        1206,
+        300
+      ],
+      "placement": [
+        110,
+        350,
+        860,
+        1304
+      ],
+      "nativeTargetRetained": true,
+      "treeAndControlsContinuous": true
+    },
+    "この5つの数字で": [
+      367,
+      585,
+      345,
+      44
+    ],
+    "12を作れる？": [
+      294,
+      665,
+      491,
+      77
+    ],
+    "puzzleRule": {
+      "text": "5つの数を使って12を作れ",
+      "runs": [
+        {
+          "text": "5つの数を使って",
+          "color": "#f7f8fc",
+          "bounds": [
+            190,
+            984,
+            403,
+            51
+          ]
+        },
+        {
+          "text": "12",
+          "color": "#fde047",
+          "bounds": [
+            608,
+            969,
+            112,
+            64
+          ]
+        },
+        {
+          "text": "を作れ",
+          "color": "#f7f8fc",
+          "bounds": [
+            734,
+            984,
+            156,
+            51
+          ]
+        }
+      ]
+    },
+    "numberFrame": {
+      "bounds": [
+        130,
+        1070,
+        950,
+        1248
+      ],
+      "displayStart": 0,
+      "displayEnd": 2
+    },
+    "みんなは解けた？": [
+      276,
+      350,
+      527,
+      66
+    ],
+    "ジャマイカの木": [
+      291,
+      835,
+      498,
+      68
+    ],
+    "あなたもアプリで挑戦": [
+      347,
+      965,
+      386,
+      37
+    ],
+    "App Storeで検索": [
+      337,
+      1125,
+      406,
+      53
+    ],
+    "時間切れ": [
+      406,
+      800,
+      267,
+      64
+    ]
+  }
+}

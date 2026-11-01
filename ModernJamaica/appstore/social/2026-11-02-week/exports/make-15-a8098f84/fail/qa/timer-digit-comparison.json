@@ -1,0 +1,23 @@
+{
+  "compositingRegionEndsAtY": 270,
+  "timerDigitsRegionStartsAtY": 270,
+  "digitsAreOutsideOverlay": true,
+  "comparison": [
+    {
+      "time": 13.3,
+      "timerDigitsMeanAbsolutePixelDifferenceAfterReencode": 0.022450532724505326
+    },
+    {
+      "time": 14.3,
+      "timerDigitsMeanAbsolutePixelDifferenceAfterReencode": 0.02125824454591578
+    },
+    {
+      "time": 15.3,
+      "timerDigitsMeanAbsolutePixelDifferenceAfterReencode": 0.019507864028411974
+    },
+    {
+      "time": 16.7,
+      "timerDigitsMeanAbsolutePixelDifferenceAfterReencode": 0.039294774226281075
+    }
+  ]
+}

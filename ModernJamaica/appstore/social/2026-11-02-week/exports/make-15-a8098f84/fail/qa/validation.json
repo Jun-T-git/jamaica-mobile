@@ -1,0 +1,65 @@
+{
+  "decode": "passed",
+  "resolution": [
+    1080,
+    1920
+  ],
+  "duration": 19.1,
+  "fps": 30.0,
+  "frames": 573,
+  "sourceSha256": "127698b23a9ddc4305cd7787bfcd092ce83d15749a59171c9e7d7693c48973e5",
+  "sha256": "c01f38cd48c5dba1941f84293bef7600a40532307e7bd9509dd3112a52b9f1f1",
+  "integratedLUFS": -17.05,
+  "truePeakDBTP": -1.49,
+  "appFrameUncropped": false,
+  "nativeStatsOmitted": true,
+  "nativeTargetRetained": true,
+  "customPlaybackTarget": false,
+  "variant": "fail",
+  "endCardStart": 17.1,
+  "endCardOpaque": true,
+  "presentation": {},
+  "cropping": true,
+  "developerBannerPixelFractionMax": 0,
+  "visualReview": {
+    "sourceFrames": "passed: native target/leaves/four operations/wrong16/countdown0 checked; no answer revealed",
+    "finalExtractedFrames": "passed: native0 and all5 leaves visible, development refresh banner removed by restoring static native label from same recording",
+    "fullPlayback": "not performed by editor",
+    "audioListening": "not performed by editor; loudness measured, AAC stream copied in postprocess",
+    "cutBoundaries": "passed: every cut first/last frame and final native0/CTA checked after label restoration"
+  },
+  "published": false,
+  "postprocess": {
+    "operation": "Restore only the native static timer label covered by blue development overlay",
+    "sourceLabel": {
+      "normalizedRecording": "build/make-15-a8098f84-cfr.mp4",
+      "time": 3,
+      "crop": [
+        335,
+        205,
+        260,
+        80
+      ],
+      "scale": [
+        180,
+        55
+      ]
+    },
+    "placement": [
+      720,
+      215,
+      180,
+      55
+    ],
+    "outputInterval": [
+      13.2,
+      17.1
+    ],
+    "nativeTimerDigitsBelowY": 270,
+    "nativeTimerNumbersReplaced": false,
+    "treePixelsCompositedOver": false,
+    "unmaskedSha256": "176073eae6fc9ac1eb40f27178ab8b4824414842679b55b333610034e2eb97a6",
+    "finalSha256": "c01f38cd48c5dba1941f84293bef7600a40532307e7bd9509dd3112a52b9f1f1"
+  },
+  "postprocessDeveloperBannerFractionMax": 0
+}
