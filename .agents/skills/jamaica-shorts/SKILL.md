@@ -28,7 +28,7 @@ python3 .agents/skills/jamaica-shorts/scripts/problems.py check --target 23 --nu
 
 制作指針のテンプレート・native画面・音源を再利用する。正解版は実際の正解と完成した木、失敗版は実際の不正解と制限時間ゼロを収録し、失敗版に正解を見せない。未操作画面の数字を編集で別問題へ書き換えない。
 
-収録・編集の具体例は `ModernJamaica/appstore/social/2026-10-31-duo/`。`renderer/render.py` は元収録のハッシュ・算術・時刻を検査してから書き出す。候補のtargetだけを変えて旧素材を流用しない。カットと正解後の保持時刻は新しい30fps正規化素材で決める。
+収録の具体例は `ModernJamaica/appstore/social/2026-10-31-duo/`。改善編集の出発点は `ModernJamaica/appstore/social/2026-11-01-duo-v2/` と制作指針の11/1節。rendererは前者を使い、manifestは後者を指定する。`renderer/render.py` は元収録のハッシュ・算術・時刻を検査してから書き出す。候補のtargetだけを変えて旧素材を流用しない。カットと正解後の保持時刻は新しい30fps正規化素材で決める。
 
 **同じ目標数を再使用できるので、保存先・configのidを目標数だけで作らない。** `reserve` が返す `suggestedId` とvariantを使い、既存動画・問題設定を上書きしない。数字の元の並びは収録記録にそのまま保存し、重複判定だけをソートする。
 

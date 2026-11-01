@@ -1,0 +1,22 @@
+[
+  {
+    "file": "exports/make-23/reveal/make-23-reveal.mp4",
+    "target": 23,
+    "variant": "reveal",
+    "seconds": 15.7,
+    "sha256": "e2813a6c7e4ac735f915be4365b96f1bf3fbc9aaddb3f603a6d800c5b446e18f",
+    "visualReview": "passed",
+    "visualReviewScope": "主担当・独立担当によるカット境界・演算・結果・CTAの抽出画像、360px幅確認。通し再生・主観的音声試聴・投稿UIは未確認",
+    "published": false
+  },
+  {
+    "file": "exports/make-65/fail/make-65-fail.mp4",
+    "target": 65,
+    "variant": "fail",
+    "seconds": 16.5,
+    "sha256": "94487589fbacd1ccd08b8ee92d2be022b34446facdcffad506b3a2eb6bdf2a70",
+    "visualReview": "passed",
+    "visualReviewScope": "主担当・独立担当によるカット境界・演算・結果・CTAの抽出画像、360px幅確認。通し再生・主観的音声試聴・投稿UIは未確認",
+    "published": false
+  }
+]

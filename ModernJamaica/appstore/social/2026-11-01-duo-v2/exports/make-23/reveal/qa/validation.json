@@ -1,0 +1,31 @@
+{
+  "decode": "passed",
+  "resolution": [
+    1080,
+    1920
+  ],
+  "duration": 15.7,
+  "fps": 30.0,
+  "frames": 471,
+  "sourceSha256": "9fb5ac5bef0b58ed7cbe31e7b0190062f1a7eb7b6b0a9f2d1e0ef41c67518349",
+  "sha256": "e2813a6c7e4ac735f915be4365b96f1bf3fbc9aaddb3f603a6d800c5b446e18f",
+  "integratedLUFS": -16.95,
+  "truePeakDBTP": -2.0,
+  "appFrameUncropped": false,
+  "nativeStatsOmitted": true,
+  "nativeTargetRetained": true,
+  "customPlaybackTarget": false,
+  "variant": "reveal",
+  "endCardStart": 13.9,
+  "endCardOpaque": false,
+  "presentation": {
+    "version": 2,
+    "introDuration": 1.6,
+    "ctaStillTime": 53.7
+  },
+  "cropping": true,
+  "developerBannerPixelFractionMax": 0,
+  "visualReview": "passed",
+  "published": false,
+  "visualReviewScope": "主担当・独立担当によるカット境界・演算・結果・CTAの抽出画像、360px幅確認。通し再生・主観的音声試聴・投稿UIは未確認"
+}

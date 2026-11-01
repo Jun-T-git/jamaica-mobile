@@ -26,7 +26,11 @@ def validate_problem(c):
     value,used=evaluate_tree(c['answerTree'])
     if value!=c['target'] or Counter(used)!=Counter(c['numbers']):raise ValueError('Solution must reach target using all five numbers exactly once')
     if c['variant'] not in ['reveal','fail']:raise ValueError('Unknown variant')
-    if not c['cuts'] or abs(c['cuts'][0][1]-c['cuts'][0][0]-2)>1e-6:raise ValueError('Intro must be 2 seconds')
+    intro=c.get('presentation',{}).get('introDuration',2)
+    presentation=c.get('presentation',{})
+    if presentation.get('version',1) not in (1,2):raise ValueError('Unknown presentation version')
+    if type(intro) not in (int,float) or not math.isfinite(intro) or not .5<=intro<=3:raise ValueError('Invalid intro duration')
+    if not c['cuts'] or abs(c['cuts'][0][1]-c['cuts'][0][0]-intro)>1e-6:raise ValueError('Intro cut does not match its duration')
     last=-1
     for a,b in c['cuts']:
         if not all(isinstance(x,(int,float)) and math.isfinite(x) for x in [a,b]) or not 0<=a<b or a<last:raise ValueError('Cuts must be chronological and nonoverlapping')
@@ -46,6 +50,22 @@ def validate_problem(c):
         wrong,used=evaluate_tree(c['wrongTree'])
         if wrong==c['target'] or Counter(used)!=Counter(c['numbers']):raise ValueError('Wrong-answer take must use the same five digits and miss the target')
         if any(e['file']=='success.mp3' for e in c['effects']):raise ValueError('Fail variant cannot use success effect')
+        closing=presentation.get('ctaStillTime',c['questionStillTime'])
+        if type(closing) not in (int,float) or not math.isfinite(closing) or not 0<=closing<=c['reviewedNoAnswerUntil']:raise ValueError('Closing frame outside reviewed answer-free footage')
+    caption=presentation.get('resultCaption')
+    if caption:
+        start,end=caption['start'],caption['end']
+        play=sum(b-a for a,b in c['cuts'])+sum(f['seconds'] for f in c['operatorFreezes'])+c['completedHold']
+        if not all(type(t) in (int,float) and math.isfinite(t) for t in (start,end)) or not 0<=start<end<=play+1e-6:raise ValueError('Caption outside gameplay')
+        if c['variant']=='fail':
+            elapsed=0;wrong_at=None
+            for i,(a,b) in enumerate(c['cuts']):
+                pauses=[f for f in c['operatorFreezes'] if f['cut']==i]
+                if a<=c['wrongSourceTime']<b:
+                    wrong_at=elapsed+c['wrongSourceTime']-a+sum(f['seconds'] for f in pauses if f['sourceTime']<=c['wrongSourceTime'])
+                    break
+                elapsed+=b-a+sum(f['seconds'] for f in pauses)
+            if wrong_at is None or start<wrong_at:raise ValueError('Failure caption before native wrong result')
     return c
 
 def load_problem(path):
@@ -61,5 +81,8 @@ def load_problem(path):
     if list(meta['size'])!=evidence['sourceSize']:raise ValueError('Actual source resolution differs from evidence')
     if max(b for a,b in c['cuts'])>meta['duration']:raise ValueError('Cut extends past recording end')
     if c['variant']=='reveal' and not 0<=c['cleanCompletedTime']<meta['duration']:raise ValueError('Invalid completed frame time')
+    if 'ctaStillTime' in c.get('presentation',{}):
+        t=c['presentation']['ctaStillTime']
+        if type(t) not in (int,float) or not math.isfinite(t) or not 0<=t<meta['duration']:raise ValueError('Invalid closing frame time')
     if c['normalizedCachePath'].exists() and hashlib.sha256(c['normalizedCachePath'].read_bytes()).hexdigest()!=c['normalizedSha256']:raise ValueError('Normalized cache mismatch')
     return c

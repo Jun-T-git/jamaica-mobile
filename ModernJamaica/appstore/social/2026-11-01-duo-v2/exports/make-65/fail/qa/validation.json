@@ -1,0 +1,36 @@
+{
+  "decode": "passed",
+  "resolution": [
+    1080,
+    1920
+  ],
+  "duration": 16.5,
+  "fps": 30.0,
+  "frames": 495,
+  "sourceSha256": "3d6b92d40ac806f9467fd24a50d2468ec3004d6be1dfec82568a097e0a26ae1d",
+  "sha256": "94487589fbacd1ccd08b8ee92d2be022b34446facdcffad506b3a2eb6bdf2a70",
+  "integratedLUFS": -17.09,
+  "truePeakDBTP": -2.98,
+  "appFrameUncropped": false,
+  "nativeStatsOmitted": true,
+  "nativeTargetRetained": true,
+  "customPlaybackTarget": false,
+  "variant": "fail",
+  "endCardStart": 14.7,
+  "endCardOpaque": false,
+  "presentation": {
+    "version": 2,
+    "introDuration": 1.6,
+    "ctaStillTime": 71.5,
+    "resultCaption": {
+      "text": "あと1 どこを直す？",
+      "start": 10.4,
+      "end": 14.7
+    }
+  },
+  "cropping": true,
+  "developerBannerPixelFractionMax": 0,
+  "visualReview": "passed",
+  "published": false,
+  "visualReviewScope": "主担当・独立担当によるカット境界・演算・結果・CTAの抽出画像、360px幅確認。通し再生・主観的音声試聴・投稿UIは未確認"
+}

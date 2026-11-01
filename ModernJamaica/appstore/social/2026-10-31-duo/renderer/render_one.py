@@ -13,6 +13,9 @@ PARSER.add_argument('--problem',required=True,type=Path)
 PARSER.add_argument('--output',required=True,type=Path)
 ARGS=PARSER.parse_args();CONFIG=load_problem(ARGS.problem)
 FAIL=CONFIG['variant']=='fail'
+MODERN=CONFIG.get('presentation',{}).get('version')==2
+PRESENTATION=CONFIG.get('presentation',{})
+INTRO=PRESENTATION.get('introDuration',2)
 OUT=ARGS.output.resolve();OUT.mkdir(parents=True,exist_ok=True)
 APP=next(x for x in Path(__file__).resolve().parents if (x/'ios/ModernJamaica').is_dir());RAW=CONFIG['recordingPath']
 BUILD=OUT/'build';QA=OUT/'qa'
@@ -86,9 +89,14 @@ layout['difficulty']={'level':LEVEL,'bands':STAR_BANDS,'label':[675+(210-small.w
 GAME_CROP='split=2[goal][board];[goal]crop=1206:280:0:420[top];[board]crop=1206:1550:0:1000[bottom];[top][bottom]vstack=inputs=2,scale=860:1304:flags=lanczos,setsar=1'
 layout['gameViewport']={'sourceCrops':[[0,420,1206,280],[0,1000,1206,1550]],'omittedBlankStrip':[0,700,1206,300],'placement':[110,350,860,1304],'nativeTargetRetained':True,'treeAndControlsContinuous':True}
 
-for kind in ['hook','plain','complete','cta']+(['timeout'] if FAIL else []):
+for kind in ['hook','plain','complete','hold','cta']+(['timeout'] if FAIL else []):
     im=header.copy()
-    if kind=='hook':
+    if kind=='hook' and MODERN:
+        label(im,'5つ全部を1回ずつ',975,60,MINT)
+        ImageDraw.Draw(im).rounded_rectangle((130,1070,950,1248),radius=28,outline=MINT,width=5)
+        layout['puzzleRule']={'text':'5つ全部を1回ずつ','targetShownOnlyInNativeCard':True}
+        layout['numberFrame']={'bounds':[130,1070,950,1248],'displayStart':0,'displayEnd':INTRO}
+    elif kind=='hook':
         label(im,'この5つの数字で',585,46,MUTED,False)
         label(im,f'{TARGET}を作れる？',665,80,MINT)
         runs=[('5つの数を使って',52,WHITE),(str(TARGET),76,GOLD),('を作れ',52,WHITE)]
@@ -105,8 +113,14 @@ for kind in ['hook','plain','complete','cta']+(['timeout'] if FAIL else []):
         layout['numberFrame']={'bounds':[130,1070,950,1248],'displayStart':0,'displayEnd':2}
     elif kind=='plain':
         pass
-    elif kind in ['complete','timeout']:
+    elif kind in ['complete','timeout','hold']:
+        if MODERN and kind=='hold':label(im,'次は自分でつなごう',650,54,MINT)
+
         if kind=='timeout':label(im,'時間切れ',800,68,'#fda4af')
+    elif MODERN:
+        label(im,'今度は自分でつなごう',610,48,MINT)
+        label(im,'App Storeで',710,42,WHITE,False)
+        label(im,'「ジャマイカの木」を検索',775,52,WHITE)
     else:
         yy,xx=np.mgrid[0:H,0:W];glow=np.exp(-((xx-540)**2/(650**2)+(yy-850)**2/(850**2)))
         pixels=np.zeros((H,W,3),dtype=np.uint8)
@@ -122,11 +136,15 @@ for kind in ['hook','plain','complete','cta']+(['timeout'] if FAIL else []):
     if kind in ['plain','timeout']:
         timer_overlay=im.copy();ImageDraw.Draw(timer_overlay).rectangle((665,220,970,345),fill=BG);timer_overlay.save(BUILD/('timer-timeout.png' if kind=='timeout' else 'timer.png'))
 Image.new('RGB',(W,H),BG).save(BUILD/'canvas.png')
+RESULT=PRESENTATION.get('resultCaption')
+if RESULT:
+    im=Image.new('RGBA',(W,H));label(im,RESULT['text'],531,32,MINT);im.save(BUILD/'result-caption.png')
+
 
 # The gameplay viewport excludes native chrome and the development refresh strip.
 clips=[];timeline=[];offset=0
 for i,(a,b) in enumerate(CUTS):
-    kind='hook' if offset<2 else 'complete' if i==len(CUTS)-1 else 'plain'
+    kind='hook' if i==0 else 'complete' if i==len(CUTS)-1 else 'plain'
     freeze=FREEZE_LENGTHS.get(i,0)
     frames=round((b-a+freeze)*FPS)
     timing=f"setpts=PTS+if(gte(T\\,{FREEZES[i]-a+1/FPS-1e-6:.9f})\\,{freeze}/TB\\,0),fps=30," if freeze else ''
@@ -148,11 +166,25 @@ for i,(a,b) in enumerate(CUTS):
     print(f'Full-screen cut {i+1} rendered',flush=True)
 
 # Same complete screen after the last merge, held while showing the search copy.
-run(['-loglevel','error','-ss',CONFIG['questionStillTime'] if FAIL else CONFIG['cleanCompletedTime'],'-i',SRC,'-frames:v',1,'-vf',GAME_CROP,BUILD/'complete-game.png'])
-complete=Image.new('RGB',(W,H),BG);complete.paste(Image.open(BUILD/'complete-game.png'),(110,350));complete.save(BUILD/'complete-app.png')
+closing_time=PRESENTATION.get('ctaStillTime',CONFIG['questionStillTime'] if FAIL else CONFIG['cleanCompletedTime'])
+complete=Image.new('RGB',(W,H),BG)
+if MODERN:
+    # Closing composition only: one contiguous native tree crop, no redrawn nodes.
+    # Keep all leaves and roots; omit the now-unused controls to separate the copy.
+    run(['-loglevel','error','-ss',closing_time,'-i',SRC,'-frames:v',1,'-vf','crop=1206:280:0:420,scale=860:200:flags=lanczos',BUILD/'closing-goal.png'])
+    tree_height=940 if FAIL else 1000
+    scaled_tree_height=round(tree_height*860/1206)
+    run(['-loglevel','error','-ss',closing_time,'-i',SRC,'-frames:v',1,'-vf',f'crop=1206:{tree_height}:0:1000,scale=860:{scaled_tree_height}:flags=lanczos',BUILD/'closing-tree.png'])
+    complete.paste(Image.open(BUILD/'closing-goal.png'),(110,350))
+    complete.paste(Image.open(BUILD/'closing-tree.png'),(110,800))
+    layout['closingViewport']={'sourceTreeCrop':[0,1000,1206,tree_height],'treePlacement':[110,800,860,scaled_tree_height],'goalPlacement':[110,350,860,200],'controlsOmitted':True,'nativeTreeContinuous':True}
+else:
+    run(['-loglevel','error','-ss',closing_time,'-i',SRC,'-frames:v',1,'-vf',GAME_CROP,BUILD/'complete-game.png'])
+    complete.paste(Image.open(BUILD/'complete-game.png'),(110,350))
+complete.save(BUILD/'complete-app.png')
 for name,seconds in ([('hold',HOLD)] if HOLD else [])+[('cta',END)]:
     clip=BUILD/f'{name}.mp4';clips.append(clip)
-    overlay='complete' if name=='hold' else 'cta'
+    overlay=('hold' if MODERN else 'complete') if name=='hold' else 'cta'
     run(['-loglevel','warning','-loop',1,'-framerate',FPS,'-i',BUILD/'complete-app.png','-loop',1,'-framerate',FPS,'-i',BUILD/f'{overlay}.png',
          '-filter_complex','[0:v][1:v]overlay=0:0,format=yuv420p[v]','-map','[v]','-frames:v',round(seconds*FPS),'-r',FPS,'-fps_mode','cfr','-an',
          '-c:v','libx264','-preset','fast','-crf',18,clip],f'{name}.log')
@@ -161,13 +193,17 @@ run(['-loglevel','warning','-f','concat','-safe',0,'-i',listing,'-c','copy',BUIL
 
 # Audio composition is the same original score and app effects as v2.
 exec(Path(__file__).with_name('audio.py').read_text())
-run(['-loglevel','warning','-i',BUILD/'silent.mp4','-i',BUILD/'mix.wav','-map','0:v','-map','1:a',
+extra_input=['-loop',1,'-framerate',FPS,'-i',BUILD/'result-caption.png'] if RESULT else []
+extra_filter=['-filter_complex',f"[0:v][2:v]overlay=0:0:enable='between(t,{RESULT['start']},{RESULT['end']-1/FPS})'[captioned]"] if RESULT else []
+video_stream='[captioned]' if RESULT else '0:v'
+
+run(['-loglevel','warning','-i',BUILD/'silent.mp4','-i',BUILD/'mix.wav',*extra_input,*extra_filter,'-map',video_stream,'-map','1:a',
      '-t',DURATION,'-c:v','libx264','-preset','fast','-b:v','3M','-minrate','3M','-maxrate','3M','-bufsize','6M','-x264-params','nal-hrd=cbr:filler=1','-profile:v','high','-pix_fmt','yuv420p','-color_primaries','bt709','-color_trc','bt709','-colorspace','bt709','-af','loudnorm=I=-17:TP=-1.5:LRA=7','-c:a','aac','-ar',48000,'-ac',2,'-b:a','192k',
      '-movflags','+faststart',DEST],'encode.log')
 run(['-v','error','-i',DEST,'-f','null','-'],'decode.log')
 run(['-i',DEST,'-af','loudnorm=I=-17:TP=-1.5:LRA=7:print_format=json','-vn','-f','null','-'],'loudness.log')
 sheet=Image.new('RGB',(1800,1340),BG);d=ImageDraw.Draw(sheet)
-sample_times=list(np.linspace(0,DURATION-.1,10)) if FAIL else [0,2.4,3.6,4.9,6.3,8.8,11.4,PLAY-1.3,PLAY+.2,DURATION-.2]
+sample_times=[0,1.9,3.5,5.5,7.7,10.5,PLAY-2.5,PLAY-.4,PLAY+.5,DURATION-.1] if FAIL else [0,2.4,3.6,4.9,6.3,8.8,11.4,PLAY-1.3,PLAY+.2,DURATION-.2]
 for i,t in enumerate(sample_times):
     raw=run(['-loglevel','error','-ss',t,'-i',DEST,'-frames:v',1,'-f','image2pipe','-vcodec','png','-'])
     im=Image.open(io.BytesIO(raw)).convert('RGB');small=im.resize((360,640),Image.Resampling.LANCZOS)
@@ -185,11 +221,14 @@ assert blue_banner_max<.02, 'Developer refresh banner detected'
 
 assert count==round(DURATION*FPS)
 audio=json.loads(re.findall(r'\{\s*"input_i".*?\}',(QA/'loudness.log').read_text(),re.S)[-1])
-(OUT/'timeline.json').write_text(json.dumps({'segments':timeline,'variant':CONFIG['variant'],'answerHold':HOLD,'ctaStart':PLAY,'duration':DURATION,'effects':events},ensure_ascii=False,indent=2)+'\n')
-(OUT/'layout.json').write_text(json.dumps({'appSourceBounds':[0,0,1206,2622],'fit':'Native target and continuous tree-controls region retained; only blank strip y700-1000 removed; no custom playback target','captionBounds':layout},ensure_ascii=False,indent=2)+'\n')
+(OUT/'timeline.json').write_text(json.dumps({'segments':timeline,'variant':CONFIG['variant'],'answerHold':HOLD,'presentation':PRESENTATION,'ctaStart':PLAY,'duration':DURATION,'effects':events},ensure_ascii=False,indent=2)+'\n')
+(OUT/'layout.json').write_text(json.dumps({'appSourceBounds':[0,0,1206,2622],'fit':('Gameplay retains native target and continuous tree-controls; closing retains native goal and separate continuous tree crop without controls' if MODERN else 'Native target and continuous tree-controls region retained; only blank strip y700-1000 removed; no custom playback target'),'captionBounds':layout},ensure_ascii=False,indent=2)+'\n')
 (QA/'validation.json').write_text(json.dumps({'decode':'passed','resolution':meta['size'],'duration':meta['duration'],'fps':meta['fps'],'frames':count,
     'sourceSha256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'sha256':hashlib.sha256(DEST.read_bytes()).hexdigest(),
     'integratedLUFS':float(audio['input_i']),'truePeakDBTP':float(audio['input_tp']),
-    'appFrameUncropped':False,'nativeStatsOmitted':True,'nativeTargetRetained':True,'customPlaybackTarget':False,'variant':CONFIG['variant'],'endCardStart':PLAY,'endCardOpaque':True,'cropping':True,'developerBannerPixelFractionMax':blue_banner_max,'visualReview':'pending','published':False},ensure_ascii=False,indent=2)+'\n')
+    'appFrameUncropped':False,'nativeStatsOmitted':True,'nativeTargetRetained':True,'customPlaybackTarget':False,'variant':CONFIG['variant'],'endCardStart':PLAY,'endCardOpaque':not MODERN,'presentation':PRESENTATION,'cropping':True,'developerBannerPixelFractionMax':blue_banner_max,'visualReview':'pending','published':False},ensure_ascii=False,indent=2)+'\n')
 (OUT/'post-copy.txt').write_text(f"5つの数字で{TARGET}を作れる？\n5つの数をすべて1回ずつ使う計算パズル\n難易度 {'★'*LEVEL}{'☆'*(5-LEVEL)}\n"+('みんなは解けた？\n' if FAIL else '')+'ジャマイカの木\nApp Storeで検索\n#ジャマイカの木 #算数パズル #脳トレ\n')
+if MODERN:
+    title=f'5つの数字で{TARGET}を作れる？' if not FAIL else f'{TARGET}にあと1…どこを直す？'
+    (OUT/'post-copy.txt').write_text(title+'｜ジャマイカの木\n\n5つの数字を全部1回ずつ使う計算パズル。\n'+('あなたならどうつなぐ？\n' if FAIL else '次は自分でつないでみよう。\n')+'App Storeで「ジャマイカの木」を検索\n#ジャマイカの木 #算数パズル #脳トレ\n')
 print(DEST,flush=True)

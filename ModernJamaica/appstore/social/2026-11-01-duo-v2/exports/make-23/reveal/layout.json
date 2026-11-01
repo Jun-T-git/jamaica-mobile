@@ -1,0 +1,186 @@
+{
+  "appSourceBounds": [
+    0,
+    0,
+    1206,
+    2622
+  ],
+  "fit": "Gameplay retains native target and continuous tree-controls; closing retains native goal and separate continuous tree crop without controls",
+  "captionBounds": {
+    "brandHeader": {
+      "icon": [
+        110,
+        258,
+        80,
+        80
+      ],
+      "title": [
+        210,
+        275,
+        333,
+        46
+      ]
+    },
+    "difficulty": {
+      "level": 2,
+      "bands": [
+        [
+          10,
+          19
+        ],
+        [
+          20,
+          39
+        ],
+        [
+          40,
+          59
+        ],
+        [
+          60,
+          79
+        ],
+        [
+          80,
+          99
+        ]
+      ],
+      "label": [
+        739,
+        258,
+        82,
+        28
+      ],
+      "stars": [
+        [
+          675,
+          298,
+          34,
+          34
+        ],
+        [
+          718,
+          298,
+          34,
+          34
+        ],
+        [
+          761,
+          298,
+          34,
+          34
+        ],
+        [
+          804,
+          298,
+          34,
+          34
+        ],
+        [
+          847,
+          298,
+          34,
+          34
+        ]
+      ],
+      "displayStart": 0,
+      "displayEnd": 13.9
+    },
+    "gameViewport": {
+      "sourceCrops": [
+        [
+          0,
+          420,
+          1206,
+          280
+        ],
+        [
+          0,
+          1000,
+          1206,
+          1550
+        ]
+      ],
+      "omittedBlankStrip": [
+        0,
+        700,
+        1206,
+        300
+      ],
+      "placement": [
+        110,
+        350,
+        860,
+        1304
+      ],
+      "nativeTargetRetained": true,
+      "treeAndControlsContinuous": true
+    },
+    "5つ全部を1回ずつ": [
+      289,
+      975,
+      501,
+      61
+    ],
+    "puzzleRule": {
+      "text": "5つ全部を1回ずつ",
+      "targetShownOnlyInNativeCard": true
+    },
+    "numberFrame": {
+      "bounds": [
+        130,
+        1070,
+        950,
+        1248
+      ],
+      "displayStart": 0,
+      "displayEnd": 1.6
+    },
+    "次は自分でつなごう": [
+      301,
+      650,
+      478,
+      52
+    ],
+    "今度は自分でつなごう": [
+      303,
+      610,
+      474,
+      48
+    ],
+    "App Storeで": [
+      409,
+      710,
+      261,
+      42
+    ],
+    "「ジャマイカの木」を検索": [
+      245,
+      775,
+      589,
+      50
+    ],
+    "closingViewport": {
+      "sourceTreeCrop": [
+        0,
+        1000,
+        1206,
+        1000
+      ],
+      "treePlacement": [
+        110,
+        800,
+        860,
+        713
+      ],
+      "goalPlacement": [
+        110,
+        350,
+        860,
+        200
+      ],
+      "controlsOmitted": true,
+      "nativeTreeContinuous": true
+    }
+  }
+}
