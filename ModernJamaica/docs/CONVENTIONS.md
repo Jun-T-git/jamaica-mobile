@@ -50,6 +50,8 @@ npm test                  # Jest
 npx tsc --noEmit          # 型チェック（CI 相当のゲート）
 ```
 
+CIの入口は `.github/workflows/app-checks.yml`。アプリソースまたは同workflowのpush/PRで、型チェック・lint・Jestを実行する。ネイティブのビルド/実操作・署名・TestFlight配信は別途確認する。公開repoと標準Ubuntu runnerを前提にし、private repoではjobを自動でskipする（検証合格ではない）。private化や有料runnerへの変更前には費用と承認範囲を再確認する。
+
 **変更を「検証済み」と言う前に最低限**: `npm test` が green であること、UI/挙動を変えた場合はシミュレータ/実機で実際に動かして確認する（`/run`・`/verify` も利用可）。
 
 > `npx tsc --noEmit` と `npm run lint` は現在 green（lint は既存の warning が 1 件。下記「既知の技術的負債」#6/#7 は解消済み）。自分の変更で新たなエラーや warning を増やさないこと。

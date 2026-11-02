@@ -44,7 +44,8 @@
         "ModernJamaica/jest.config.js",
         "ModernJamaica/.eslintrc.js",
         "ModernJamaica/src/services/adService.ts",
-        "ModernJamaica/firestore.rules"
+        "ModernJamaica/firestore.rules",
+        ".github/workflows/app-checks.yml"
       ]
     },
     {
