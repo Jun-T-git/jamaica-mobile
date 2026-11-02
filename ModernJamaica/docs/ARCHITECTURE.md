@@ -92,6 +92,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 |---|---|---|---|
 | ランキング | `services/rankingService.ts` | スコア送信（新記録時のみ・**チャレンジ専用**・失敗分は次回再送）／取得／順位（件数の集計クエリ） | Firestore `userScoresV2` コレクション |
 | ユーザー | `services/userService.ts` | 匿名認証（UID がランキングのドキュメント ID）・初期表示名生成・バリデーション | Firebase Auth（匿名） |
+| ニックネーム案内の提示予約 | `services/nicknamePromptService.ts` | 保存済みプロフィール・説明完了・任意設定・提示予約の記録から対象を判定し、同時の予約を直列化 | AsyncStorage |
 | 広告 | `services/adService.ts` | 購入・閲覧期限の確認、ATT と SDK 初期化、メニュー離脱時の頻度制限付き全画面広告、任意のリワード広告、配置別の広告収益イベント | AdMob（+ `react-native-tracking-transparency`） |
 | 買い切り購入 | `services/purchaseService.ts` | 商品情報取得の重複防止/タイムアウト・購入/復元と入口別計測・復帰時の権利再確認 | `ios/ModernJamaica/PurchaseModule.swift` / StoreKit 2 |
 | 解答例の閲覧期限 | `services/reviewAccessService.ts` | 報酬獲得時の期限付与と再起動後の復元 | AsyncStorage |
@@ -116,6 +117,14 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 - `screens/PurchaseScreen.tsx` が特典・価格・状態別 UI と購入・復元を提供する。設定の `components/molecules/PurchaseCard.tsx` は共通画面への小さな入口に限定する。ネイティブは検証済みトランザクション、現在の権利、取消状態を確認し、権利更新を JS に通知する。
 - 広告の表示条件は `utils/monetizationPolicy.ts`、調整値と作成・設定済みの iOS リワード本番 ID は `config/monetization.ts`。購入権利の初回確認前はインタースティシャルを表示しない。バナーのコンポーネント・広告 ID・API は削除済み。
 - 提供範囲、リリース設定、実機確認、収益検証は [MONETIZATION.md](./MONETIZATION.md)。
+
+## ニックネーム案内の基盤
+
+`services/nicknamePromptService.ts` は、保存名が自動生成名の形式で、任意の名前を設定済みではなく、説明完了が保存され、まだ提示予約していない場合だけ案内を予約する。名前の新規生成・変更やサーバー同期は行わず、保存名を呼び出し元へ渡す。正確な保存キーと判定条件は同サービスを正とする。
+
+複数の呼び出しや再マウントで予約が重ならないよう直列化し、予約記録の永続化に成功してから表示許可を返す。読み取り失敗・判定用記録の不正・予約の書き込み失敗は表示許可にしない。記録は実際の画面表示の確認ではなく表示前の予約であり、呼び出し元は取得した予約を表示まで保持する責任を持つ。
+
+現在は基盤サービスのみで画面に接続していない。モーダルの表示・名前登録/保存・既存のランキング同期との接続、実機とTestFlightでの動作確認は未実施。失敗系と競合のサービス契約は `__tests__/services/nicknamePromptService.test.ts` を参照する。
 
 ## 永続化キー
 
