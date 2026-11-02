@@ -32,7 +32,9 @@
         "ModernJamaica/src/screens/ModeSelectionScreen.tsx",
         "ModernJamaica/src/components/organisms/TutorialModal.tsx",
         "ModernJamaica/src/components/organisms/NicknamePromptModal.tsx",
-        "ModernJamaica/src/store/settingsStore.ts"
+        "ModernJamaica/src/store/settingsStore.ts",
+        "ModernJamaica/metro.config.js",
+        "ModernJamaica/ios/export-options-testflight.plist"
       ]
     },
     {

@@ -1,69 +1,105 @@
-# fastlane — TestFlight リリース自動化
+fastlane documentation
+----
 
-iOS ビルドを TestFlight へ配信する。**iOS のみリリース対象**（Android は配信しない）。
+# Installation
 
-## レーン
+Make sure you have the latest version of the Xcode command line tools installed:
 
-### `ios beta`
-Release ビルドを作成し TestFlight（内部テスター）へアップロードする。
-
-- バージョン（marketing version）は引数で指定。
-- ビルド番号は「同バージョン train の最新 +1」で自動採番（単調増加）。
-- 署名は App Store Connect API キーによる**クラウド配布署名**（証明書をリポジトリに置かない）。
-
-```bash
-bundle exec fastlane ios beta version:1.1.4 changelog:"広告設定の修正"
+```sh
+xcode-select --install
 ```
 
-必要な環境変数:
+For _fastlane_ installation instructions, see [Installing _fastlane_](https://docs.fastlane.tools/#installing-fastlane)
 
-| 変数 | 内容 |
-|---|---|
-| `ASC_KEY_ID` | App Store Connect API キーの Key ID |
-| `ASC_ISSUER_ID` | 同 Issuer ID（チーム共通） |
-| `ASC_KEY_PATH` | ダウンロードした `AuthKey_*.p8` のパス |
+# Available Actions
 
-> API キーは **Admin ロール**であること。App Manager 以下だとクラウド配布証明書の作成が 403 で失敗する。
+## iOS
 
-## CI（GitHub Actions）
+### ios beta
 
-ワークフロー: `.github/workflows/ios-testflight.yml`（手動トリガー `workflow_dispatch`）。
-
-```bash
-gh workflow run ios-testflight.yml -f version=1.1.4 -f changelog="広告設定の修正"
+```sh
+[bundle exec] fastlane ios beta
 ```
 
-### 必要な GitHub Secrets
+Release ビルドを作成し TestFlight へアップロードする
 
-リポジトリの Settings → Secrets and variables → Actions に登録:
+使い方: bundle exec fastlane ios beta version:1.1.4 changelog:"広告設定の修正"
 
-| Secret | 内容 | 例 |
-|---|---|---|
-| `APP_STORE_CONNECT_KEY_ID` | Key ID | `5YYWZS47QX` |
-| `APP_STORE_CONNECT_ISSUER_ID` | Issuer ID | `72df938e-…` |
-| `APP_STORE_CONNECT_KEY_BASE64` | `.p8` を base64 化した文字列 | `base64 -i AuthKey_XXXX.p8 \| pbcopy` |
 
-`gh` で登録する例:
 
-```bash
-gh secret set APP_STORE_CONNECT_KEY_ID --body "5YYWZS47QX"
-gh secret set APP_STORE_CONNECT_ISSUER_ID --body "72df938e-43ed-4ea6-ad00-60250d211c17"
-gh secret set APP_STORE_CONNECT_KEY_BASE64 < <(base64 -i ~/.appstoreconnect/private_keys/AuthKey_5YYWZS47QX.p8)
+必要な環境変数（CI では GitHub Secrets から注入）:
+
+  ASC_KEY_ID    … App Store Connect API キーの Key ID
+
+  ASC_ISSUER_ID … 同 Issuer ID（チーム共通）
+
+  ASC_KEY_PATH  … ダウンロードした AuthKey_*.p8 のパス
+
+### ios metadata
+
+```sh
+[bundle exec] fastlane ios metadata
 ```
 
-## 補足
+App Store の掲載文(タイトル/サブタイトル/説明/キーワード/宣伝文/URL/What's New)とスクリーンショットを反映する（バイナリは送らない）
 
-- **Export Compliance**: 暗号化を輸出対象として使っていない場合、`ios/ModernJamaica/Info.plist` に
-  `ITSAppUsesNonExemptEncryption=false` を追加しておくと、アップロード後の「Missing Compliance」で
-  止まらず内部テスターへ自動配信される。追加は輸出コンプライアンス上の申告なので、内容を確認のうえ行うこと。
-- **外部テスター**へ配信する場合は Fastfile の `distribute_external: true` にする（初回は Beta App Review が必要）。
-- ローカルの非常に新しい Xcode では `fmt` のコンパイルが失敗することがあるが、CI ランナーは安定版 Xcode のため発生しない。
+使い方: bundle exec fastlane ios metadata version:1.1.4
 
-## 配信記録 — 2026-10-18 / 1.3.2 (2)
 
-- 最適化を反映したソース: `a5e9c8f376801fb9c15b28e3818e6ee96dc3d343`（コード整理は `70a4136`、配信版のビルド番号を揃えたコミットを含む）。
-- Jest 19 suites / 129 tests、TypeScript（未使用ローカル変数・引数チェックを含む）、ESLint、iOS 本番 JS バンドル生成が成功。
-- [TestFlight CI](https://github.com/Jun-T-git/jamaica-mobile/actions/runs/39113718144) は開発用証明書の発行上限で停止。既存証明書を取り消さず、ローカルの有効な署名を使って Release アーカイブと App Store 向け IPA を作成・アップロードした。
-- アーカイブと IPA の実体が `com.junt.modernjamaica` / 1.3.2 / build 2 であることと、必要な音源・Firebase 設定の同梱を確認。実機での手動操作検証は未実施。
-- App Store Connect のビルド ID: `578bdbdf-ab25-4b59-8dfe-56f7ca9e9e62`。処理は `VALID`、内部配信は `IN_BETA_TESTING`。外部テスターへの配信は実施していない。
-- 審査待ちだった build 1 の依頼を取り下げ、更新内容の説明文を反映し、build 2 を明示して[本番審査へ再提出](https://github.com/Jun-T-git/jamaica-mobile/actions/runs/39115018334)。CI 成功と API 上の同ビルドの紐付け、`WAITING_FOR_REVIEW` / `AFTER_APPROVAL` を確認。記録時点では審査待ちで、承認後に自動公開される。
+
+反映するのは fastlane/metadata/ja/*.txt と fastlane/screenshots/ja/*.png。
+
+App Review の連絡先は fastlane/metadata/review_information/*.txt（公開リポジトリのため CI が Secrets から生成。
+
+ローカルでは .gitignore 済みのこのフォルダに手で置く）。審査提出にはこの連絡先が必須。
+
+掲載文はリポジトリが正（fastlane/metadata/ja）。実行すると App Store Connect の現行値を上書きするので、
+
+変更内容を確認してから流すこと。審査提出はしない。
+
+必要な環境変数は beta レーンと同じ（ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_PATH）。
+
+### ios release
+
+```sh
+[bundle exec] fastlane ios release
+```
+
+本番リリース: 最新ビルドを紐付けて審査提出する（メタデータ/スクショは触らない）
+
+使い方: bundle exec fastlane ios release version:1.1.4 [build:5]
+
+
+
+- build を省略すると該当バージョンの最新の処理済みビルドを紐付ける。同じバージョンに複数のビルドが
+
+  あるときは build で番号を固定する（処理待ちの新ビルドではなく古いビルドが選ばれるのを防ぐ）
+
+- What's New とスクショは事前に `metadata` レーンで反映しておくこと。ここでは再アップロードしない
+
+  （deliver 再アップロードによるスクショ重複を避けるため、掃除と提出を分離）
+
+- 輸出コンプライアンス: 非該当（暗号化なし。Info.plist の ITSAppUsesNonExemptEncryption=false と整合）
+
+- 広告識別子(IDFA): 使用する（広告配信のため。ATT で許可を求め、iOS の制限設定を尊重する。ADR-0007）
+
+- 審査承認後は自動で公開（automatic_release）
+
+必要な環境変数は beta レーンと同じ（ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_PATH）。
+
+----
+
+This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
+
+More information about _fastlane_ can be found on [fastlane.tools](https://fastlane.tools).
+
+The documentation of _fastlane_ can be found on [docs.fastlane.tools](https://docs.fastlane.tools).
+
+## リリース記録 — 2026-10-27 21:58 JST
+
+- **1.3.3 (1)**: 木の段間隔を均等化し、木の高さ上限と上下の余白を調整。重なり防止の最小間隔を上限より優先する。提出元のローカル変更は未コミット。
+- 検証: TypeScript・lint 成功、19 suites / 132 tests 成功。シミュレーターで木の全段表示を確認。ローカル Xcode Release の archive・export・upload 成功。
+- Archive: `/Users/junteraoka/Library/Developer/Xcode/Archives/2026-10-27/ModernJamaica 1.3.3 (1).xcarchive`。IPA: `build/ModernJamaica-1.3.3-1.ipa`（ModernJamaica 配下）。
+- Build ID: `361f8d44-0258-4a5e-9b80-afcc9226a04b`。処理状態 `VALID`、既存の内部グループへ自動配信され `IN_BETA_TESTING`。外部配信は未実施。
+- 日本語リリースノートを更新し、既存スクリーンショット 6 枚を継承。初回の審査提出は年齢区分の必須 `socialMedia` 未設定で失敗したため、ソーシャル機能がない実装に合わせてドラフトの `socialMedia` / `socialMediaAgeRestricted` を `false` に設定し、`fastlane ios release` の再実行で提出成功。
+- Version ID: `aecd6cc7-a69b-4f8d-a2b5-e33d181ac575`。Review Submission ID: `d663c267-ec0f-47b9-802f-a9ee1c65a3ec`。提出時刻は `2026-10-27T12:58:39Z`。API で同じビルドの紐付け、`WAITING_FOR_REVIEW`、承認後の自動公開 `AFTER_APPROVAL` を確認。

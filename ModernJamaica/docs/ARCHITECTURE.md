@@ -142,7 +142,9 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 
 ## ビルド構成
 
+- Metro: `metro.config.js` は共有依存のシンボリックリンクを実パスへ解決し、依存ディレクトリを監視・モジュール解決の対象にする。worktreeでも依存を解決しつつ、別作業ツリーのアプリソース全体を監視対象へ混ぜない。
 - iOS: `ios/`（CocoaPods）。効果音と Dev/Prod の Firebase 設定 plist は `ios/` 直下の資源を Xcode から参照する。
+- 利用者受入用の `ios/export-options-testflight.plist` は内部TestFlight専用のアップロード設定で、版番号の自動変更を無効にする。本番公開用や外部テスト配布用として使わない。
 - Android: `android/`
 - Firebase: `firebase.json` / `.firebaserc` / `firestore.rules`
 

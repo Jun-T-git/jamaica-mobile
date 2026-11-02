@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 
 /**
@@ -6,6 +8,12 @@ const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
  *
  * @type {import('@react-native/metro-config').MetroConfig}
  */
-const config = {};
+// Worktrees can share installed dependencies through a symlink. Metro must
+// watch the real dependency directory, without watching another app source tree.
+const dependencies = fs.realpathSync(path.join(__dirname, 'node_modules'));
+const config = {
+  watchFolders: [dependencies],
+  resolver: { nodeModulesPaths: [dependencies] },
+};
 
 module.exports = mergeConfig(getDefaultConfig(__dirname), config);
