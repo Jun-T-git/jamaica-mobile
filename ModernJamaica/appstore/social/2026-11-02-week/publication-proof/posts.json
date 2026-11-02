@@ -8,7 +8,9 @@
       "videoId": "UizNqcegWhM",
       "url": "https://youtube.com/shorts/UizNqcegWhM",
       "scheduledAt": "2026-11-02T19:00:00+09:00",
-      "status": "scheduled",
+      "publishedAt": "2026-11-02T19:00:00+09:00",
+      "publicationObservedAt": "2026-11-03T04:48:28+09:00",
+      "status": "published",
       "sha256": "1ee83f4799c19cb683cccb903d68e0981c1dd2551fe6fd41cb8e592b1f35d35a",
       "checks": {
         "copyright": "passed",
@@ -16,9 +18,17 @@
       },
       "pinnedComment": {
         "text": "他の解き方を見つけた方はコメントで教えてください！",
-        "posted": false,
-        "pinned": false,
-        "followupAutomationId": "automation"
+        "posted": true,
+        "pinned": true,
+        "followupAutomationId": "automation",
+        "commentId": "UgztuO3BUt2WztlW87Z4AaABAg",
+        "url": "https://www.youtube.com/watch?v=UizNqcegWhM&lc=UgztuO3BUt2WztlW87Z4AaABAg",
+        "confirmedAt": "2026-11-03T04:48:28+09:00",
+        "proof": {
+          "capturedAt": "2026-11-03T04:48:28+09:00",
+          "capture": "YouTube watch page screenshot captured by the automation UI",
+          "verification": "TeraTech | アプリ開発の自コメント本文と「@teratech_official さんによって固定されています」表示を確認"
+        }
       },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で24を作れ！｜ジャマイカの木",
