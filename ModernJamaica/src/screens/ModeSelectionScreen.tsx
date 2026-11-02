@@ -1,6 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useEffect, useState } from 'react';
+import { useIsFocused } from '@react-navigation/native';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -12,6 +13,8 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Logo } from '../components/atoms/Logo';
 import { Typography } from '../components/atoms/Typography';
+import { NicknamePromptModal } from '../components/organisms/NicknamePromptModal';
+import { acknowledgeNicknamePromptShown, completeTutorial, hasCompletedTutorial, prepareNicknamePrompt, isNicknamePromptStillEligible } from '../services/nicknamePromptService';
 import { TutorialModal } from '../components/organisms/TutorialModal';
 import { ModernDesign } from '../constants';
 import { useMonetizationStore } from '../store/monetizationStore';
@@ -19,8 +22,6 @@ import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';
 import { GameMode } from '../types';
 import { soundManager, SoundType } from '../utils/SoundManager';
-
-const TUTORIAL_COMPLETED_KEY = '@jamaica_tutorial_completed';
 
 interface ModeSelectionScreenProps {
   navigation: any;
@@ -34,20 +35,28 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   const { height: windowHeight } = useWindowDimensions();
   const compact = windowHeight < 750;
   const loadDisplayName = useSettingsStore(state => state.loadDisplayName);
+  const isFocused = useIsFocused();
   const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialComplete, setTutorialComplete] = useState(false);
+  const [tutorialDismissing, setTutorialDismissing] = useState(false);
+  const [nameLoaded, setNameLoaded] = useState(false);
+  const invitationShown = useRef(false);
+  const [invitationName, setInvitationName] = useState<string | null>(null);
 
-  // 初回起動時は遊び方を自動で表示
   useEffect(() => {
-    AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY)
-      .then(completed => {
-        if (completed !== 'true') setShowTutorial(true);
-      })
-      .catch(() => {});
+    let active = true;
+    hasCompletedTutorial().then(completed => {
+      if (!active) return;
+      if (completed === false) setShowTutorial(true);
+      setTutorialComplete(completed === true);
+    });
+    return () => { active = false; };
   }, []);
 
   const handleTutorialClose = () => {
+    setTutorialDismissing(Platform.OS === 'ios');
     setShowTutorial(false);
-    AsyncStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true').catch(() => {});
+    completeTutorial().then(setTutorialComplete);
   };
 
   const handleTutorialPress = () => {
@@ -56,11 +65,26 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   };
 
   useEffect(() => {
-    // ゲームデータを読み込み
+    let active = true;
     loadStoredData();
-    // 表示名を読み込み（未設定の場合は自動生成）
-    loadDisplayName();
+    loadDisplayName().then(loaded => { if (active) setNameLoaded(loaded); });
+    return () => { active = false; };
   }, [loadStoredData, loadDisplayName]);
+
+  useEffect(() => {
+    let active = true;
+    if (!isFocused) setInvitationName(null);
+    if (isFocused && !invitationShown.current && nameLoaded && tutorialComplete && !showTutorial && !tutorialDismissing) {
+      prepareNicknamePrompt().then(async result => {
+        if (result.status !== 'claimed') return;
+        // Settings may have changed while storage was loading. Never replace it
+        // with the old generated name, nor display over another route/tutorial.
+        const eligible = await isNicknamePromptStillEligible(result.displayName);
+        if (active && eligible) setInvitationName(result.displayName);
+      });
+    }
+    return () => { active = false; };
+  }, [isFocused, nameLoaded, tutorialComplete, showTutorial, tutorialDismissing]);
 
   const handleModeSelect = (mode: GameMode) => {
     // ゲームモード選択ボタン効果音
@@ -252,7 +276,12 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
       </View>
       </ScrollView>
 
-      <TutorialModal visible={showTutorial} onClose={handleTutorialClose} />
+      <TutorialModal visible={showTutorial && isFocused} onClose={handleTutorialClose}
+        onDismiss={() => setTutorialDismissing(false)} />
+      {invitationName !== null && isFocused && !showTutorial && !tutorialDismissing && (
+        <NicknamePromptModal initialName={invitationName} onClose={() => { invitationShown.current = true; acknowledgeNicknamePromptShown(); setInvitationName(null); }}
+          onShow={() => { invitationShown.current = true; acknowledgeNicknamePromptShown(); }} />
+      )}
     </SafeAreaView>
   );
 };

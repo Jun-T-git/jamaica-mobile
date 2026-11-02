@@ -56,3 +56,45 @@ async function readAndClaim(): Promise<NicknamePromptClaim> {
   }
   return { status: 'claimed', displayName: name };
 }
+
+// Retain a reservation across an effect cancellation before native presentation.
+// Once onShow fires, a remount must not invite the player again.
+let pendingInvitation: Extract<NicknamePromptClaim, { status: 'claimed' }> | null = null;
+let preparation: Promise<NicknamePromptClaim> | null = null;
+
+export function prepareNicknamePrompt(): Promise<NicknamePromptClaim> {
+  if (pendingInvitation) return Promise.resolve(pendingInvitation);
+  if (preparation) return preparation;
+  preparation = claimNicknamePrompt().then(result => {
+    if (result.status === 'claimed') pendingInvitation = result;
+    return result;
+  }).finally(() => { preparation = null; });
+  return preparation;
+}
+
+export function acknowledgeNicknamePromptShown(): void {
+  pendingInvitation = null;
+}
+
+export async function isNicknamePromptStillEligible(displayName: string): Promise<boolean> {
+  try {
+    const [name, explicitlySet] = await Promise.all([
+      AsyncStorage.getItem('@display_name'), AsyncStorage.getItem('@display_name_set'),
+    ]);
+    return name === displayName && (explicitlySet === null || explicitlySet === 'false');
+  } catch {
+    return false;
+  }
+}
+
+export async function hasCompletedTutorial(): Promise<boolean | null> {
+  try { return (await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY)) === 'true'; }
+  catch { return null; }
+}
+
+export async function completeTutorial(): Promise<boolean> {
+  try {
+    await AsyncStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
+    return true;
+  } catch { return false; }
+}

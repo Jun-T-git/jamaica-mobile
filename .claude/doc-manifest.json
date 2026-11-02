@@ -28,7 +28,11 @@
         "ModernJamaica/App.tsx",
         "ModernJamaica/package.json",
         "ModernJamaica/src/services/*.ts",
-        "ModernJamaica/src/config/ranking.ts"
+        "ModernJamaica/src/config/ranking.ts",
+        "ModernJamaica/src/screens/ModeSelectionScreen.tsx",
+        "ModernJamaica/src/components/organisms/TutorialModal.tsx",
+        "ModernJamaica/src/components/organisms/NicknamePromptModal.tsx",
+        "ModernJamaica/src/store/settingsStore.ts"
       ]
     },
     {

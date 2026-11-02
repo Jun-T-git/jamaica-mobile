@@ -20,6 +20,9 @@ export class RankingService {
   // （旧 userScores のスコアは新しい計算式と比較できず、ドキュメントIDも認証UIDではない）
   private readonly collectionName = 'userScoresV2';
 
+  private displayNameRevision = 0;
+  private displayNameWriteQueue: Promise<boolean> = Promise.resolve(true);
+
   private constructor() {}
 
   static getInstance(): RankingService {
@@ -275,27 +278,25 @@ export class RankingService {
    * ユーザーの表示名を更新
    */
   async updateDisplayName(newDisplayName: string): Promise<boolean> {
-    
+    const revision = ++this.displayNameRevision;
     try {
       const userId = await userService.getAuthUserId();
-      
       const docRef = firestore().collection(this.collectionName).doc(userId);
-      
-      // ドキュメントが存在するかチェック
       const doc = await docRef.get();
-      
-      if (doc.exists()) {
-        // 既存ドキュメントの表示名を更新
-        await docRef.update({
-          displayName: newDisplayName.trim(),
-          lastUpdated: Date.now(),
-        });
+      // A timed-out invitation may still be awaiting auth/read when Settings
+      // saves a newer name. Only the latest request may enqueue a write.
+      const write = this.displayNameWriteQueue.catch(() => false).then(async () => {
+        if (revision !== this.displayNameRevision) return false;
+        if (doc.exists()) {
+          await docRef.update({ displayName: newDisplayName.trim(), lastUpdated: Date.now() });
+        }
+        // No score document yet: the next score submission uses the saved name.
         return true;
-      } else {
-        // ドキュメントが存在しない場合は何もしない
-        // （初回スコア提出時に正しい表示名が設定される）
-        return true;
-      }
+      });
+      // Serialize actual writes too: a newer write must follow an already sent
+      // older one, rather than allowing delayed completion to win last.
+      this.displayNameWriteQueue = write;
+      return await write;
     } catch (error) {
       console.error('❌ Failed to update display name:', error);
       return false;

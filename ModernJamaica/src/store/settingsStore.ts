@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { registerNickname, NicknameRegistrationResult } from '../services/nicknameRegistrationService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { soundManager } from '../utils/SoundManager';
 import { hapticService } from '../services/hapticService';
@@ -16,9 +17,13 @@ interface SettingsStore {
   loadHapticsSetting: () => Promise<void>;
   setDisplayName: (name: string) => Promise<boolean>;
   updateDisplayNameWithFirebase: (name: string) => Promise<boolean>;
-  loadDisplayName: () => Promise<void>;
+  registerNickname: (name: string) => Promise<NicknameRegistrationResult>;
+  loadDisplayName: () => Promise<boolean>;
   resetDisplayName: () => Promise<void>;
 }
+
+let displayNameRevision = 0;
+let displayNameLoad: Promise<boolean> | null = null;
 
 export const useSettingsStore = create<SettingsStore>((set, _get) => ({
   soundEnabled: true,
@@ -77,6 +82,7 @@ export const useSettingsStore = create<SettingsStore>((set, _get) => ({
   },
 
   setDisplayName: async (name: string) => {
+    ++displayNameRevision;
     try {
       // バリデーション
       const validation = userService.validateDisplayName(name);
@@ -103,40 +109,53 @@ export const useSettingsStore = create<SettingsStore>((set, _get) => ({
     }
   },
 
-  loadDisplayName: async () => {
-    try {
-      const [savedName, isSet] = await Promise.all([
-        AsyncStorage.getItem('@display_name'),
-        AsyncStorage.getItem('@display_name_set'),
-      ]);
+  loadDisplayName: () => {
+    // StrictMode/remounts must share initial generation instead of replacing
+    // the saved default name with two independently generated names.
+    if (displayNameLoad) return displayNameLoad;
+    const revision = displayNameRevision;
+    displayNameLoad = (async () => {
+      try {
+        const [savedName, isSet] = await Promise.all([
+          AsyncStorage.getItem('@display_name'),
+          AsyncStorage.getItem('@display_name_set'),
+        ]);
+        if (revision !== displayNameRevision) return false;
 
-      if (savedName) {
-        set({
-          displayName: savedName,
-          isDisplayNameSet: isSet === 'true',
-        });
-      } else {
-        // 初回ユーザーの場合はデフォルト名を生成
-        // 読み込みのたびに名前が変わらないよう保存しておく（ランキングの表示名に使われる）
+        if (savedName) {
+          set({
+            displayName: savedName,
+            isDisplayNameSet: isSet === 'true',
+          });
+        } else {
+          // 初回ユーザーの場合はデフォルト名を生成
+          // 読み込みのたびに名前が変わらないよう保存しておく（ランキングの表示名に使われる）
+          const defaultName = userService.generateDefaultDisplayName();
+          await AsyncStorage.setItem('@display_name', defaultName);
+          if (revision !== displayNameRevision) return false;
+          set({
+            displayName: defaultName,
+            isDisplayNameSet: false,
+          });
+        }
+        return true;
+      } catch (error) {
+        if (revision !== displayNameRevision) return false;
+        console.warn('Failed to load display name:', error);
+        // エラー時はデフォルト名を設定
         const defaultName = userService.generateDefaultDisplayName();
-        await AsyncStorage.setItem('@display_name', defaultName);
         set({
           displayName: defaultName,
           isDisplayNameSet: false,
         });
+        return false;
       }
-    } catch (error) {
-      console.warn('Failed to load display name:', error);
-      // エラー時はデフォルト名を設定
-      const defaultName = userService.generateDefaultDisplayName();
-      set({
-        displayName: defaultName,
-        isDisplayNameSet: false,
-      });
-    }
+    })().finally(() => { displayNameLoad = null; });
+    return displayNameLoad;
   },
 
   updateDisplayNameWithFirebase: async (name: string) => {
+    ++displayNameRevision;
     try {
       // バリデーション
       const validation = userService.validateDisplayName(name);
@@ -166,7 +185,17 @@ export const useSettingsStore = create<SettingsStore>((set, _get) => ({
     }
   },
 
+  registerNickname: async (name: string) => {
+    ++displayNameRevision;
+    const result = await registerNickname(name);
+    if (result.status === 'saved') {
+      set({ displayName: result.displayName, isDisplayNameSet: true });
+    }
+    return result;
+  },
+
   resetDisplayName: async () => {
+    ++displayNameRevision;
     try {
       await AsyncStorage.removeItem('@display_name');
       await AsyncStorage.removeItem('@display_name_set');

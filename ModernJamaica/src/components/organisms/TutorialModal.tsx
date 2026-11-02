@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Button } from '../atoms/Button';
 import { ModernDesign } from '../../constants';
@@ -9,6 +9,7 @@ import { soundManager, SoundType } from '../../utils/SoundManager';
 interface TutorialModalProps {
   visible: boolean;
   onClose: () => void;
+  onDismiss?: () => void;
 }
 
 type NodeVariant = 'default' | 'selected' | 'target' | 'result';
@@ -147,6 +148,7 @@ const STEPS = [
 export const TutorialModal: React.FC<TutorialModalProps> = ({
   visible,
   onClose,
+  onDismiss,
 }) => {
   const [stepIndex, setStepIndex] = useState(0);
 
@@ -181,7 +183,8 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType={Platform.OS === 'ios' ? 'fade' : 'none'}
+      onDismiss={onDismiss}
       onRequestClose={handleSkip}
     >
       <View style={styles.overlay}>

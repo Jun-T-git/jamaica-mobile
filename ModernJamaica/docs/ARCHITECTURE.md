@@ -24,7 +24,7 @@ src/
 ├── components/          # UI（アトミックデザイン）— DESIGN-SYSTEM.md 参照
 │   ├── atoms/           # Button, Card, Typography, Icon, Logo, StatValue, SoundToggleButton
 │   ├── molecules/       # Dialog, GameStat, RankingEntry, DifficultyTabs, CountdownOverlay, SuccessOverlay, ComboIndicator, ScoreTierBar（基準スコア）等
-│   ├── organisms/       # GameBoard, GameHeader, PauseMenu, RankingBoard, TutorialModal（初回起動時の遊び方）
+│   ├── organisms/       # GameBoard, GameHeader, PauseMenu, RankingBoard, TutorialModal（初回起動時の遊び方）, NicknamePromptModal（任意の名前登録）
 │   └── ErrorBoundary.tsx
 ├── screens/             # 画面（購入モーダルを含む）
 ├── store/               # Zustand ストア（gameStore, settingsStore, statsStore, monetizationStore）
@@ -71,7 +71,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 ## 状態管理（Zustand）
 
 - **`store/gameStore.ts`** — 単一の統合ストアがチャレンジ／無限の両モードを扱う（`UnifiedGameState`）。タイマー・スコア・コンボ・問題生成・ノード結合・Undo 履歴・ハイスコア（モード×難易度）・ランキング送信を集約。単一ストアで 2 モードを扱う判断は [decisions/0002-zustand-unified-store.md](./decisions/0002-zustand-unified-store.md)。
-- **`store/settingsStore.ts`** — サウンド ON/OFF、振動、表示名（ニックネーム）。AsyncStorage 永続化と、表示名の Firebase 同期。
+- **`store/settingsStore.ts`** — サウンド ON/OFF、振動、表示名（ニックネーム）。AsyncStorage 永続化と、表示名の Firebase 同期。表示名の初回読み込み/生成は同時呼び出しで共有し、名前を重複生成しない。途中で名前が変更された場合は古い読み込み結果を適用しない。
 - **`store/statsStore.ts`** — プレイ回数などの内部記録。`gameStore` の `initGame` / `endGame` から更新され、レビュー表示条件や分析に使用する。ホームとリザルトには累計・連続プレイ日数を表示しない。連続日数の計算は `utils/playStreak.ts`、永続化は `services/playerStatsService.ts`。
 - **`store/monetizationStore.ts`** — 検証済み購入権利・商品価格・解答例の閲覧期限・購入/動画処理中の状態。購入権利をローカルの自己申告フラグから復元しない。
 - UI は selector で必要な状態・アクションだけを購読する。複数フィールドの選択には `useShallow` を使い、盤面はメモ化と安定した props でタイマー更新による不要な再描画を抑える（`hooks/useSimpleGameScreen.ts` / `components/organisms/GameBoard.tsx`）。
@@ -93,6 +93,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 | ランキング | `services/rankingService.ts` | スコア送信（新記録時のみ・**チャレンジ専用**・失敗分は次回再送）／取得／順位（件数の集計クエリ） | Firestore `userScoresV2` コレクション |
 | ユーザー | `services/userService.ts` | 匿名認証（UID がランキングのドキュメント ID）・初期表示名生成・バリデーション | Firebase Auth（匿名） |
 | ニックネーム案内の提示予約 | `services/nicknamePromptService.ts` | 保存済みプロフィール・説明完了・任意設定・提示予約の記録から対象を判定し、同時の予約を直列化 | AsyncStorage |
+| ニックネーム登録 | `services/nicknameRegistrationService.ts` | 名前を検証し、端末への保存確認と上限付きのランキング反映確認を区別する | AsyncStorage / Firestore |
 | 広告 | `services/adService.ts` | 購入・閲覧期限の確認、ATT と SDK 初期化、メニュー離脱時の頻度制限付き全画面広告、任意のリワード広告、配置別の広告収益イベント | AdMob（+ `react-native-tracking-transparency`） |
 | 買い切り購入 | `services/purchaseService.ts` | 商品情報取得の重複防止/タイムアウト・購入/復元と入口別計測・復帰時の権利再確認 | `ios/ModernJamaica/PurchaseModule.swift` / StoreKit 2 |
 | 解答例の閲覧期限 | `services/reviewAccessService.ts` | 報酬獲得時の期限付与と再起動後の復元 | AsyncStorage |
@@ -118,13 +119,15 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 - 広告の表示条件は `utils/monetizationPolicy.ts`、調整値と作成・設定済みの iOS リワード本番 ID は `config/monetization.ts`。購入権利の初回確認前はインタースティシャルを表示しない。バナーのコンポーネント・広告 ID・API は削除済み。
 - 提供範囲、リリース設定、実機確認、収益検証は [MONETIZATION.md](./MONETIZATION.md)。
 
-## ニックネーム案内の基盤
+## ニックネーム案内と登録
 
-`services/nicknamePromptService.ts` は、保存名が自動生成名の形式で、任意の名前を設定済みではなく、説明完了が保存され、まだ提示予約していない場合だけ案内を予約する。名前の新規生成・変更やサーバー同期は行わず、保存名を呼び出し元へ渡す。正確な保存キーと判定条件は同サービスを正とする。
+`screens/ModeSelectionScreen.tsx` は、画面にフォーカスがあり、保存名の読み込みと説明完了の永続化が成功し、説明モーダルが閉じている場合に案内を準備する。iOSでは `components/organisms/TutorialModal.tsx` のネイティブdismiss通知も待ち、説明と重ねない。`services/nicknamePromptService.ts` が自動生成名の形式・任意設定済みでないこと・説明完了・提示予約記録を照合する。正確な保存キーと判定条件は同サービスを正とする。
 
-複数の呼び出しや再マウントで予約が重ならないよう直列化し、予約記録の永続化に成功してから表示許可を返す。読み取り失敗・判定用記録の不正・予約の書き込み失敗は表示許可にしない。記録は実際の画面表示の確認ではなく表示前の予約であり、呼び出し元は取得した予約を表示まで保持する責任を持つ。
+予約要求は直列化し、予約記録の永続化に成功してから表示許可と保存名を返す。読み取り失敗・判定用記録の不正・予約の書き込み失敗は表示許可にしない。表示前に設定が変わっていないかも再確認する。同じプロセス内では予約を保持し、StrictModeのeffectキャンセルや表示前の画面離脱後も再利用できる。`components/organisms/NicknamePromptModal.tsx` のネイティブ表示通知（または閉じる操作）で保持予約を破棄し、再表示を抑える。**記録は表示前の予約であり、永続化後から実表示までのクラッシュでは、一度も表示されず次回も案内しない場合がある**。表示を必ず一度保証する方式ではなく、重複を防ぐ方式である。
 
-現在は基盤サービスのみで画面に接続していない。モーダルの表示・名前登録/保存・既存のランキング同期との接続、実機とTestFlightでの動作確認は未実施。失敗系と競合のサービス契約は `__tests__/services/nicknamePromptService.test.ts` を参照する。
+案内は保存名を初期入力にし、任意登録か後で設定する操作を提供する。`services/nicknameRegistrationService.ts` が入力検証と端末保存を行い、ランキング更新の成功確認を別に返す。端末保存が確認できなければ成功とせず、ランキングの失敗/確認待ち上限到来では端末保存済み・ランキング反映未確認と案内する。確認待ち上限は同サービスの定数を正とし、上限到来は通信の取消やサーバー未反映の確定を意味しない。登録中の二重送信を抑え、あとから設定でも変更できる。既存設定画面の登録経路まで同じ結果契約へ置き換えたものではない。ランキングの名前変更は新旧の経路を通じて最新要求を優先し、送信済みの書き込みを直列化して、遅れた旧名が新しい名前を上書きするのを防ぐ。
+
+サービスと画面の接続は実装済みだが、実機/TestFlightでの動作・配信は未確認。契約と競合の確認対象は `__tests__/services/nicknamePromptService.test.ts`、`__tests__/services/nicknameRegistrationService.test.ts`、`__tests__/components/nicknameInvitationFlow.test.tsx`、`__tests__/components/nicknamePromptModal.test.tsx` を参照する。モック上の確認をネイティブ表示や配信の合格とはしない。
 
 ## 永続化キー
 
