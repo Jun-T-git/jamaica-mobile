@@ -16,17 +16,21 @@
       "videoId": "wPzWmWNu_BI",
       "url": "https://youtube.com/shorts/wPzWmWNu_BI",
       "scheduledAt": "2026-11-02T12:00:00+09:00",
-      "status": "scheduled",
+      "status": "published",
       "sha256": "13e6d3cd897264695ada90f3d55802f2d96b392c396093f8c15588350b99f0ff",
       "sourceFile": "exports/make-44-00fc72e0/comment-answer/make-44-00fc72e0-comment-answer.mp4",
       "fixedCommentFile": "exports/make-44-00fc72e0/comment-answer/fixed-comment.txt",
       "pinnedComment": {
         "text": "6×（4＋3）＋1＋1＝44\n\n他の解き方を見つけた方はコメントで教えてください！",
-        "posted": false,
-        "pinned": false,
+        "posted": true,
+        "pinned": true,
         "followupAutomationId": "automation",
         "textSha256": "b2833585a0f7e6fe9f8c7a5f80048a601b257bfc7477f0f4f36dffdb9934a73a",
-        "arithmeticAndAllFiveVerified": true
+        "arithmeticAndAllFiveVerified": true,
+        "commentId": "Ugy25S7We-HjZ-ggq3Z4AaABAg",
+        "url": "https://www.youtube.com/watch?v=wPzWmWNu_BI&lc=Ugy25S7We-HjZ-ggq3Z4AaABAg",
+        "confirmedAt": "2026-11-02T18:49:04+09:00",
+        "proof": "CUA execution screenshot captured 2026-11-02T18:49:04+09:00; visible state showed the exact body and '@teratech_official さんによって固定されています'."
       },
       "checks": {
         "copyright": "passed",
