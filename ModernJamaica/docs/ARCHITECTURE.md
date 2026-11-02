@@ -127,7 +127,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 
 案内は保存名を初期入力にし、任意登録か後で設定する操作を提供する。`services/nicknameRegistrationService.ts` が入力検証と端末保存を行い、ランキング更新の成功確認を別に返す。端末保存が確認できなければ成功とせず、ランキングの失敗/確認待ち上限到来では端末保存済み・ランキング反映未確認と案内する。確認待ち上限は同サービスの定数を正とし、上限到来は通信の取消やサーバー未反映の確定を意味しない。登録中の二重送信を抑え、あとから設定でも変更できる。既存設定画面の登録経路まで同じ結果契約へ置き換えたものではない。ランキングの名前変更は新旧の経路を通じて最新要求を優先し、送信済みの書き込みを直列化して、遅れた旧名が新しい名前を上書きするのを防ぐ。
 
-サービスと画面の接続は実装済みだが、実機/TestFlightでの動作・配信は未確認。契約と競合の確認対象は `__tests__/services/nicknamePromptService.test.ts`、`__tests__/services/nicknameRegistrationService.test.ts`、`__tests__/components/nicknameInvitationFlow.test.tsx`、`__tests__/components/nicknamePromptModal.test.tsx` を参照する。モック上の確認をネイティブ表示や配信の合格とはしない。
+契約と競合の確認対象は `__tests__/services/nicknamePromptService.test.ts`、`__tests__/services/nicknameRegistrationService.test.ts`、`__tests__/services/rankingService.nickname.test.ts`、`__tests__/store/settingsStore.nickname.test.ts`、`__tests__/components/nicknameInvitationFlow.test.tsx`、`__tests__/components/nicknamePromptModal.test.tsx` を参照する。ネイティブの表示順序・入力/キーボード・再起動・同期成功/失敗・TestFlight利用可能性について、固定版と実行条件の証拠は[所管Story #12](https://github.com/Jun-T-git/jamaica-mobile/issues/12)へ集約する。モック上の確認をネイティブ表示や配信の合格とはしない。
 
 ## 永続化キー
 
