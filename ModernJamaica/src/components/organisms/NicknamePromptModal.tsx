@@ -42,7 +42,7 @@ export const NicknamePromptModal: React.FC<Props> = ({ initialName, onClose, onS
       <KeyboardAvoidingView style={styles.overlay} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView style={styles.card} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <View accessibilityViewIsModal>
-            <Typography variant="h4" textAlign="center">ニックネームをつけよう</Typography>
+            <Typography variant="h4" textAlign="center">ニックネーム登録</Typography>
             <Typography variant="body2" color="secondary" style={styles.description}>
               スコアに表示するあなたの名前です。本名などの個人情報は入れないでください。
             </Typography>
