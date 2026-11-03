@@ -51,7 +51,7 @@
       "videoId": "EhhznMRLirI",
       "url": "https://youtube.com/shorts/EhhznMRLirI",
       "scheduledAt": "2026-11-03T19:00:00+09:00",
-      "status": "scheduled",
+      "status": "published",
       "sha256": "6f029f4b55dabf855cf3ce50e0d596675fc8d36375f281a1ed4c0e0d64f73ad7",
       "checks": {
         "copyright": "passed",
@@ -61,7 +61,9 @@
         "text": "解けた方はぜひコメントで教えてください！",
         "posted": false,
         "pinned": false,
-        "followupAutomationId": "automation"
+        "followupAutomationId": "automation",
+        "lastAttemptAt": "2026-11-03T19:02:00+09:00",
+        "lastAttemptResult": "公開済みのwatch page（動画ID・タイトル・@teratech_officialを照合）でコメント欄見出しのみ表示され、コメント入力欄が未表示。5秒待機・再読込後も未表示のため、投稿・固定は実行していない。"
       },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で12を作れる？｜ジャマイカの木",
