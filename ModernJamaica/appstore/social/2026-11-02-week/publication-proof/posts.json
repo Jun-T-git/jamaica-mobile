@@ -59,11 +59,15 @@
       },
       "pinnedComment": {
         "text": "解けた方はぜひコメントで教えてください！",
-        "posted": false,
-        "pinned": false,
+        "posted": true,
+        "pinned": true,
         "followupAutomationId": "automation",
-        "lastAttemptAt": "2026-11-03T19:02:00+09:00",
-        "lastAttemptResult": "公開済みのwatch page（動画ID・タイトル・@teratech_officialを照合）でコメント欄見出しのみ表示され、コメント入力欄が未表示。5秒待機・再読込後も未表示のため、投稿・固定は実行していない。"
+        "lastAttemptAt": "2026-11-03T19:14:26+09:00",
+        "lastAttemptResult": "公開済みのwatch pageで動画ID・タイトル・@teratech_officialを照合後、本文を実投稿し、固定確認を実行。",
+        "commentId": "UgxXbMGykoi3n7Imh_Z4AaABAg",
+        "url": "https://www.youtube.com/watch?v=EhhznMRLirI&lc=UgxXbMGykoi3n7Imh_Z4AaABAg",
+        "confirmedAt": "2026-11-03T19:14:26+09:00",
+        "proof": "CUA execution screenshot captured 2026-11-03T19:14:26+09:00; visible state showed the exact body and '@teratech_official さんによって固定されています'."
       },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で12を作れる？｜ジャマイカの木",
