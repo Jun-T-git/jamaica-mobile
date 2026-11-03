@@ -64,17 +64,21 @@
       "videoId": "FHU6Gz4MYy0",
       "url": "https://youtube.com/shorts/FHU6Gz4MYy0",
       "scheduledAt": "2026-11-03T12:00:00+09:00",
-      "status": "scheduled",
+      "status": "published",
       "sha256": "47e208a2a1dd63776e6f9bbbf25e5ef1f80eb3749c72f73dd90848dbe8877b26",
       "sourceFile": "exports/make-17-b2187dbc/comment-answer/make-17-b2187dbc-comment-answer.mp4",
       "fixedCommentFile": "exports/make-17-b2187dbc/comment-answer/fixed-comment.txt",
       "pinnedComment": {
         "text": "6×（1＋1）＋5×1＝17\n\n他の解き方を見つけた方はコメントで教えてください！",
-        "posted": false,
-        "pinned": false,
+        "posted": true,
+        "pinned": true,
         "followupAutomationId": "automation",
         "textSha256": "7e47d4b5499aacb27f66ab73d6a96883fbf420a3477c4c431fd5812d0bae4ee2",
-        "arithmeticAndAllFiveVerified": true
+        "arithmeticAndAllFiveVerified": true,
+        "commentId": "UgxExMmCO6WP7YlblKp4AaABAg",
+        "url": "https://www.youtube.com/watch?v=FHU6Gz4MYy0&lc=UgxExMmCO6WP7YlblKp4AaABAg",
+        "confirmedAt": "2026-11-03T12:45:52+09:00",
+        "proof": "pinned-17-2026-11-03.png"
       },
       "checks": {
         "copyright": "passed",
@@ -92,7 +96,8 @@
       "finalListNotice": "none",
       "finalListProcessingIndicator": "none",
       "listProof": "scheduled-final-list.png",
-      "aiDisclosureRationale": "Native game footage, code-based editing and background accompaniment; official YouTube disclosure examples checked2026-11-01"
+      "aiDisclosureRationale": "Native game footage, code-based editing and background accompaniment; official YouTube disclosure examples checked2026-11-01",
+      "publicationObservedAt": "2026-11-03T12:45:52+09:00"
     },
     {
       "id": "make-23-435688ae",
@@ -230,13 +235,15 @@
   "fixedCommentFollowup": {
     "automationId": "automation",
     "status": "ACTIVE",
-    "scope": "5 comment-answer videos in this file only, together with original7 in2026-11-02-week",
-    "plannedPublication": "2026-11-02..06 each12:00JST",
-    "checks": "12:01 and12:15; original7 at19:01 and19:15",
-    "rrule": "FREQ=DAILY;BYHOUR=12,19;BYMINUTE=1,15;BYSECOND=0;UNTIL=20261108T101500Z",
-    "notificationPolicy": "failed_runs_only",
-    "firstScheduledExecutionVerified": false,
+    "timezone": "Asia/Tokyo",
+    "schedule": "公開後1/5/10/15/20/25分。30分以内の投稿・固定表示確認が完了条件。",
+    "rrule": "FREQ=DAILY;BYHOUR=3,10;BYMINUTE=1,5,10,15,20,25;BYSECOND=0;UNTIL=20261108T102500Z",
+    "schedulerTimezoneObserved": "UTC",
+    "nextRunVerifiedAt": "2026-11-03T12:45:52+09:00",
+    "nextRunNominalAt": "2026-11-03T19:01:00+09:00",
     "requires": "local device running and signed-in browser",
-    "independentMissedRunDetection": false
+    "independentMissedRunDetection": false,
+    "scope": "original7 plus comment-answer5 only; finish by2026-11-09",
+    "futureExecutionVerified": false
   }
 }

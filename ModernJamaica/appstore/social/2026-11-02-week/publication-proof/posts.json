@@ -246,13 +246,16 @@
   ],
   "fixedCommentFollowup": {
     "automationId": "automation",
-    "name": "ジャマイカ予約動画の公開後コメント固定",
     "status": "ACTIVE",
     "timezone": "Asia/Tokyo",
-    "schedule": "2026-11-02..08 12:01/12:15/19:01/19:15 JST; new5 at noon, original7 at19",
-    "rrule": "FREQ=DAILY;BYHOUR=12,19;BYMINUTE=1,15;BYSECOND=0;UNTIL=20261108T101500Z",
-    "scope": "Original7 in this file plus5 in2026-11-02-comment-week/publication-proof/posts.json only; skip private and completed; no duplicate comments",
-    "notification": "failed_runs_only",
-    "unverified": "Schedule updated; first scheduled execution and future pins unverified, requires local device/login, independent missed-run detection not connected"
+    "schedule": "公開後1/5/10/15/20/25分。30分以内の投稿・固定表示確認が完了条件。",
+    "rrule": "FREQ=DAILY;BYHOUR=3,10;BYMINUTE=1,5,10,15,20,25;BYSECOND=0;UNTIL=20261108T102500Z",
+    "schedulerTimezoneObserved": "UTC",
+    "nextRunVerifiedAt": "2026-11-03T12:45:52+09:00",
+    "nextRunNominalAt": "2026-11-03T19:01:00+09:00",
+    "requires": "local device running and signed-in browser",
+    "independentMissedRunDetection": false,
+    "scope": "original7 plus comment-answer5 only; finish by2026-11-09",
+    "futureExecutionVerified": false
   }
 }
