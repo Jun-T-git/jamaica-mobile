@@ -47,7 +47,7 @@ python3 .agents/skills/jamaica-shorts/scripts/problems.py check --target 23 --nu
 
 ## サムネイル
 
-今後は[制作指針のサムネイル基準](../../../ModernJamaica/appstore/social/shorts-playbook.md#サムネイルは冒頭の問題提示へ統一)に沿って、冒頭の問題提示から5数字・目標・問いが読めるフレームを選ぶ。最終MP4で縮小表示を確認し、投稿時に明示選択、保存後に動画IDと表示画像を照合して選択時刻・結果を記録する。冒頭が自動選択されると仮定しない。既存投稿の一括変更は今回の提案に含めない。
+今後は[制作指針のサムネイル基準](../../../ModernJamaica/appstore/social/shorts-playbook.md#サムネイルは冒頭の問題提示へ統一)に沿って、冒頭の問題提示から5数字・目標・問いが読めるフレームを選ぶ。最終MP4で縮小表示を確認し、投稿時に明示選択、保存後に動画IDと表示画像を照合して選択時刻・結果を記録する。冒頭が自動選択されると仮定しない。2026-11-04の追加指示「既存動画も」により既存25本を照合し、15本変更・10本は既に冒頭のため維持した。再作業は[実行記録](../../../ModernJamaica/appstore/social/2026-11-04-thumbnails/changes.json)とStudioを照合し、変更済みを未対応としない。
 
 ## 原稿と誘導
 
