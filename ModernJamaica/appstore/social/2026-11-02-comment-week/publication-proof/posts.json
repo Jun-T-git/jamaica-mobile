@@ -113,17 +113,21 @@
       "videoId": "94Jn4owuIL0",
       "url": "https://youtube.com/shorts/94Jn4owuIL0",
       "scheduledAt": "2026-11-04T12:00:00+09:00",
-      "status": "scheduled",
+      "status": "published",
       "sha256": "3d7e92287960c4ea60d3f729111f7a390b6e0d6b3dd71c89893fb936302273b5",
       "sourceFile": "exports/make-23-435688ae/comment-answer/make-23-435688ae-comment-answer.mp4",
       "fixedCommentFile": "exports/make-23-435688ae/comment-answer/fixed-comment.txt",
       "pinnedComment": {
         "text": "6×5−（6＋2÷2）＝23\n\n他の解き方を見つけた方はコメントで教えてください！",
-        "posted": false,
-        "pinned": false,
+        "posted": true,
+        "pinned": true,
         "followupAutomationId": "automation",
         "textSha256": "348ec54b43a62aaf71df55d7f1d0ef38d5043e0933b3b438ae3a5284d21822dd",
-        "arithmeticAndAllFiveVerified": true
+        "arithmeticAndAllFiveVerified": true,
+        "commentId": "UgyA_83fcJgSQAGVHH14AaABAg",
+        "url": "https://www.youtube.com/watch?v=94Jn4owuIL0&lc=UgyA_83fcJgSQAGVHH14AaABAg",
+        "confirmedAt": "2026-11-04T12:03:50+09:00",
+        "proof": "CUA execution screenshot captured 2026-11-04T12:03:50+09:00; visible state showed the exact body, '@teratech_official さんによって固定されています', and 'コメントを固定しました'."
       },
       "checks": {
         "copyright": "passed",
