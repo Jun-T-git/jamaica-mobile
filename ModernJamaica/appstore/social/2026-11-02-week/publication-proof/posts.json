@@ -90,7 +90,7 @@
       "videoId": "jC-sQ8rZe70",
       "url": "https://youtube.com/shorts/jC-sQ8rZe70",
       "scheduledAt": "2026-11-04T19:00:00+09:00",
-      "status": "scheduled",
+      "status": "published",
       "sha256": "3f2e5b1ca1527fb3d8608f92457f54ca07b4434b9d0b018e37515dc0ac403f6d",
       "checks": {
         "copyright": "passed",
@@ -98,9 +98,13 @@
       },
       "pinnedComment": {
         "text": "他の解き方を見つけた方はコメントで教えてください！",
-        "posted": false,
-        "pinned": false,
-        "followupAutomationId": "automation"
+        "posted": true,
+        "pinned": true,
+        "followupAutomationId": "automation",
+        "commentId": "UgwImCws5iQ9Qinj0494AaABAg",
+        "url": "https://www.youtube.com/watch?v=jC-sQ8rZe70&lc=UgwImCws5iQ9Qinj0494AaABAg",
+        "confirmedAt": "2026-11-04T19:09:10+09:00",
+        "proof": "CUA execution screenshot captured 2026-11-04T19:09:10+09:00; visible state showed the exact body and '@teratech_official さんによって固定されています'."
       },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で27を作れ！｜ジャマイカの木",
