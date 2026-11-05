@@ -127,7 +127,7 @@
       "videoId": "3XhTO_53gas",
       "url": "https://youtube.com/shorts/3XhTO_53gas",
       "scheduledAt": "2026-11-05T19:00:00+09:00",
-      "status": "scheduled",
+      "status": "published",
       "sha256": "4ffe314314ec300cf79aca08caf66e1b05bd56639c9bcb278260d84c987412ab",
       "checks": {
         "copyright": "passed",
@@ -137,7 +137,9 @@
         "text": "解けた方はぜひコメントで教えてください！",
         "posted": false,
         "pinned": false,
-        "followupAutomationId": "automation"
+        "followupAutomationId": "automation",
+        "lastCheckedAt": "2026-11-05T19:08:32+0900",
+        "lastCheckResult": "公開済み（YouTube Shortsのタイトル・@teratech_official・コメント数0を画面で確認）。自コメントは未投稿。投稿直前にComputer Useの外部コメント送信確認が必要となったため、この実行では未完了。"
       },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で20を作れる？｜ジャマイカの木",
