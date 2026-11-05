@@ -161,17 +161,21 @@
       "videoId": "QVZH058j_UQ",
       "url": "https://youtube.com/shorts/QVZH058j_UQ",
       "scheduledAt": "2026-11-05T12:00:00+09:00",
-      "status": "scheduled",
+      "status": "published",
       "sha256": "1724f710361ef4c63ad84481a108bf1bb8898c3290c972b31bf56c91f4e4cc0a",
       "sourceFile": "exports/make-48-8dba5bcc/comment-answer/make-48-8dba5bcc-comment-answer.mp4",
       "fixedCommentFile": "exports/make-48-8dba5bcc/comment-answer/fixed-comment.txt",
       "pinnedComment": {
         "text": "（5＋3）×（4＋2）×1＝48\n\n他の解き方を見つけた方はコメントで教えてください！",
-        "posted": false,
-        "pinned": false,
+        "posted": true,
+        "pinned": true,
         "followupAutomationId": "automation",
         "textSha256": "63cdc2899c9baecbc6de3fb322b6640adbc370829101dbce0944be5f3dddc800",
-        "arithmeticAndAllFiveVerified": true
+        "arithmeticAndAllFiveVerified": true,
+        "commentId": "Ugx-PDLO8c5A-e3W--V4AaABAg",
+        "url": "https://www.youtube.com/watch?v=QVZH058j_UQ&lc=Ugx-PDLO8c5A-e3W--V4AaABAg",
+        "confirmedAt": "2026-11-05T12:16:00+09:00",
+        "proof": "CUA execution screenshot captured 2026-11-05T12:16:00+09:00; visible state showed the exact body, '@teratech_official さんによって固定されています', and 'コメントを固定しました'."
       },
       "checks": {
         "copyright": "passed",
@@ -189,7 +193,8 @@
       "finalListNotice": "none",
       "finalListProcessingIndicator": "none",
       "listProof": "scheduled-final-list.png",
-      "aiDisclosureRationale": "Native game footage, code-based editing and background accompaniment; official YouTube disclosure examples checked2026-11-01"
+      "aiDisclosureRationale": "Native game footage, code-based editing and background accompaniment; official YouTube disclosure examples checked2026-11-01",
+      "publicationObservedAt": "2026-11-05T12:12:31+09:00"
     },
     {
       "id": "make-37-ba02597f",
