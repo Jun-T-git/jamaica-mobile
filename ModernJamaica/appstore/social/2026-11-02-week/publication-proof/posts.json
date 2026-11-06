@@ -135,11 +135,17 @@
       },
       "pinnedComment": {
         "text": "解けた方はぜひコメントで教えてください！",
-        "posted": false,
-        "pinned": false,
+        "posted": true,
+        "pinned": true,
         "followupAutomationId": "automation",
         "lastCheckedAt": "2026-11-05T19:08:32+0900",
-        "lastCheckResult": "公開済み（YouTube Shortsのタイトル・@teratech_official・コメント数0を画面で確認）。自コメントは未投稿。投稿直前にComputer Useの外部コメント送信確認が必要となったため、この実行では未完了。"
+        "lastCheckResult": "公開済み（YouTube Shortsのタイトル・@teratech_official・コメント数0を画面で確認）。自コメントは未投稿。投稿直前にComputer Useの外部コメント送信確認が必要となったため、この実行では未完了。",
+        "commentId": "UgwkFi49kiNJ8WL7ebt4AaABAg",
+        "url": "https://www.youtube.com/watch?v=3XhTO_53gas&lc=UgwkFi49kiNJ8WL7ebt4AaABAg",
+        "confirmedAt": "2026-11-06T23:08:03+09:00",
+        "proof": "CUA native Chrome AX: video ID, channel, exact body and @teratech_official さんによって固定されています; 37 also verified after reload.",
+        "within30Minutes": false,
+        "lastAttemptResult": "11/6夜に復旧。許可済み通常発信にも再承認を要求した誤判断を修正。30分期限は未達。"
       },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で20を作れる？｜ジャマイカの木",
@@ -162,7 +168,7 @@
       "videoId": "t9PLaEkUTw4",
       "url": "https://youtube.com/shorts/t9PLaEkUTw4",
       "scheduledAt": "2026-11-06T19:00:00+09:00",
-      "status": "scheduled",
+      "status": "published",
       "sha256": "2c355e6dfe11128e58111409d32689e50b634aa8d6c66b08bf059303e34251ed",
       "checks": {
         "copyright": "passed",
@@ -170,9 +176,15 @@
       },
       "pinnedComment": {
         "text": "他の解き方を見つけた方はコメントで教えてください！",
-        "posted": false,
-        "pinned": false,
-        "followupAutomationId": "automation"
+        "posted": true,
+        "pinned": true,
+        "followupAutomationId": "automation",
+        "commentId": "UgzssvTNqw2ji8eyq314AaABAg",
+        "url": "https://www.youtube.com/watch?v=t9PLaEkUTw4&lc=UgzssvTNqw2ji8eyq314AaABAg",
+        "confirmedAt": "2026-11-06T23:08:03+09:00",
+        "proof": "CUA native Chrome AX: video ID, channel, exact body and @teratech_official さんによって固定されています; 37 also verified after reload.",
+        "within30Minutes": false,
+        "lastAttemptResult": "11/6夜に復旧。許可済み通常発信にも再承認を要求した誤判断を修正。30分期限は未達。"
       },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で21を作れ！｜ジャマイカの木",
@@ -268,6 +280,7 @@
     "requires": "local device running and signed-in browser",
     "independentMissedRunDetection": false,
     "scope": "original7 plus comment-answer5 only; finish by2026-11-09",
-    "futureExecutionVerified": false
+    "futureExecutionVerified": false,
+    "recordWorktree": "/private/tmp/jamaica-shorts-delivery-20261104"
   }
 }

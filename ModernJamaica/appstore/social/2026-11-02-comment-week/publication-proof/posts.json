@@ -210,17 +210,23 @@
       "videoId": "aNhB2APZy74",
       "url": "https://youtube.com/shorts/aNhB2APZy74",
       "scheduledAt": "2026-11-06T12:00:00+09:00",
-      "status": "scheduled",
+      "status": "published",
       "sha256": "7af919f676b6ce6431dfe02f31b3e1b9e7f61cc0b3f379815227103fee4bd644",
       "sourceFile": "exports/make-37-ba02597f/comment-answer/make-37-ba02597f-comment-answer.mp4",
       "fixedCommentFile": "exports/make-37-ba02597f/comment-answer/fixed-comment.txt",
       "pinnedComment": {
         "text": "6×（5＋1）＋2−1＝37\n\n他の解き方を見つけた方はコメントで教えてください！",
-        "posted": false,
-        "pinned": false,
+        "posted": true,
+        "pinned": true,
         "followupAutomationId": "automation",
         "textSha256": "3f7b54895b232f18b8897e80dbce64e693a1b5a8c6652b2f95d26a90e3b340ef",
-        "arithmeticAndAllFiveVerified": true
+        "arithmeticAndAllFiveVerified": true,
+        "commentId": "UgyYiNg_wrWUomD48rV4AaABAg",
+        "url": "https://www.youtube.com/watch?v=aNhB2APZy74&lc=UgyYiNg_wrWUomD48rV4AaABAg",
+        "confirmedAt": "2026-11-06T23:08:03+09:00",
+        "proof": "CUA native Chrome AX: video ID, channel, exact body and @teratech_official さんによって固定されています; 37 also verified after reload.",
+        "within30Minutes": false,
+        "lastAttemptResult": "11/6夜に復旧。許可済み通常発信にも再承認を要求した誤判断を修正。30分期限は未達。"
       },
       "checks": {
         "copyright": "passed",
@@ -253,6 +259,7 @@
     "requires": "local device running and signed-in browser",
     "independentMissedRunDetection": false,
     "scope": "original7 plus comment-answer5 only; finish by2026-11-09",
-    "futureExecutionVerified": false
+    "futureExecutionVerified": false,
+    "recordWorktree": "/private/tmp/jamaica-shorts-delivery-20261104"
   }
 }
