@@ -218,8 +218,8 @@
         "posted": false,
         "pinned": false,
         "followupAutomationId": "automation",
-        "lastCheckedAt": "2026-11-07T19:17:15+09:00",
-        "lastCheckResult": "公開予定時刻後の17分再照合でも未公開。YouTube watch pageで動画ID FmFTCFqdvU0・タイトル・TeraTech | アプリ開発（@teratech_official）および非公開表示、コメント投稿不可を確認し、公開設定・コメント・固定状態は変更していない。cua_replの画面キャプチャで非公開表示とコメント投稿不可を確認したが、ローカル保存用スクリーンショット出力は利用できないためパスは未記録。"
+        "lastCheckedAt": "2026-11-07T19:21:11+09:00",
+        "lastCheckResult": "公開予定時刻後の21分再照合でも未公開。YouTube watch pageで動画ID FmFTCFqdvU0・タイトル・TeraTech | アプリ開発（@teratech_official）および非公開表示、コメント投稿不可を確認し、公開設定・コメント・固定状態は変更していない。cua_repl native Chrome AXで非公開表示とコメント投稿不可を確認したが、ローカル保存用スクリーンショット出力は利用できないためパスは未記録。"
       },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で15を作れる？｜ジャマイカの木",
