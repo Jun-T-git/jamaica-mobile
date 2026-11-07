@@ -17,6 +17,10 @@
 
 > gesture-handler / linear-gradient / vector-icons も依存にあるが、盤面操作は**タップベース**であり drag/pan gesture は使っていない。`react-native-reanimated` は**不使用・未依存**。
 
+## 開発ツールの依存と公開範囲
+
+React Native CLI と iOS / Android の CLI は `package.json` と `package-lock.json` で版を固定する。更新時は対応する CLI 群の整合と既知の脆弱性を確認する。Metro の動作確認を手元の端末内で行う場合は `npm start -- --host 127.0.0.1` を使う。実機からの接続が必要な場合は接続元を限定し、開発サーバを公開ネットワークへ露出しない。
+
 ## ディレクトリ構成（`src/`）
 
 ```
