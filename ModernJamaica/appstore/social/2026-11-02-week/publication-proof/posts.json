@@ -218,8 +218,8 @@
         "posted": false,
         "pinned": false,
         "followupAutomationId": "automation",
-        "lastCheckedAt": "2026-11-07T12:25:39+09:00",
-        "lastCheckResult": "公開予定前のため投稿・固定は未実行。YouTube watch pageで動画ID・タイトル・@teratech_officialおよび非公開表示を確認し、公開設定は変更していない。"
+        "lastCheckedAt": "2026-11-07T19:02:09+09:00",
+        "lastCheckResult": "公開予定時刻後の照合でも未公開。YouTube watch pageで動画ID・タイトル・@teratech_officialおよび非公開表示、コメント投稿不可を確認し、公開設定は変更していない。cua_replの画面キャプチャで確認したが、ローカル保存用スクリーンショット出力は利用できないためパスは未記録。"
       },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で15を作れる？｜ジャマイカの木",
