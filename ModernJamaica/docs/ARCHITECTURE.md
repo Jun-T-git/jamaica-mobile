@@ -23,6 +23,8 @@ React Native CLI と iOS / Android の CLI は `package.json` と `package-lock.
 
 CLI の `fast-xml-parser` はローカルの Android Manifest・Xcode workspace / scheme の読み取りに使う。`shell-quote` は開発時のエディタ起動等の依存に含まれる。監査結果は `devDependencies` の区分だけで配信アプリへの影響を決めず、実際の呼び出し元・入力・使用 API を確認する。ロックファイルの互換更新でも開発コマンドの確認を行い、残る advisory を解消済みと扱わない。
 
+Firebase の推移依存は `@react-native-firebase/app` → `firebase` を入口に、Firestore の Node 版 `@firebase/firestore` → `@grpc/proto-loader` → `protobufjs` と、Realtime Database の Node 版 `@firebase/database` → `faye-websocket` → `websocket-driver` を含む。前者は組込みの JSON descriptor を `fromJSON` で読み込み、後者は WebSocket の Client を使う。アプリのランキングは `services/rankingService.ts` から React Native Firebase の native API を使うため、これらの Node 側ロック更新と、実際の iOS bundle・native SDK の配信影響は分けて確認する。依存ツリーに存在することだけで配信版の到達性や修正適用を断定しない。
+
 ## ディレクトリ構成（`src/`）
 
 ```
