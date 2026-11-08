@@ -23,6 +23,8 @@ React Native CLI と iOS / Android の CLI は `package.json` と `package-lock.
 
 CLI の `fast-xml-parser` はローカルの Android Manifest・Xcode workspace / scheme の読み取りに使う。エディタ起動は開発サーバの `POST /open-stack-frame` → `@react-native-community/cli-tools` の `launchEditor` → `launch-editor` と進み、リクエストの `file`・`lineNumber` がエディタの起動引数へ渡る。`shell-quote` もこの起動処理の依存に含まれる。この経路は Node の開発環境が対象で、`launch-editor` のロック単独更新はゲーム処理・native SDK を変更しない。監査結果は `devDependencies` の区分だけで配信アプリへの影響を決めず、実際の呼び出し元・入力・使用 API を確認する。ロックファイルの互換更新でも開発コマンドの確認を行い、残る advisory を解消済みと扱わない。React Navigation の runtime 側に残る `query-string` / `decode-uri-component` の指摘は、この CLI 更新では解消しない。linking を変更する際は入力経路と到達性を再評価する。
 
+CLI の `@react-native-community/cli-server-api` は、開発用 HTTP の `POST /open-stack-frame` と `POST /open-url` の入力を `body-parser` の JSON middleware で読み取る。圧縮本文の展開は既定で有効なため、本文読み取りの安全性はこの Node 側の依存更新で確認する。`qs` は `body-parser` の URL エンコード入力用の依存であり、この JSON 経路は `qs.parse` / `qs.stringify` を使わない。親依存との整合を保って更新し、配信アプリへの影響は別途 bundle・native SDK と照合する。
+
 Firebase の推移依存は `@react-native-firebase/app` → `firebase` を入口に、Firestore の Node 版 `@firebase/firestore` → `@grpc/proto-loader` → `protobufjs` と、Realtime Database の Node 版 `@firebase/database` → `faye-websocket` → `websocket-driver` を含む。前者は組込みの JSON descriptor を `fromJSON` で読み込み、後者は WebSocket の Client を使う。アプリのランキングは `services/rankingService.ts` から React Native Firebase の native API を使うため、これらの Node 側ロック更新と、実際の iOS bundle・native SDK の配信影響は分けて確認する。依存ツリーに存在することだけで配信版の到達性や修正適用を断定しない。
 
 ## ディレクトリ構成（`src/`）
