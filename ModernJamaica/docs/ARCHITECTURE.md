@@ -21,6 +21,8 @@
 
 React Native CLI と iOS / Android の CLI は `package.json` と `package-lock.json` で版を固定する。更新時は対応する CLI 群の整合と既知の脆弱性を確認する。Metro の動作確認を手元の端末内で行う場合は `npm start -- --host 127.0.0.1` を使う。実機からの接続が必要な場合は接続元を限定し、開発サーバを公開ネットワークへ露出しない。
 
+CLI の `fast-xml-parser` はローカルの Android Manifest・Xcode workspace / scheme の読み取りに使う。`shell-quote` は開発時のエディタ起動等の依存に含まれる。監査結果は `devDependencies` の区分だけで配信アプリへの影響を決めず、実際の呼び出し元・入力・使用 API を確認する。ロックファイルの互換更新でも開発コマンドの確認を行い、残る advisory を解消済みと扱わない。
+
 ## ディレクトリ構成（`src/`）
 
 ```
