@@ -21,6 +21,8 @@
 
 React Native CLI と iOS / Android の CLI は `package.json` と `package-lock.json` で版を固定する。更新時は対応する CLI 群の整合と既知の脆弱性を確認する。Metro の動作確認を手元の端末内で行う場合は `npm start -- --host 127.0.0.1` を使う。実機からの接続が必要な場合は接続元を限定し、開発サーバを公開ネットワークへ露出しない。
 
+CLI の開発用 HTTP は `compression` で応答を圧縮し、CLI・Metro の開発接続と React DevTools はそれぞれの依存する `ws` を使う。同名パッケージでも複数の版が共存するため、監査・ロック更新では各呼び出し元の解決先を確認する。これらのロック更新は native SDK・ゲーム処理の変更や本番配信を伴わず、開発サーバの到達範囲と配信 bundle への影響は分けて確認する。
+
 CLI の `fast-xml-parser` はローカルの Android Manifest・Xcode workspace / scheme の読み取りに使う。エディタ起動は開発サーバの `POST /open-stack-frame` → `@react-native-community/cli-tools` の `launchEditor` → `launch-editor` と進み、リクエストの `file`・`lineNumber` がエディタの起動引数へ渡る。`shell-quote` もこの起動処理の依存に含まれる。この経路は Node の開発環境が対象で、`launch-editor` のロック単独更新はゲーム処理・native SDK を変更しない。監査結果は `devDependencies` の区分だけで配信アプリへの影響を決めず、実際の呼び出し元・入力・使用 API を確認する。ロックファイルの互換更新でも開発コマンドの確認を行い、残る advisory を解消済みと扱わない。React Navigation の runtime 側に残る `query-string` / `decode-uri-component` の指摘は、この CLI 更新では解消しない。linking を変更する際は入力経路と到達性を再評価する。
 
 CLI の `@react-native-community/cli-server-api` は、開発用 HTTP の `POST /open-stack-frame` と `POST /open-url` の入力を `body-parser` の JSON middleware で読み取る。圧縮本文の展開は既定で有効なため、本文読み取りの安全性はこの Node 側の依存更新で確認する。`qs` は `body-parser` の URL エンコード入力用の依存であり、この JSON 経路は `qs.parse` / `qs.stringify` を使わない。親依存との整合を保って更新し、配信アプリへの影響は別途 bundle・native SDK と照合する。
