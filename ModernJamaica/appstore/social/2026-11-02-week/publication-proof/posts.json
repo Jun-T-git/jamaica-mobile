@@ -215,11 +215,15 @@
       },
       "pinnedComment": {
         "text": "解けた方はぜひコメントで教えてください！",
-        "posted": false,
-        "pinned": false,
+      "posted": true,
+      "pinned": true,
         "followupAutomationId": "automation",
-        "lastCheckedAt": "2026-11-08T12:30:00+09:00",
-        "lastCheckResult": "公開予定を過ぎた未完了分として再照合し、YouTube Shortsで動画ID FmFTCFqdvU0・タイトル・TeraTech | アプリ開発（@teratech_official）・コメント数0を確認した。指定文言「解けた方はぜひコメントで教えてください！」は投稿欄へ入力済みだが、Computer Useの外部コメント送信は最終操作時確認が必要なため未送信。公開設定・固定状態は変更していない。CUA表示スクリーンショットで動画と空のコメント欄を確認したが、ローカル保存用スクリーンショット出力は利用できないためパスは未記録。公開後30分以内の投稿・固定は未達。"
+      "lastCheckedAt": "2026-11-08T12:29:00+09:00",
+      "lastCheckResult": "公開済みのYouTube Shortsで動画ID FmFTCFqdvU0・タイトル・TeraTech | アプリ開発（@teratech_official）を照合後、指定文言を実投稿して固定した。本文と「@teratech_official さんによって固定されています」表示を確認。公開後30分以内の投稿・固定は未達。",
+      "commentId": "UgzRy-XB8wejsrZWnzR4AaABAg",
+      "url": "https://www.youtube.com/watch?v=FmFTCFqdvU0&lc=UgzRy-XB8wejsrZWnzR4AaABAg",
+      "confirmedAt": "2026-11-08T12:29:00+09:00",
+      "proof": "CUA native Chrome AX: exact body and '@teratech_official さんによって固定されています' were visible; the tool does not expose a local screenshot path."
       },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で15を作れる？｜ジャマイカの木",
@@ -242,7 +246,8 @@
       "videoId": "GW1ifSa8cpM",
       "url": "https://youtube.com/shorts/GW1ifSa8cpM",
       "scheduledAt": "2026-11-08T19:00:00+09:00",
-      "status": "scheduled",
+  "status": "published",
+  "publishedAt": "2026-11-08T12:25:00+09:00",
       "sha256": "d9b96348645829f4973f4bb9fa0f26107794dfa8044334d0b3446dd7c10754e0",
       "checks": {
         "copyright": "passed",
@@ -250,9 +255,13 @@
       },
       "pinnedComment": {
         "text": "他の解き方を見つけた方はコメントで教えてください！",
-        "posted": false,
-        "pinned": false,
-        "followupAutomationId": "automation"
+      "posted": true,
+      "pinned": true,
+      "followupAutomationId": "automation",
+      "commentId": "Ugx8mOwpDl1JOSoBAfh4AaABAg",
+      "url": "https://www.youtube.com/watch?v=GW1ifSa8cpM&lc=Ugx8mOwpDl1JOSoBAfh4AaABAg",
+      "confirmedAt": "2026-11-08T12:29:00+09:00",
+      "proof": "CUA native Chrome AX: exact body and '@teratech_official さんによって固定されています' were visible; the tool does not expose a local screenshot path."
       },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で24を作れ！｜ジャマイカの木",
