@@ -207,7 +207,7 @@
       "videoId": "FmFTCFqdvU0",
       "url": "https://youtube.com/shorts/FmFTCFqdvU0",
       "scheduledAt": "2026-11-07T19:00:00+09:00",
-      "status": "scheduled",
+      "status": "published",
       "sha256": "c01f38cd48c5dba1941f84293bef7600a40532307e7bd9509dd3112a52b9f1f1",
       "checks": {
         "copyright": "passed",
@@ -218,8 +218,8 @@
         "posted": false,
         "pinned": false,
         "followupAutomationId": "automation",
-        "lastCheckedAt": "2026-11-08T12:07:23+09:00",
-        "lastCheckResult": "公開予定を過ぎた未完了分として再照合したが、YouTube watch pageで動画ID FmFTCFqdvU0・タイトル・TeraTech | アプリ開発（@teratech_official）および非公開表示、コメント投稿不可を確認した。公開設定・コメント・固定状態は変更していない。cua_repl native Chrome AXで非公開表示とコメント投稿不可を確認したが、ローカル保存用スクリーンショット出力は利用できないためパスは未記録。公開後30分以内の投稿・固定は、公開されなかったため実行不能。"
+        "lastCheckedAt": "2026-11-08T12:30:00+09:00",
+        "lastCheckResult": "公開予定を過ぎた未完了分として再照合し、YouTube Shortsで動画ID FmFTCFqdvU0・タイトル・TeraTech | アプリ開発（@teratech_official）・コメント数0を確認した。指定文言「解けた方はぜひコメントで教えてください！」は投稿欄へ入力済みだが、Computer Useの外部コメント送信は最終操作時確認が必要なため未送信。公開設定・固定状態は変更していない。CUA表示スクリーンショットで動画と空のコメント欄を確認したが、ローカル保存用スクリーンショット出力は利用できないためパスは未記録。公開後30分以内の投稿・固定は未達。"
       },
       "confirmedAt": "2026-11-01T20:53:13+09:00",
       "title": "5つの数字で15を作れる？｜ジャマイカの木",
