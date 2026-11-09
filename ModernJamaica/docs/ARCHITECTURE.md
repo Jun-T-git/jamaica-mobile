@@ -27,6 +27,8 @@ CLI の `fast-xml-parser` はローカルの Android Manifest・Xcode workspace 
 
 CLI の `@react-native-community/cli-server-api` は、開発用 HTTP の `POST /open-stack-frame` と `POST /open-url` の入力を `body-parser` の JSON middleware で読み取る。圧縮本文の展開は既定で有効なため、本文読み取りの安全性はこの Node 側の依存更新で確認する。`qs` は `body-parser` の URL エンコード入力用の依存であり、この JSON 経路は `qs.parse` / `qs.stringify` を使わない。親依存との整合を保って更新し、配信アプリへの影響は別途 bundle・native SDK と照合する。
 
+ESLint のファイル列挙は CLI 引数の glob を、設定の override 判定は `files` / `excludedFiles` を `minimatch` に渡す。`glob` も検索パターンと除外パターンを `minimatch` へ渡し、`test-exclude` は Istanbul の設定・既定値に由来する `include` / `exclude` で計測対象を選ぶ。これらのパターンの波括弧展開は `brace-expansion` に委ねられる。ここで確認した経路はローカルの Node 開発・lint・カバレッジ処理であり、利用者のゲーム入力を処理する経路ではない。各呼び出し元の解決先は `package-lock.json` を正とし、互換範囲内の更新だけで別系統の `minimatch` に残る advisory や、メジャー更新を要する展開数増幅の指摘まで解消したとは扱わない。
+
 Firebase の推移依存は `@react-native-firebase/app` → `firebase` を入口に、Firestore の Node 版 `@firebase/firestore` → `@grpc/proto-loader` → `protobufjs` と、Realtime Database の Node 版 `@firebase/database` → `faye-websocket` → `websocket-driver` を含む。前者は組込みの JSON descriptor を `fromJSON` で読み込み、`@grpc/grpc-js` のクライアント経路で Firestore に接続する。後者は WebSocket の Client を使う。アプリのランキングは `services/rankingService.ts` から React Native Firebase の native API を使うため、これらの Node 側ロック更新と、実際の iOS bundle・native SDK の配信影響は分けて確認する。依存ツリーに存在することだけで配信版の到達性や修正適用を断定しない。
 
 ## ディレクトリ構成（`src/`）
