@@ -27,7 +27,7 @@ CLI の `fast-xml-parser` はローカルの Android Manifest・Xcode workspace 
 
 CLI の `@react-native-community/cli-server-api` は、開発用 HTTP の `POST /open-stack-frame` と `POST /open-url` の入力を `body-parser` の JSON middleware で読み取る。圧縮本文の展開は既定で有効なため、本文読み取りの安全性はこの Node 側の依存更新で確認する。`qs` は `body-parser` の URL エンコード入力用の依存であり、この JSON 経路は `qs.parse` / `qs.stringify` を使わない。親依存との整合を保って更新し、配信アプリへの影響は別途 bundle・native SDK と照合する。
 
-Firebase の推移依存は `@react-native-firebase/app` → `firebase` を入口に、Firestore の Node 版 `@firebase/firestore` → `@grpc/proto-loader` → `protobufjs` と、Realtime Database の Node 版 `@firebase/database` → `faye-websocket` → `websocket-driver` を含む。前者は組込みの JSON descriptor を `fromJSON` で読み込み、後者は WebSocket の Client を使う。アプリのランキングは `services/rankingService.ts` から React Native Firebase の native API を使うため、これらの Node 側ロック更新と、実際の iOS bundle・native SDK の配信影響は分けて確認する。依存ツリーに存在することだけで配信版の到達性や修正適用を断定しない。
+Firebase の推移依存は `@react-native-firebase/app` → `firebase` を入口に、Firestore の Node 版 `@firebase/firestore` → `@grpc/proto-loader` → `protobufjs` と、Realtime Database の Node 版 `@firebase/database` → `faye-websocket` → `websocket-driver` を含む。前者は組込みの JSON descriptor を `fromJSON` で読み込み、`@grpc/grpc-js` のクライアント経路で Firestore に接続する。後者は WebSocket の Client を使う。アプリのランキングは `services/rankingService.ts` から React Native Firebase の native API を使うため、これらの Node 側ロック更新と、実際の iOS bundle・native SDK の配信影響は分けて確認する。依存ツリーに存在することだけで配信版の到達性や修正適用を断定しない。
 
 ## ディレクトリ構成（`src/`）
 
