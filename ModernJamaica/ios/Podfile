@@ -11,11 +11,14 @@ prepare_react_native_project!
 # Firebase推奨設定
 use_frameworks! :linkage => :static
 $RNFirebaseAsStaticFramework = true
+# CocoaPods の最終メジャー系列を使用し、Firestore は eMudhra 修正版に固定する。
+$FirebaseSDKVersion = '12.19.0'
 # 広告識別子(IDFA)を使わない方針のため、Analyticsは広告ID連携なしで組み込む
 $RNFirebaseAnalyticsWithoutAdIdSupport = true
 
 target 'ModernJamaica' do
   config = use_native_modules!
+  pod 'FirebaseFirestore', '12.19.3'
 
   use_react_native!(
     :path => config[:reactNativePath],
