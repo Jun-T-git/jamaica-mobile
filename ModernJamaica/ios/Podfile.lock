@@ -3639,18 +3639,18 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNFBAnalytics (22.4.0):
+  - RNFBAnalytics (23.0.1):
     - FirebaseAnalytics/Core (= 12.19.0)
     - React-Core
     - RNFBApp
-  - RNFBApp (22.4.0):
+  - RNFBApp (23.0.1):
     - Firebase/CoreOnly (= 12.19.0)
     - React-Core
-  - RNFBAuth (22.4.0):
+  - RNFBAuth (23.0.1):
     - Firebase/Auth (= 12.19.0)
     - React-Core
     - RNFBApp
-  - RNFBFirestore (22.4.0):
+  - RNFBFirestore (23.0.1):
     - Firebase/Firestore (= 12.19.0)
     - React-Core
     - RNFBApp
@@ -4324,10 +4324,10 @@ SPEC CHECKSUMS:
   ReactCommon: ec1cdf708729338070f8c4ad746768a782fd9eb1
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
   RNCAsyncStorage: f30b3a83064e28b0fc46f1fbd3834589ed64c7b9
-  RNFBAnalytics: 4c4dbed7c4a3a422c22de039be2125dd07c5804f
-  RNFBApp: c7d903a006a080667f900b44dde063d28371327c
-  RNFBAuth: cc0465dd1fe0181557fbf40d94a03ad3d3172a9f
-  RNFBFirestore: 4317d6980d99f9033bb7a7b7e8aec3c3820f3258
+  RNFBAnalytics: c64a027e9377e76ab11f3d764be294d616d1957f
+  RNFBApp: 6f21e0b9f1ed5b05ed48477de2f233429c1a3cb2
+  RNFBAuth: ab4ea3780d90f3aa6544e7adb24d9094fec387fe
+  RNFBFirestore: 36bee4f202d6c59667fdeeda3b47b46330af66d9
   RNGestureHandler: a5a26c1bb50a095f9a2064aee8c5bf7059942124
   RNGoogleMobileAds: 5530721cd5215f728d26ff72d9e73b2cd8d5f858
   RNReactNativeHapticFeedback: f1b19cb455f9a0cb25fe005d9a5f6b43a987bdf6

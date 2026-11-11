@@ -35,7 +35,7 @@ originalAppVersion は Apple アカウントの最初の取得時ビルドであ
 
 - Firebase Analytics の first_open / session_start / user_engagement は手動複製しない。
 - 現在の StoreKit 2 ブリッジは検証済み購入のみ権利を付与。JS は remove_ads_purchase_started / remove_ads_purchase_result の診断イベント、復元は remove_ads_restored。purchase / in_app_purchase を手動追加していない。保留/取消/復元を売上にしない。
-- Firebase Analytics は Podfile.lock の `FirebaseAnalytics/Core`（広告ID連携なし）を使用する。Firestore のセキュリティ対応に伴い Firebase Apple SDK を更新した。StoreKit 2 向けの [公式 API](https://firebase.google.com/docs/analytics/ios/measure-in-app-purchases) は利用可能だが、既存の売上イベント送信は変更していない。購入売上は DebugView と Sandbox で自動収集との重複や復元抑止を確認し、一取引一経路を確かめてから利用する。
+- Firebase Analytics は Podfile.lock の `FirebaseAnalytics/Core`（広告ID連携なし）を使用する。Firestore のセキュリティ対応に伴い Firebase Apple SDK を更新した。StoreKit 2 向けの [公式 API](https://firebase.google.com/docs/analytics/ios/measure-in-app-purchases) はネイティブ側で利用できる。React Native Firebase のブリッジ更新に伴う売上イベント送信の追加はなく、購入収益の欠測可能性は残る。購入売上は DebugView と Sandbox で自動収集との重複や復元抑止を確認し、一取引一経路を確かめてから利用する。
 - AdMob の PAID callback は既存 ad_revenue（診断イベント）を使用し、ad_impression は手動追加しない。AdMob と Firebase の既存連携/自動 ad_impression はコンソール・実機で確認する。ad_revenue と標準広告収益を合算しない。
 - review_reward_earned は EARNED_REWARD callback で grant() を開始した直後の既存イベント。永続化完了を表すものではなく、実際の閲覧期限付与の集計 alias とする前に await 後の発火への移行を検証する。共通 reward_granted を重ねていない。
 

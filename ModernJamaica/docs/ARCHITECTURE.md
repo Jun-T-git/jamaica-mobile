@@ -130,7 +130,7 @@ Splash → ModeSelection → DifficultySelection → (ChallengeMode | InfiniteMo
 
 ## ビルド構成
 
-- iOS: `ios/`（CocoaPods）。効果音と Dev/Prod の Firebase 設定 plist は `ios/` 直下の資源を Xcode から参照する。 Firebase の CocoaPods 版は Podfile で指定し、Firestore は [eMudhra 対応版](https://firebase.google.com/support/guides/compromised-emudhra-intermediate-ca) に固定する。更新時は Podfile.lock と実際のアプリへの組み込みを確認する。
+- iOS: `ios/`（CocoaPods）。効果音と Dev/Prod の Firebase 設定 plist は `ios/` 直下の資源を Xcode から参照する。 Firebase の CocoaPods 版は Podfile で指定し、Firestore は [eMudhra 対応版](https://firebase.google.com/support/guides/compromised-emudhra-intermediate-ca) に固定する。Firebase Apple SDK 12 に対応する React Native Firebase を併用する。更新時は Podfile.lock と実際のアプリへの組み込みを確認する。
 - Android: `android/`
 - Firebase: `firebase.json` / `.firebaserc` / `firestore.rules`
 
